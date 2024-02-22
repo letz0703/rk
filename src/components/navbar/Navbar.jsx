@@ -1,8 +1,13 @@
-const Navbar = ({children}) => {
+import Link from "next/link"
+import Links from "./links/Links"
+
+const Navbar = () => {
   return (
     <div>
-      <h2>Navbar</h2>
-      {children}
+      <h2>Logo</h2>
+      <div>
+        <Links></Links>
+      </div>
     </div>
   )
 }
