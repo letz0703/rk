@@ -1,0 +1,93 @@
+{
+  "editor.tokenColorCustomizations": {
+    "comments": "#619713",
+    "keywords": "#b3b4b7",
+    "variables": "#cca700",
+    "textMateRules": [
+      {
+        "scope": "variable.other.readwrite.js.jsx",
+        "settings": {
+          "foreground": "#7cc36e",
+          "fontStyle": "italic"
+        }
+      },
+      {
+        "scope": "variable.other.readwrite.alias.js.jsx",
+        "settings": {
+          "foreground": "#969ea7",
+          "fontStyle": "italic"
+        }
+      },
+      {
+        "scope": "variable.object.property.js.jsx",
+        "settings": {
+          "foreground": "#7cc36e",
+          "fontStyle": "italic"
+        }
+      },
+      {
+        "scope": "entity.name.function.js.jsx",
+        "settings": {
+          "foreground": "#63e8fb",
+          "fontStyle": "italic"
+        }
+      },
+      {
+        "scope": "variable.other.constant.js.jsx",
+        "settings": {
+          "foreground": "#9aba51"
+        }
+      },
+      {
+        "scope": "support.type.property-name.css",
+        "settings": {
+          "foreground": "#d4acf7",
+          "fontStyle": "italic"
+        }
+      },
+      {
+        "scope": "meta.property-name.scss",
+        "settings": {
+          "foreground": "#FAC3C7",
+          "fontStyle": "italic"
+        }
+      },
+      {
+        "scope": "variable.other.constant.js.jsx",
+        "settings": {
+          "foreground": "#7cc36e",
+          "fontStyle": "italic"
+        }
+      },
+      {
+        "scope": "keyword.control.import.js",
+        "settings": {
+          "foreground": "#a5a5a5cc",
+          "fontStyle": "italic"
+        }
+      },
+      {
+        "scope": "support.type.property-name.css",
+        "settings": {
+          "foreground": "#bbb8b8",
+          "fontStyle": "italic"
+        }
+      },
+      {
+        "scope": "entity.name.function.js.jsx",
+        "settings": {
+          "foreground": "#d68779",
+          "fontStyle": "italic"
+        }
+      },
+      {
+        "scope": "support.class.component.js.jsx",
+        "settings": {
+          "foreground": "#00f7ff",
+          "fontStyle": "italic"
+        }
+      }
+    ]
+  },
+  "workbench.colorTheme": "GitHub Dark Dimmed"
+}
