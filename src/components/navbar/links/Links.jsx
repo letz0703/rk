@@ -16,14 +16,16 @@ const Links = () => {
     },
     {
       title: "Blog",
-      path: "/posts"
+      path: "/blog"
     }
   ]
 
   return (
     <div>
       {links.map(link => (
-        <Link href={link.path}>{link.title}</Link>
+        <Link href={link.path} key={link.title}>
+          {link.title}
+        </Link>
       ))}
     </div>
   )
