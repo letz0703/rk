@@ -3,7 +3,7 @@ import Link from "next/link"
 const Links = () => {
   const links = [
     {
-      title: "Homepage",
+      title: "Home",
       path: "/"
     },
     {

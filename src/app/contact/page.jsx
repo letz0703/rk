@@ -1,3 +1,8 @@
-export function Page() {
-  return <h1>Page</h1>
+const Page = () => {
+  return (
+    <div>
+      <h2>Page</h2>
+    </div>
+  )
 }
+export default Page
