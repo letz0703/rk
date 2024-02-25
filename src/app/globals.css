@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   --bg: #0d0c22;
   --bgSoft: #2d2b42;
@@ -23,7 +27,7 @@ a {
 }
 
 .container {
-  /*background-color: rebeccapurple;*/
+  background-color: rebeccapurple;
   width: 1536px;
   margin: auto;
   padding-left: 50px;
