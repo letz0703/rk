@@ -46,7 +46,9 @@ const Links = () => {
             <NavLink item={{title: "Login", path: "/login"}} />
           )}
         </div>
-        <button onClick={() => setOpen(!open)}>Menu</button>{" "}
+        <button className={styles.menuButton} onClick={() => setOpen(!open)}>
+          Menu
+        </button>{" "}
       </div>
       {open && (
         <div className={styles.mobileLinks}>

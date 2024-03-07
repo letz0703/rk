@@ -30,10 +30,56 @@ a {
   background-color: rebeccapurple;
   width: 1536px;
   margin: auto;
-  padding-left: 50px;
-  padding-right: 5em;
+  padding-left: 5rem;
+  padding-right: 5rem;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+
+/* media query 2024.03.04/월 */
+@media (max-width: 1536px) {
+  .container {
+    width: 1366px;
+  }
+}
+
+@media (max-width: 1366px) {
+  .container {
+    width: 1280px;
+  }
+}
+@media (max-width: 1280px) {
+  .container {
+    width: 1024px;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .container {
+    width: 768px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    width: 640px;
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    width: 475px;
+  }
+}
+
+@media (max-width: 470px) {
+  .container {
+    width: 100%; /* Adjust the width to ensure it fits on smaller screens */
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 }
