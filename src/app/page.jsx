@@ -7,8 +7,8 @@ const Home = () => {
     <>
       <div className={styles.container}>
         <div className={` ${styles.textContainer}`}>
-          <h1>LOVE & FREE</h1>
-          <p>Free Images created by Us</p>
+          <h1 className={`${styles.title}`}>LOVE & FREE</h1>
+          <p className={`${styles.description}`}>Free Images created by Us</p>
           <div className={` ${styles.buttons}`}>
             <button className={` ${styles.button}`}>
               youtube.com/@rainskiss.m
