@@ -9,6 +9,16 @@
 					"label": ""
 				}
 			]
+		},
+		{
+			"path": "src/app/home.module.css",
+			"bookmarks": [
+				{
+					"line": 16,
+					"column": 21,
+					"label": ""
+				}
+			]
 		}
 	]
 }

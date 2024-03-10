@@ -1,5 +1,9 @@
 [git](https://github.com/safak/next14-tutorial)
 
+2024.03.10/일
+이미지 색상 변경 : filter: grayscale(1)
+https://css-tricks.com/almanac/properties/f/filter/
+
 ####### shortcuts
 cmdK+cmdD : go to source definition
 2024.03.07/목 external image
