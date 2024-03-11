@@ -21,10 +21,18 @@
 }
 .boxes {
   display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: space-between;
+}
+
+.box h1 {
+  color: var(--btn);
 }
 .imgContainer {
   flex: 1;
   position: relative;
+}
+.img {
+  object-fit: contain;
 }

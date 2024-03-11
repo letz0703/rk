@@ -11,25 +11,25 @@ const AboutPage = () => {
           sapiente quaerat eos molestias repellat commodi blanditiis est quas
           ratione?
         </p>
-      </div>
-      <div className={styles.boxes}>
         <div className={styles.boxes}>
-          <h1>10 K+</h1>
-          <p> Years of experience </p>
-        </div>
-        <div className={styles.boxes}>
-          <h1>10 K+</h1>
-          <p> Years of experience </p>
-        </div>
-        <div className={styles.boxes}>
-          <div className={styles.box}>
+          <div className={styles.boxes}>
             <h1>10 K+</h1>
             <p> Years of experience </p>
+          </div>
+          <div className={styles.boxes}>
+            <h1>10 K+</h1>
+            <p> Years of experience </p>
+          </div>
+          <div className={styles.boxes}>
+            <div className={styles.box}>
+              <h1>10 K+</h1>
+              <p> Years of experience </p>
+            </div>
           </div>
         </div>
       </div>
       <div className={styles.imgContainer}>
-        <Image src="/about.png" alt="about" fill />
+        <Image src="/about.png" alt="about" fill className={styles.img} />
       </div>
     </div>
   )
