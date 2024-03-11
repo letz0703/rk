@@ -6,8 +6,10 @@
   --bg: #0d0c22;
   --bgSoft: #2d2b42;
   --text: white;
+  --textB: black;
   --textSoft: #e5e5e5;
   --btn: #c10002;
+  --btnSilver: silver;
 }
 
 * {

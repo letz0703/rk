@@ -4,6 +4,32 @@
 }
 .textContainer {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5rem;
+}
+.title {
+  font-size: 3em;
+}
+.description {
+  font-size: 1.5em;
+}
+
+.buttons {
+  display: flex;
+  gap: 2em;
+}
+
+.button {
+  padding: 2em;
+  min-width: 120px;
+  cursor: pointer;
+  border: none;
+  border-radius: 0.5em;
+}
+.button:first-child {
+  background-color: var(--btnSilver);
+  color: var(--textB);
 }
 .imageContainer {
   flex: 1;
