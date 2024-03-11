@@ -12,15 +12,15 @@ const AboutPage = () => {
           ratione?
         </p>
         <div className={styles.boxes}>
-          <div className={styles.boxes}>
+          <div className={styles.box}>
             <h1>10 K+</h1>
             <p> Years of experience </p>
           </div>
-          <div className={styles.boxes}>
+          <div className={styles.box}>
             <h1>10 K+</h1>
             <p> Years of experience </p>
           </div>
-          <div className={styles.boxes}>
+          <div className={styles.box}>
             <div className={styles.box}>
               <h1>10 K+</h1>
               <p> Years of experience </p>

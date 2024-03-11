@@ -26,13 +26,22 @@
   justify-content: space-between;
 }
 
+.box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .box h1 {
+  font-size: 2em;
+  font-weight: k00;
   color: var(--btn);
 }
 .imgContainer {
   flex: 1;
   position: relative;
 }
+
 .img {
   object-fit: contain;
 }
