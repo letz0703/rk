@@ -1,3 +1,15 @@
+2024.03.11/월
+snippet 생성
+divv
+
+```
+className": {
+  "prefix": "divv",
+  "body": ["<div className='{styles.$1}'>$2</div>"],
+  "description": "class name 24"
+},
+```
+
 [git](https://github.com/safak/next14-tutorial)
 
 2024.03.10/일
