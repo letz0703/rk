@@ -1,8 +1,15 @@
-const BlogPage = ({children}) => {
+import styles from "./blog.module.css"
+import PostCard from "@/components/postCard/postCard"
+
+const BlogPage = () => {
   return (
     <div>
-      <h2>BlogPage</h2>
-      {children}
+      <div className={styles.container}>
+        <PostCard className={styles.post} />
+        <PostCard className={styles.post} />
+        <PostCard className={styles.post} />
+        <PostCard className={styles.post} />
+      </div>
     </div>
   )
 }
