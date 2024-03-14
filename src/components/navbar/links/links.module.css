@@ -38,5 +38,6 @@
     align-items: center;
     justify-content: center;
     gap: 1em;
+    z-index: 100;
   }
 }
