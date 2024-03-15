@@ -1,5 +1,10 @@
 import Image from "next/image"
 import styles from "./contact.module.css"
+import dynamic from "next/dynamic"
+
+const HydrationTestNoSSR = dynamic(() => import("@/components/hydrationTest"), {
+  ssr: false
+})
 const ContactPage = () => {
   return (
     <div className={styles.container}>
