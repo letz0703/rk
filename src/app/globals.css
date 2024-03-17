@@ -77,11 +77,12 @@ a {
     width: 475px;
   }
 }
-
-@media (max-width: 470px) {
+@media (max-width: 475px) {
   .container {
-    width: 100%; /* Adjust the width to ensure it fits on smaller screens */
-    padding-left: 1rem;
-    padding-right: 1rem;
+    width: 380px;
+    /*width: 100%; */
+    /* Adjust the width to ensure it fits on smaller screens */
+    /*padding-left: 1rem;*/
+    /*padding-right: 1rem;*/
   }
 }

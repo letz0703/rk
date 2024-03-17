@@ -10,10 +10,8 @@ const Home = () => {
           <h1 className={`${styles.title}`}>LOVE & FREE</h1>
           <p className={`${styles.description}`}>Free Images created by Us</p>
           <div className={` ${styles.buttons}`}>
-            <button className={` ${styles.button}`}>
-              youtube.com/@rainskiss.m
-            </button>
-            <button className={` ${styles.button}`}>pinterest</button>
+            <button className={` ${styles.button}`}>youtube</button>{" "}
+            <button className={styles.button}>pintrest</button>{" "}
           </div>
           <div className={`${styles.brands}`}>
             <Image
