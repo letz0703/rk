@@ -1,3 +1,11 @@
+# Not Use SSR (Serverside Rendering)
+
+https://youtu.be/vCOSTG10Y4o?t=7409
+
+const HydrationTestNoSSR = dynamic(() => import("@/components/hydrationTest"), {
+ssr: false
+})
+
 2024.03.11/월
 snippet 생성
 divv
