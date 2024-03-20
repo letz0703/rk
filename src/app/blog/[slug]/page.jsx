@@ -1,7 +1,10 @@
 import Image from "next/image"
 import styles from "./singlePost.module.css"
 
-const SinglePost = () => {
+//const SinglePost = ({params, searchParams}) => { //2024.03.20 수 search param
+const SinglePost = ({params, searchParams}) => {
+  //2024.03.20 수 search param
+  //console.log(searchParams)
   return (
     <div className={styles.container}>
       <div className={styles.imgContainer}>
