@@ -1,3 +1,4 @@
 - Mixing Course For Beginner
 	- Lesson 6 [[abletone live]]
-	-
+	- [[lesson 2 Ear Training]]
+-

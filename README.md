@@ -1,3 +1,19 @@
+# path name 2024.03.20 수
+
+hooks
+useRouter(), usePatname(), useSearchParams()
+https://youtu.be/vCOSTG10Y4o?t=8111
+const q= useSearchParms().get("q")
+
+# navigation
+
+https://youtu.be/vCOSTG10Y4o?t=7852
+useRouter hook
+
+### pre fetch
+
+<Link href="" prefetch={false}>
+
 # Not Use SSR (Serverside Rendering)
 
 https://youtu.be/vCOSTG10Y4o?t=7409

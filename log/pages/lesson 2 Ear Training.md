@@ -1,0 +1,6 @@
+- {{video https://www.youtube.com/watch?v=O_-04p7a-c0&list=PL9oiyAGA6zOTSPR5-ttojODT4PW7d2U_Z&index=2}}
+- Hear Better
+- Listening Frequency
+	- {{youtube-timestamp 2:21}}
+	- visual practice: {{youtube-timestamp 3:39}}
+	-
