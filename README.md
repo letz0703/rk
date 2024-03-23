@@ -1,5 +1,16 @@
 # Data Fetching
 
+## cache
+
+    https://youtu.be/vCOSTG10Y4o?t=8460
+    don't want cache
+    await fetch("https://....", {cache: "force-cache"}) to {cache: "no-store"}
+    why? fresh data.
+
+### cache interval
+
+    {next:{revaludate:3600}}
+
 # path name 2024.03.20 수
 
 hooks
@@ -14,7 +25,7 @@ useRouter hook
 
 ### pre fetch
 
-<Link href="" prefetch={false}>
+<Linkkhref="" prefetch={false}>
 
 # Not Use SSR (Serverside Rendering)
 

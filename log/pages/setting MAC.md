@@ -1,0 +1,6 @@
+- Dock  설정
+	- #ctrlF3
+		- 열린 프로그램 전체 보기
+	- Mouse13
+		- Mission Control
+		-
