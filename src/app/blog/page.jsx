@@ -2,9 +2,14 @@ import styles from "./blog.module.css"
 import PostCard from "@/components/postCard/postCard"
 
 const getData = async () => {
-  const res = await fetch("https://jsonplaceholder.typicode.com/posts", {
-    cache: "no-store"
-  })
+  const res = await fetch(
+    "https://jsonplaceholder.typicode.com/posts",
+    //{
+    //  cache: "no-store"
+    //}
+    //,
+    {next: {revalidate: 3600}}
+  )
   if (!res.ok) {
     throw new Error("wrong!")
   }
