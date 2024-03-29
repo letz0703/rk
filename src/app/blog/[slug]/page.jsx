@@ -33,7 +33,7 @@ const SinglePost = async ({params, searchParams}) => {
         />
       </div>
       <div className={styles.textContainer}>
-        <h1 className={styles.title}>{post.title}</h1>
+        <h1 className={styles.title}>{post?.title}</h1>
         <div className={styles.detail}>
           <Image
             className={styles.avartar}

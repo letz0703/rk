@@ -5,8 +5,8 @@
     {
       "label": "new react folder and files",
 
-      //"command": "mkdir src/components/${input:dirName} && touch 'src/components/${input:dirName}/${input:dirName}.jsx' 'src/components/${input:dirName}/${input:dirName}.module.css'",
-      "command": "mkdir src/components/${input:dirName} && touch 'src/components/${input:dirName}/page.jsx' 'src/components/${input:dirName}/${input:dirName}.module.css'",
+      "command": "mkdir src/components/${input:dirName} && touch 'src/components/${input:dirName}/${input:dirName}.jsx' 'src/components/${input:dirName}/${input:dirName}.module.css'",
+      //"command": "mkdir src/components/${input:dirName} && touch 'src/components/${input:dirName}/page.jsx' 'src/components/${input:dirName}/${input:dirName}.module.css'",
 
       "type": "shell",
       "problemMatcher": [],
