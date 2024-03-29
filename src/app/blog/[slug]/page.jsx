@@ -1,5 +1,6 @@
 import Image from "next/image"
 import styles from "./singlePost.module.css"
+import {getPost} from "@/lib/data"
 
 //const SinglePost = ({params, searchParams}) => { //2024.03.20 수 search param
 
@@ -20,7 +21,7 @@ const SinglePost = async ({params, searchParams}) => {
   //2024.03.20 수 search param
   //console.log(searchParams)
   const {slug} = params
-  const post = await getData(slug)
+  const post = getPost(slug)
   return (
     <div className={styles.container}>
       <div className={styles.imgContainer}>
