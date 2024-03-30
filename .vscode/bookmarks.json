@@ -19,6 +19,16 @@
 					"label": ""
 				}
 			]
+		},
+		{
+			"path": "src/lib/action.js",
+			"bookmarks": [
+				{
+					"line": 5,
+					"column": 14,
+					"label": ""
+				}
+			]
 		}
 	]
 }
