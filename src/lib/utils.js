@@ -1,6 +1,6 @@
 const {default: mongoose} = require("mongoose")
 const connection = {}
-const connectToDb = async () => {
+export const connectToDb = async () => {
   try {
     if (connection.isConnected) {
       console.log("Using existing connection")
