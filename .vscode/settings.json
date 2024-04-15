@@ -89,5 +89,6 @@
       }
     ]
   },
-  "workbench.colorTheme": "GitHub Dark Dimmed"
+  "workbench.colorTheme": "GitHub Dark Dimmed",
+  "typescript.tsdk": "node_modules/typescript/lib"
 }
