@@ -1,0 +1,7 @@
+- {{video https://www.youtube.com/watch?v=-dHIjmQyjFQ}}
+	- {{youtube-timestamp 00:50}}
+	- featured secection 첫방문자들용 트레일러
+	- {{youtube-timestamp 1:56}} 브렌딩
+	- {{youtube-timestamp 2:28}} channel banner
+	- watter mark
+- id:: 66188ac9-5c71-45d0-b7f6-b25732ab6587

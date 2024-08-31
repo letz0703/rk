@@ -1,11 +1,14 @@
 import Image from "next/image"
 import styles from "./contact.module.css"
-import dynamic from "next/dynamic"
 
 //const HydrationTestNoSSR = dynamic(() => import("@/components/hydrationTest"), {
 //  ssr: false
 //})
 const a = 2
+
+export const metadata = {
+  title: "Contact"
+}
 
 const ContactPage = () => {
   return (
