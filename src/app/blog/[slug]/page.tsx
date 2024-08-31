@@ -33,7 +33,7 @@ const SinglePost = async ({params, searchParams}) => {
         />
       </div>
       <div className={styles.textContainer}>
-        <h1 className={styles.title}>{post.title}</h1>
+        <h1 className={styles.title}>{post?.title}</h1>
         <div className={styles.detail}>
           <Image
             className={styles.avartar}
@@ -42,13 +42,12 @@ const SinglePost = async ({params, searchParams}) => {
             width={50}
             height={50}
           />
-          <div className={styles.detailText}>
-            <span className={styles.detailTitle}>Author</span>
-            <span className={styles.detailValue}>rainskiss.m</span>
-          </div>
+          <Suspense fallback={<div>Loading...</div>}>
+            <PostUser userId={post.userId} />
+          </Suspense>
           <div className={styles.detailText}>
             <span className={styles.detailTitle}>Published</span>
-            <span className={styles.detailValue}>2024.03.13</span>
+            <span className={styles.detailValue}>01.01,2024</span>
           </div>
         </div>
         <div className={styles.content}>{post.body}</div>
