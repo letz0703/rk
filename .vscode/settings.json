@@ -90,5 +90,6 @@
     ]
   },
   "workbench.colorTheme": "GitHub Dark Dimmed",
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "editor.defaultFormatter": "dbaeumer.vscode-eslint"
 }
