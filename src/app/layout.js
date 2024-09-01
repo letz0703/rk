@@ -1,5 +1,3 @@
-import Footer from "@/components/footer/Footer"
-import Navbar from "@/components/navbar/Navbar"
 import "./globals.css"
 
 //const inter = Inter({subsets: ["latin"]})
@@ -15,9 +13,9 @@ export default function RootLayout({children}) {
       {/*<body className={inter.className}>*/}
       <body>
         <div >
-          <Navbar />
+          {/*<Navbar />*/}
           {children}
-          <Footer />
+          {/*<Footer />*/}
         </div>
       </body>
     </html>

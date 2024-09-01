@@ -1,9 +1,11 @@
 "use client"
-const Errors = () => {
+const Errors = ({error, reset}) => {
   return (
     <div>
-      <h2>Errors</h2>
+      <h2>{error.message}</h2>
+      <button  onClick={reset}>retry</button>
     </div>
   )
 }
+
 export default Errors
