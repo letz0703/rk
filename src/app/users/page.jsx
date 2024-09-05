@@ -1,61 +1,58 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getFirestore, collection, getDocs, addDoc } from "firebase/firestore"; // Firestore 모듈 가져오기
-import { initializeApp } from "firebase/app"; // Firebase 앱 초기화 모듈 가져오기
+import { useRouter } from "next/navigation";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBWcvOL2ZnZCifdn806iYhqABOm9WNzDNc",
-  authDomain: "business-card-maker-21fc7.firebaseapp.com",
-  databaseURL: "https://business-card-maker-21fc7-default-rtdb.firebaseio.com",
-  projectId: "business-card-maker-21fc7",
-  storageBucket: "business-card-maker-21fc7.appspot.com",
-  messagingSenderId: "913399558691",
-  appId: "1:913399558691:web:930b702df09fc87b8a7796",
-  measurementId: "G-VLYX0Y9ZMB"
-};
+export default function Users() {
+  const [users, setUsers] = useState([]); // 사용자 목록 상태
+  const [name, setName] = useState(""); // 이름 입력 상태
+  const [email, setEmail] = useState(""); // 이메일 입력 상태
 
-// Firebase 앱 초기화
-const app = initializeApp(firebaseConfig);
-const fireStore = getFirestore(app);
+  const router = useRouter();
 
-export default function Home() {
-  const [users, setUsers] = useState([]); // 데이터를 저장할 상태 변수
-  const [name, setName] = useState(""); // 입력 폼의 이름 상태 변수
-  const [email, setEmail] = useState(""); // 입력 폼의 이메일 상태 변수
-
-  const getUsers = async () => {
+  const fetchUsers = async () => {
     try {
-      const querySnapshot = await getDocs(collection(fireStore, "users"));
-      const data = querySnapshot.docs.map((doc) => doc.data());
-      setUsers(data); // 데이터를 상태 변수에 저장
+      const res = await fetch('/api/users', { method: 'GET' }); // GET 요청
+      const data = await res.json();
+      setUsers(data);
     } catch (error) {
-      console.error("Error fetching data: ", error);
+      console.error("Error fetching users: ", error);
     }
   };
 
   const addUser = async (e) => {
-    e.preventDefault(); // 폼 제출 시 페이지 새로고침 방지
+    e.preventDefault();
     try {
-      await addDoc(collection(fireStore, "users"), { name, email });
-      setName(""); // 입력 후 입력 필드 초기화
-      setEmail(""); // 입력 후 입력 필드 초기화
-      getUsers(); // 새로운 데이터를 포함하도록 사용자 목록을 갱신
+      const res = await fetch('/api/addUser', {
+        method: 'POST', // POST 요청
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email }),
+      });
+      const data = await res.json();
+      setUsers([...users, data]);
+      setName("");
+      setEmail("");
     } catch (error) {
       console.error("Error adding user: ", error);
     }
   };
 
   useEffect(() => {
-    getUsers();
+    fetchUsers(); // 컴포넌트 마운트 시 사용자 목록 가져오기
   }, []);
+
+  const handleUserClick = (id) => {
+    router.push(`/users/${id}`); // 사용자를 클릭하면 개별 사용자 페이지로 이동
+  };
 
   return (
     <div>
       <h1>Users List</h1>
       <ul>
-        {users.map((user, index) => (
-          <li key={index}>
+        {users.map((user) => (
+          <li key={user.id} onClick={() => handleUserClick(user.id)} style={{ cursor: 'pointer' }}>
             {user.name} - {user.email}
           </li>
         ))}
@@ -68,6 +65,8 @@ export default function Home() {
           placeholder="Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
+          id="name" // ID 추가
+          name="name" // Name 추가
           required
         />
         <input
@@ -75,6 +74,8 @@ export default function Home() {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          id="email" // ID 추가
+          name="email" // Name 추가
           required
         />
         <button type="submit">Add User</button>
