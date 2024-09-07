@@ -37,6 +37,7 @@ export default function UserPage({ params }) {
   return (
     <div>
       <h1>{user.name}</h1>
+      <p>phone: {user.userId}</p>
       <p>Email: {user.email}</p>
     </div>
   );
