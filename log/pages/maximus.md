@@ -1,8 +1,0 @@
-- {{video https://www.youtube.com/watch?v=wX_7qdyKo_c&list=PLx5i827-FDqPeqFyFfChuHyKRF36vPAjc&t=157s}}
-- {{youtube-timestamp 5:06}} Linear Phase Mode
-- {{youtube-timestamp 6:35}} 세부
--
--
-- ARC → https://arc.net/e/DF364D82-5B00-495F-A5F5-CB9D9B0EF603
-- {{youtube-timestamp 10:10}} look ahead delay
--
