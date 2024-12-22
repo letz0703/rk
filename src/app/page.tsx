@@ -1,4 +1,6 @@
-import Image from "next/image";
+"use client"
+import Image from "next/image"
+import Script from "next/script"
 
 export default function Home() {
   return (
@@ -6,21 +8,30 @@ export default function Home() {
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
         <Image
           className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
+          src="/logo rk.svg"
+          alt="rainskiss logo"
           width={180}
           height={38}
           priority
         />
         <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
           <li className="mb-2">
-            Get started by editing{" "}
+            100% VOLUME for YOUTUBE :
             <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
+              make the volume of your song perfect like a PRO
             </code>
             .
           </li>
-          <li>Save and see your changes instantly.</li>
+          <li> I equalize the volume of a song every day :
+            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
+              youtube.com/@rainskiss.m
+            </code>
+          </li>
+          <li>rainskiss@gmail.com
+            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
+              : Buy me a coffee if you're in a hurry.
+            </code>
+          </li>
         </ol>
 
         <div className="flex gap-4 items-center flex-col sm:flex-row">
@@ -30,72 +41,55 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Image
+            {/*<Image
               className="dark:invert"
-              src="/vercel.svg"
+              src="/logo rk.svg"
               alt="Vercel logomark"
               width={20}
               height={20}
-            />
-            Deploy now
+            />*/}
+            <b>youtube</b>
           </a>
           <a
             className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+            href="mailto:rainskiss@gmail.com"
             target="_blank"
             rel="noopener noreferrer"
           >
-            Read our docs
+            ✉️ request by email
           </a>
         </div>
       </main>
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+          href="https://buymeacoffee.com/rainskiss"
           target="_blank"
           rel="noopener noreferrer"
         >
           <Image
             aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
+            src="/coffee.jpg"
+            alt="buy me a coffee"
+            width={50}
+            height={50}
+          />buy me a coffee ~
         </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
+        <div>
+          <Script
+            src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js"
+            data-name="BMC-Widget"
+            data-id="rainskiss"
+            data-description="Support me on Buy me a coffee!"
+            data-message="Thank you for visiting! You can now buy me a coffee ^^*"
+            data-color="#5F7FFF"
+            data-position="Right"
+            data-x_margin="18"
+            data-y_margin="18"
+            strategy="lazyOnload"
           />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+        </div>
       </footer>
     </div>
-  );
+  )
 }
