@@ -1,6 +1,6 @@
-"use client"
+//"use client"
 import Image from "next/image"
-import Script from "next/script"
+//import Script from "next/script"
 
 export default function Home() {
   return (
@@ -16,9 +16,9 @@ export default function Home() {
         />
         <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
           <li className="mb-2">
-            100% VOLUME for YOUTUBE :
+            Perfect VOLUME for YOUTUBE : the volume will be →
             <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              make the volume of your song perfect like a PRO
+              Normalized : 100% /100% (content loudness -0.0db)
             </code>
             .
           </li>
@@ -29,7 +29,7 @@ export default function Home() {
           </li>
           <li>rainskiss@gmail.com
             <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              : Buy me a coffee if you are in a hurry.
+              : It's free for now. Subscribe and buy me a coffee if you like my work.
             </code>
           </li>
         </ol>
@@ -75,7 +75,7 @@ export default function Home() {
             height={50}
           />buy me a coffee ~
         </a>
-        <div>
+        {/*<div>
           <Script
             src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js"
             data-name="BMC-Widget"
@@ -88,7 +88,7 @@ export default function Home() {
             data-y_margin="18"
             strategy="lazyOnload"
           />
-        </div>
+        </div>*/}
       </footer>
     </div>
   )
