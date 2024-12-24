@@ -1,6 +1,6 @@
 //"use client"
 import Image from "next/image"
-//import Script from "next/script"
+import Script from "next/script"
 
 export default function Home() {
   return (
@@ -37,7 +37,7 @@ export default function Home() {
         <div className="flex gap-4 items-center flex-col sm:flex-row">
           <a
             className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+            href="https://www.youtube.com/@rainskiss.m"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -61,7 +61,7 @@ export default function Home() {
         </div>
       </main>
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
+        {/*<a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
           href="https://buymeacoffee.com/rainskiss"
           target="_blank"
@@ -74,21 +74,12 @@ export default function Home() {
             width={50}
             height={50}
           />buy me a coffee ~
-        </a>
-        {/*<div>
-          <Script
-            src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js"
-            data-name="BMC-Widget"
-            data-id="rainskiss"
-            data-description="Support me on Buy me a coffee!"
-            data-message="Thank you for visiting! You can now buy me a coffee ^^*"
-            data-color="#5F7FFF"
-            data-position="Right"
-            data-x_margin="18"
-            data-y_margin="18"
-            strategy="lazyOnload"
-          />
-        </div>*/}
+        </a>*/}
+        <a href="https://www.buymeacoffee.com/rainskiss" target="_blank">
+          <Image src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee"
+            height={40} width={130}
+          /></a>
+        <Script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="rainskiss" data-color="#FFDD00" data-emoji="☕" data-font="Comic" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" />
       </footer>
     </div>
   )
