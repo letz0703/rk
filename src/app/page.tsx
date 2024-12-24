@@ -29,7 +29,7 @@ export default function Home() {
           </li>
           <li>rainskiss@gmail.com
             <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              : It's free for now. Subscribe and buy me a coffee if you like my work.
+              : It is free for now. Subscribe and buy me a coffee if you like my work.
             </code>
           </li>
         </ol>
