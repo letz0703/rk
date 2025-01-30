@@ -14,7 +14,9 @@ export default function Letter() {
 	}
 
 	return (<>
-		<CustomModal isOpen={false} />
+		<CustomModal isOpen={false} onClose={function (): void {
+			throw new Error("Function not implemented.")
+		}} />
 		<form onSubmit={handleSubmit}>
 			{/* Use the CustomInput component with the ref */}
 			<CustomInput ref={inputRef} placeholder="Enter text" />

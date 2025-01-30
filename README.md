@@ -1,4 +1,9 @@
+2025.01.30 목 ErrorBoundary
+https://courses.webdevsimplified.com/view/courses/react-simplified-advanced/2009182-advanced-react-concepts/6307077-06-error-boundaries
 
+eslint
+.eslingrc.js
+npx next lint
 2025.01.17 금 Custom modal
 - custome modal .jsx 만들기
 - CSS 적용

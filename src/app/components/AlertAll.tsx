@@ -11,7 +11,7 @@ export default function AlertAll() {
 	const closeAlert=() => setIsOpen(false)
 
 	return (
-		<>
+		<div className="modal-overlay">
 			<button
 				className="rounded bg-blue-500 text-white px-4 py-2"
 				onClick={openAlert}
@@ -39,6 +39,6 @@ export default function AlertAll() {
 					</div>
 				</div>
 			)}
-		</>
+		</div>
 	)
 }

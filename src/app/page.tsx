@@ -20,14 +20,10 @@ export default function Home() {
         />
         <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
           <li className="mb-2">
-            Perfect VOLUME for YOUTUBE : the volume will be →
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              Normalized : 100% /100% (content loudness -0.0db)
-            </code>
-            .
+            <b>Perfect VOLUME for YOUTUBE</b> Your video’s volume will be normalized to 100% (content loudness: -0.0dB).
           </li>
           <li>
-            I equalize the volume of a song every day :
+            I equalize a song’s volume every day 🎵
             <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
               youtube.com/@rainskiss.m
             </code>
@@ -35,7 +31,8 @@ export default function Home() {
           <li>
             rainskiss@gmail.com
             <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              : It is free for now. Subscribe and buy me a coffee if you like my work.
+              : Just subscribe, and I'll enhance the songs I like from your channel!
+              <br /> ☕ Want priority service? Buy me a coffee!
             </code>
           </li>
         </ol>
