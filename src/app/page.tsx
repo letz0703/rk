@@ -6,9 +6,11 @@ import AlertClient from "./components/AlertDynamic"
 
 
 export default function Home() {
+  let a='rainskiss.m'
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <AlertClient />
+      <title>{`${a}`}</title>
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
         <Image
           className="dark:invert"
@@ -23,16 +25,16 @@ export default function Home() {
             <b>Perfect VOLUME for YOUTUBE</b> Your video’s volume will be normalized to 100% (content loudness: -0.0dB).
           </li>
           <li>
-            I equalize a song’s volume every day 🎵
+
             <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              youtube.com/@rainskiss.m
+              Resolution X 2
             </code>
           </li>
           <li>
-            rainskiss@gmail.com
+            I'll enhance the clip and equalize the volume of your video.
             <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              : Just subscribe, and I'll enhance the songs I like from your channel!
-              <br /> ☕ Want priority service? Buy me a coffee!
+              : Just subscribe and ask me
+              <br /> ☕ I'll check your favorites and introduce your playlist on the channel @rainskiss.eq4u
             </code>
           </li>
         </ol>

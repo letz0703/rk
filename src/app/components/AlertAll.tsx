@@ -28,8 +28,13 @@ export default function AlertAll() {
 						className="bg-white p-6 rounded shadow"
 						onClick={(e) => e.stopPropagation()}
 					>
-						<h2 className="text-xl font-bold mb-4">Working On Progress 2025.01.09 THU</h2>
-						<p>homepage is under construction. It will take some time as I do this on my free time</p>
+						<h2 className="text-xl font-bold mb-4">Working On Progress 2025.03.20 THU</h2>
+						<p>MON - EN</p>
+						<p>TUE - JP</p>
+						<p>WED - SHORT</p>
+						<p>THU - 4K- EN</p>
+						<p>FRI - 4K- JP</p>
+						<p>SAT - 4K- SHORT</p>
 						<button
 							className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
 							onClick={closeAlert}
