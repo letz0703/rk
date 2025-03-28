@@ -1,31 +1,36 @@
-import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import type {Metadata} from "next"
+import {Geist, Geist_Mono, Inter} from "next/font/google"
 import "./globals.css"
+import {cn} from "@/lib/utils"
 
-const geistSans=Geist({
+const inter = Inter({subsets: ["latin"], variable: "--font-sans"})
+const geistSans = Geist({
   variable: "--font-geist-sans",
-  subsets: ["latin"],
+  subsets: ["latin"]
 })
 
-const geistMono=Geist_Mono({
+const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
-  subsets: ["latin"],
+  subsets: ["latin"]
 })
 
-export const metadata: Metadata={
+export const metadata: Metadata = {
   title: "rainskiss",
-  description: "100% Volume for YOUTUBE",
+  description: "100% Volume for YOUTUBE"
 }
 
 export default function RootLayout({
-  children,
+  children
 }: Readonly<{
   children: React.ReactNode
 }>) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={cn(
+          `bg-green-400 min-h-screen font-sans antialiased ${geistSans.variable} ${geistMono.variable} antialiased`,
+          inter.variable
+        )}
       >
         {children}
       </body>
