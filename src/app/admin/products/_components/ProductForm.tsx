@@ -6,7 +6,7 @@ import {Label} from "@/components/ui/label"
 import {Textarea} from "@/components/ui/textarea"
 import {formatCurrency} from "@/lib/formatters"
 import {useState} from "react"
-import {addProduct} from "../../actions/products"
+import {addProduct} from "../../_actions/products"
 import {useFormState, useFormStatus} from "react-dom"
 
 export function ProductForm() {
@@ -46,12 +46,12 @@ export function ProductForm() {
       </div>
       <div className="space-y-2">
         <Label htmlFor="file">File</Label>
-        <input id="file" name="file" required />
+        <input type="file" id="file" name="file" required />
         {error.file && <div className="text-destructive">{error.file}</div>}
       </div>
       <div className="space-y-2">
         <Label htmlFor="image">Image</Label>
-        <input id="image" name="image" required />
+        <input type="file" id="image" name="image" required />
         {error.image && <div className="text-destructive">{error.file}</div>}
       </div>
       <SubmitButton />
