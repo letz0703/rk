@@ -1,3 +1,5 @@
+2025.03.29 토 Validate DB with Zod
+npm i zod
 2025.03.20 목 title
 
 2025.01.30 목 ErrorBoundary
