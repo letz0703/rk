@@ -1,6 +1,6 @@
-import Link from "next/link"
 import {Button} from "@/components/ui/button"
 import {PageHeader} from "../_components/PageHeader"
+import Link from "next/link"
 import {
   Table,
   TableBody,
@@ -10,7 +10,7 @@ import {
   TableRow
 } from "@/components/ui/table"
 import db from "@/db/db"
-import {CheckCircle, CheckCircle2, MoreVertical, XCircle} from "lucide-react"
+import {CheckCircle2, MoreVertical, XCircle} from "lucide-react"
 import {formatCurrency, formatNumber} from "@/lib/formatters"
 import {
   DropdownMenu,
@@ -18,27 +18,27 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger
-} from "@radix-ui/react-dropdown-menu"
+} from "@/components/ui/dropdown-menu"
 import {
   ActiveToggleDropdownItem,
   DeleteDropdownItem
-} from "./_components/ProductAction"
+} from "./_components/ProductActions"
 
-export default function AdminProductPage() {
+export default function AdminProductsPage() {
   return (
     <>
       <div className="flex justify-between items-center gap-4">
         <PageHeader>Products</PageHeader>
         <Button asChild>
-          <Link href="/admin/products/new">Add - Product</Link>
+          <Link href="/admin/products/new">Add Product</Link>
         </Button>
       </div>
-      <ProductTable />
+      <ProductsTable />
     </>
   )
 }
 
-async function ProductTable() {
+async function ProductsTable() {
   const products = await db.product.findMany({
     select: {
       id: true,
@@ -103,7 +103,6 @@ async function ProductTable() {
                       Edit
                     </Link>
                   </DropdownMenuItem>
-
                   <ActiveToggleDropdownItem
                     id={product.id}
                     isAvailableForPurchase={product.isAvailableForPurchase}

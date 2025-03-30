@@ -1,10 +1,8 @@
 "use client"
-import {DropdownMenu, DropdownMenuItem} from "@radix-ui/react-dropdown-menu"
-import {startTransition, useTransition} from "react"
-import {
-  deleteProduct,
-  toggleProductAvailablibility
-} from "../../_actions/products"
+
+import {DropdownMenuItem} from "@/components/ui/dropdown-menu"
+import {useTransition} from "react"
+import {deleteProduct, toggleProductAvailability} from "../../_actions/products"
 import {useRouter} from "next/navigation"
 
 export function ActiveToggleDropdownItem({
@@ -21,7 +19,7 @@ export function ActiveToggleDropdownItem({
       disabled={isPending}
       onClick={() => {
         startTransition(async () => {
-          await toggleProductAvailablibility(id, !isAvailableForPurchase)
+          await toggleProductAvailability(id, !isAvailableForPurchase)
           router.refresh()
         })
       }}
@@ -37,14 +35,12 @@ export function DeleteDropdownItem({
 }: {
   id: string
   disabled: boolean
-  //isAvailableForPurchase: boolean
 }) {
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
   return (
     <DropdownMenuItem
-      //variant="destructive"
-      className="text-red-600 hover:bg-red-900 focus:bg-red-900  focus:text-white"
+      variant="destructive"
       disabled={disabled || isPending}
       onClick={() => {
         startTransition(async () => {
