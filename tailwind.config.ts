@@ -1,5 +1,4 @@
 import type {Config} from "tailwindcss"
-import tailwindcssAnimate from "tailwindcss-animate"
 import {fontFamily} from "tailwindcss/defaultTheme"
 
 export default {
@@ -63,5 +62,5 @@ export default {
       }
     }
   },
-  plugins: [tailwindcssAnimate]
+  plugins: []
 } satisfies Config

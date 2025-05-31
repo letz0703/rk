@@ -2,6 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+#root {
+  @apply w-full max-w-screen-2xl;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+.photo {
+  width: 200px;
+  height: 200px;
+}
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+  @apply flex flex-col items-center;
+}
+
 .modal {
   position: absolute;
   top: 50%;
@@ -10,14 +35,12 @@
   padding: 1rem;
   background: white;
   border: 1px solid black;
-  z-index:1;
+  z-index: 1;
 }
 
 .modal-overlay.show {
   display: block;
 }
-
-
 
 @layer base {
   :root {
@@ -74,8 +97,6 @@
     --chart-5: 340 75% 55%;
   }
 }
-
-
 
 @layer base {
   * {

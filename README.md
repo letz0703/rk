@@ -1,6 +1,12 @@
-2025.03.29 토 Validate DB with Zod
-npm i zod
-2025.03.20 목 title
+
+#1
+#2
+#3 DAVINCI
+CUT PAGE
+-
+2025.03.21 금 :
+Señorita
+Nothings Gonna Change My Love For You
 
 2025.01.30 목 ErrorBoundary
 https://courses.webdevsimplified.com/view/courses/react-simplified-advanced/2009182-advanced-react-concepts/6307077-06-error-boundaries
