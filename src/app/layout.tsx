@@ -28,7 +28,7 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={cn(
-          `bg-green-400 min-h-screen font-sans antialiased ${geistSans.variable} ${geistMono.variable} antialiased`,
+          `bg-gray-700 min-h-screen font-sans antialiased ${geistSans.variable} ${geistMono.variable} antialiased`,
           inter.variable
         )}
       >

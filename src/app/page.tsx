@@ -22,26 +22,32 @@ export default function Home() {
             width={180}
             height={38}
             priority
-          />
+          />{" "}
+          <h1 className="text-2xl text-blue-500 text-bold">
+            Have Your Own Song !!
+          </h1>
           <nav>
             <LoginButton />
           </nav>
           <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
             <li className="mb-2">
-              <b>Perfect VOLUME for YOUTUBE</b> Your video’s volume will be
-              normalized to 100% (content loudness: -0.0dB).
+              I normalize audio and upscale clips as a hobby.
             </li>
             <li>
-              <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-                Resolution X 2
-              </code>
+              I create copyright-free music and wallpapers (for non-commercial
+              use only.)
             </li>
             <li>
-              I'll enhance the clip and equalize the volume of your video.
+              I make songs and short videos. Send me any lyrics and a reference
+              song, and I will create one free for you.
+              <br />
               <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-                : Just subscribe and ask me
-                <br /> ☕ I'll check your favorites and introduce your playlist
-                on the channel @rainskiss.eq4u
+                Just subscribe and email me your favorite link, reference song,
+                and lyrics, and let me know.
+                <br />
+                I'll check your favorites and make a short video for you during
+                my free time. The short I create will be posted on my YouTube
+                channel @rainskiss.m.
               </code>
             </li>
           </ol>
@@ -62,6 +68,9 @@ export default function Home() {
             >
               ✉️ request by email
             </a>
+          </div>
+          <div>
+            If you satisfied with the result or want anther, Buy Me a Coffee 😃
           </div>
         </main>
         <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
