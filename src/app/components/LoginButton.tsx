@@ -19,6 +19,7 @@ export default function LoginButton() {
     if (userData) {
       setUser(userData)
       localStorage.setItem("user", JSON.stringify(userData))
+      window.dispatchEvent(new Event("userChanged"))
     }
   }
 
@@ -26,6 +27,7 @@ export default function LoginButton() {
     localStorage.removeItem("user")
     logout()
     setUser(null)
+    window.dispatchEvent(new Event("userChanged"))
   }
 
   return (
