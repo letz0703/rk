@@ -14,7 +14,7 @@ const firebaseConfig = {
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
 }
 
-const app = initializeApp(firebaseConfig)
+const _app = initializeApp(firebaseConfig)
 const auth = getAuth()
 const provider = new GoogleAuthProvider()
 

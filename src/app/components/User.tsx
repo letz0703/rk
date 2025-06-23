@@ -20,7 +20,7 @@ export default function User() {
         setUser(null)
       }
     } catch (err) {
-      console.log("No user in Local Storage")
+      console.log(err)
       setUser(null)
     }
   }
