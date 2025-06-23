@@ -2,7 +2,6 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import {ImYoutube2} from "react-icons/im"
 
 export default function Projects() {
   return (
@@ -20,7 +19,6 @@ export default function Projects() {
                 target="_blank"
                 className="flex items-center text-sm"
               >
-                <ImYoutube2 className="text-6xl" />
                 {/*@rainskiss.m*/}
               </Link>
             </li>
