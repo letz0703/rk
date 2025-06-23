@@ -24,21 +24,8 @@ import {
   DeleteDropdownItem
 } from "./_components/ProductActions"
 
-export default function AdminProductsPage() {
-  return (
-    <>
-      <div className="flex justify-between items-center gap-4">
-        <PageHeader>Products</PageHeader>
-        <Button asChild>
-          <Link href="/admin/products/new">Add Product</Link>
-        </Button>
-      </div>
-      <ProductsTable />
-    </>
-  )
-}
-
-async function ProductsTable() {
+// ✅ async → 여기서 직접 DB 조회
+export default async function AdminProductsPage() {
   const products = await db.product.findMany({
     select: {
       id: true,
@@ -50,6 +37,32 @@ async function ProductsTable() {
     orderBy: {name: "asc"}
   })
 
+  return (
+    <>
+      <div className="flex justify-between items-center gap-4">
+        <PageHeader>Products</PageHeader>
+        <Button asChild>
+          <Link href="/admin/products/new">Add Product</Link>
+        </Button>
+      </div>
+      {/* ✅ 데이터 props로 전달 */}
+      <ProductsTable products={products} />
+    </>
+  )
+}
+
+// ✅ 비동기 아님: props 받는 순수 컴포넌트
+function ProductsTable({
+  products
+}: {
+  products: {
+    id: string
+    name: string
+    priceInCents: number
+    isAvailableForPurchase: boolean
+    _count: {orders: number}
+  }[]
+}) {
   if (products.length === 0) return <p>No products found</p>
 
   return (
