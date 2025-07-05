@@ -37,8 +37,8 @@ export default function User() {
   if (!user) return null
 
   return (
-    <div>
-      <img src={user.photoURL} alt="user" />
-    </div>
+    <>
+      <span className="hidden md:block mr-2">download(wip)</span>
+    </>
   )
 }

@@ -32,7 +32,7 @@ export default function Home() {
             I Invite You to ...
             <a
               href="https://suno.com/invite/@rainskiss_o"
-              className="btn bg-blue-200 p-1 pt-1"
+              className="btn bg-blue-200 p-1 pt-1 text-black"
             >
               RainsKiss @SUNO
             </a>
