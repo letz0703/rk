@@ -4,6 +4,7 @@ import Script from "next/script"
 import AlertClient from "./components/AlertDynamic"
 import LoginButton from "./components/LoginButton"
 import User from "./components/User"
+import CheckAdminButton from "./admin/CheckAdmin"
 
 export default function Home() {
   let a = "rainskiss.m"
@@ -19,6 +20,7 @@ export default function Home() {
           <nav className="flex">
             <User />
             <LoginButton />
+            <CheckAdminButton />
           </nav>
           <Image
             className="dark:invert"
