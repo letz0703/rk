@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import {useEffect, useState} from "react"
 
 type UserData = {
@@ -38,7 +39,9 @@ export default function User() {
 
   return (
     <>
-      <span className="hidden md:block mr-2">download(wip)</span>
+      <Link href="/downloads" className="hidden md:block mr-2">
+        download
+      </Link>
     </>
   )
 }

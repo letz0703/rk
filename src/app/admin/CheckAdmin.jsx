@@ -49,5 +49,5 @@ export default function CheckAdminButton() {
 
   if (!isAdmin) return null
 
-  return <button>관리자 전용 버튼</button>
+  return <button className="btn bg-yellow-700">관리자 전용 버튼</button>
 }
