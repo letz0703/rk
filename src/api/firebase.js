@@ -10,9 +10,9 @@ import {getDatabase, ref, get} from "firebase/database"
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN, // ← 잘못된 키
   databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DB_URL,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECTID
 }
 
 const _app = initializeApp(firebaseConfig)
