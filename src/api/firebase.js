@@ -6,7 +6,6 @@ import {
   signOut,
   onAuthStateChanged
 } from "firebase/auth"
-
 import {getDatabase, ref, get} from "firebase/database"
 
 const firebaseConfig = {
@@ -17,17 +16,18 @@ const firebaseConfig = {
 }
 
 const _app = initializeApp(firebaseConfig)
-const auth = getAuth()
+const auth = getAuth(_app) // ✅ 명시적 전달
 const provider = new GoogleAuthProvider()
-
-provider.setCustomParameters({prompt: "select_account"}) // 팝업 매번 뜨게
+provider.setCustomParameters({prompt: "select_account"})
 
 export async function login() {
   return signInWithPopup(auth, provider)
     .then(result => {
       const user = result.user
-      localStorage.setItem("user", JSON.stringify(user))
-      window.dispatchEvent(new Event("admin-check"))  // 🔥 트리거
+      if (typeof window !== "undefined") {
+        localStorage.setItem("user", JSON.stringify(user))
+        window.dispatchEvent(new Event("admin-check"))
+      }
       console.log(user)
       return user
     })
@@ -37,7 +37,15 @@ export async function login() {
 }
 
 export async function logout() {
-  localStorage.removeItem("user")
-  window.dispatchEvent(new Event("admin-check")) // 🔥 트리거
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("user")
+    window.dispatchEvent(new Event("admin-check"))
+  }
   return signOut(auth).then(() => null)
+}
+
+export function onUserStateChange(callback) {
+  return onAuthStateChanged(auth, user => {
+    callback(user)
+  })
 }
