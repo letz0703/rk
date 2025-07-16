@@ -31,44 +31,27 @@ export default function Home() {
             priority
           />
           <div>
-            I Invite You to ...
-            <a
-              href="https://suno.com/invite/@rainskiss_o"
-              className="btn bg-blue-200 p-1 pt-1 text-black"
-            >
-              RainsKiss @SUNO
-            </a>
+            LOUDNESS 0 for BGM
             <br />
             <code className="mt-2 text-green-200">
-              When you sign up and create 10 songs, We both receive 250 free
-              credits.
+              Perfect Volume for MOBILE
             </code>
           </div>
           <h1 className="text-2xl text-orange-500 text-bold">
-            Make Your Own Song <br />
+            One Free with Subscription <br />
             <span className="text-sm text-white">
-              & Let Me Mix or Master Them
+              https://youtubue.com/rasinskiss.m
             </span>
           </h1>
           <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-            <li className="mb-2">
-              I equalize songs. Buy me a coffee if you like it.
-            </li>
+            <li className="mb-2">I equalize songs.</li>
             <li className="mb-2">I upscale clips I like.</li>
             <li>
               I create copyright-free music and wallpapers for subscribers (for
               non-commercial use only.)
             </li>
-            <li>I will make a 3D doll of you. Email me and let me know.</li>
+            <li>I will make a 3D doll(picture) of you.</li>
           </ol>
-          <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-            Just subscribe and email me your favorite link, reference song, and
-            lyrics, and let me know.
-            <br />
-            I'll review your favorite links and create a short video for you in
-            my spare time. The short I create will be posted on my YouTube
-            channel @rainskiss.m if you don't mind 🦋 Let me know when it's sent
-          </code>
           <div className="flex gap-4 items-center flex-col sm:flex-row">
             <a
               className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
