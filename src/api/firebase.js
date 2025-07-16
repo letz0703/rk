@@ -6,28 +6,28 @@ import {
   signOut,
   onAuthStateChanged
 } from "firebase/auth"
+
 import {getDatabase, ref, get} from "firebase/database"
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN, // ← 잘못된 키
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
   databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DB_URL,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECTID
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
 }
-
 const _app = initializeApp(firebaseConfig)
-const auth = getAuth(_app) // ✅ 명시적 전달
+const auth = getAuth(_app)
 const provider = new GoogleAuthProvider()
-provider.setCustomParameters({prompt: "select_account"})
+console.log(process.env.NEXT_PUBLIC_FIREBASE_API_KEY)
+
+provider.setCustomParameters({prompt: "select_account"}) // 팝업 매번 뜨게
 
 export async function login() {
   return signInWithPopup(auth, provider)
     .then(result => {
       const user = result.user
-      if (typeof window !== "undefined") {
-        localStorage.setItem("user", JSON.stringify(user))
-        window.dispatchEvent(new Event("admin-check"))
-      }
+      localStorage.setItem("user", JSON.stringify(user))
+      window.dispatchEvent(new Event("admin-check")) // 🔥 트리거
       console.log(user)
       return user
     })
@@ -37,10 +37,8 @@ export async function login() {
 }
 
 export async function logout() {
-  if (typeof window !== "undefined") {
-    localStorage.removeItem("user")
-    window.dispatchEvent(new Event("admin-check"))
-  }
+  localStorage.removeItem("user")
+  window.dispatchEvent(new Event("admin-check")) // 🔥 트리거
   return signOut(auth).then(() => null)
 }
 
