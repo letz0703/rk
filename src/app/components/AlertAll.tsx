@@ -11,12 +11,12 @@ export default function AlertAll() {
 
   return (
     <div className="modal-overlay">
-      <button
+      {/*<button
         className="rounded bg-blue-500 text-white px-4 py-2"
         onClick={openAlert}
       >
         <b>Letter from ][</b>
-      </button>
+      </button>*/}
 
       {isOpen && (
         <div
