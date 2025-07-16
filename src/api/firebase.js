@@ -28,7 +28,7 @@ export async function login() {
       const user = result.user
       localStorage.setItem("user", JSON.stringify(user))
       window.dispatchEvent(new Event("admin-check")) // 🔥 트리거
-      console.log(user)
+      //console.log(user)
       return user
     })
     .catch(err => {
