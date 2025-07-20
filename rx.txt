@@ -1,0 +1,13 @@
+import {plugin} from "postcss"
+
+//FlSTUDIO
+;<Mixing>preset MS encoder/decoder</Mixing>
+//https://youtu.be/L5_59o7Kl7Q?t=193
+//L/R 이 Mid하고 Side 라네... 미친 그럼 why use L/R not M/S... crazy
+//https://chatgpt.com/c/687d4054-b0cc-8001-952d-a97441c0eb06
+
+view > mid /side
+
+spectrum plugin
+
+imager 80, 150, 2k

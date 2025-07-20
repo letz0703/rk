@@ -1,21 +1,22 @@
+GPT REACT : https://chatgpt.com/c/687c549e-6a34-8001-af6d-ae0bbec390c9
+
+
 2025.07.20 SUN
 AM
 SUNO. ART
 https://suno.com/playlist/441109ec-84f5-49df-82f0-9e6cc8bc127f
 GPT.스트라빈스키, 피카소, 장콕도
 https://chatgpt.com/c/687c40a7-134c-8001-8483-2412a9119ca0
+https://www.youtube.com/shorts/uL5gplhIydI 모스탄 대사
 
-#1
-#2
-#3 DAVINCI
-CUT PAGE
--
+DAVINCI
+CUT PAGE-
 2025.03.21 금 :
 Señorita
 Nothings Gonna Change My Love For You
 
 2025.01.30 목 ErrorBoundary
-https://courses.webdevsimplified.com/view/courses/react-simplified-advanced/2009182-advanced-react-concepts/6307077-06-error-boundaries
+https://courses.webdevsimplified.com/view/courses/react-simplified-탄advanced/2009182-advanced-react-concepts/6307077-06-error-boundaries
 
 eslint
 .eslingrc.js
