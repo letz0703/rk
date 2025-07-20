@@ -1,3 +1,9 @@
+2025.07.20 SUN
+AM
+SUNO. ART
+https://suno.com/playlist/441109ec-84f5-49df-82f0-9e6cc8bc127f
+GPT.스트라빈스키, 피카소, 장콕도
+https://chatgpt.com/c/687c40a7-134c-8001-8483-2412a9119ca0
 
 #1
 #2

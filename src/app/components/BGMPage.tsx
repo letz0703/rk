@@ -7,15 +7,8 @@ export default function BGMPage() {
       genre: "Nature",
       cover: "/covers/Gentle Breeze.png",
       youtube: "https://youtu.be/9sZW5qF8meM",
-      download: "https://drive.google.com/file/d/11dy5fKzyVNZylvtbq58Hy9X-tGDXTOhi/view?usp=sharing",
-      suno: "https://suno.com/playlist/e427a63e-c2e4-4df6-a5b9-b5b44bd7f5c7"
-    },
-    {
-      title: "City Pulse",
-      genre: "Funk",
-      cover: "/covers/City Pulse.png",
-      youtube: "https://youtube.com/watch?v=유튜브ID2",
-      download: "https://drive.google.com/file/d/파일ID2/view?usp=sharing",
+      download:
+        "https://drive.google.com/file/d/11dy5fKzyVNZylvtbq58Hy9X-tGDXTOhi/view?usp=sharing",
       suno: "https://suno.com/playlist/e427a63e-c2e4-4df6-a5b9-b5b44bd7f5c7"
     }
   ]
