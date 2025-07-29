@@ -4,7 +4,7 @@ import {useEffect, useState} from "react"
 import {useAuthContext} from "../components/context/AuthContext"
 
 export default function CheckAdminButton() {
-  const [isAdmin, setIsAdmin] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(true)
 
   // ✅ 관리자 체크 함수 따로 빼줌
   const checkAdmin = () => {
