@@ -1,4 +1,8 @@
+https://chatgpt.com/c/687c549e-6a34-8001-af6d-ae0bbec390c9
+- 2025.08.04 월 : UPLOAD TO CLOUD
+
 https://academy.dream-coding.com/courses/player/react/lessons/1535
+
 2025.07.29 화 am done
 
 
