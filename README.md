@@ -6,7 +6,7 @@ https://academy.dream-coding.com/courses/player/react/lessons/1535
 
 
 Woon : 2025.07.27 일
-https://chatgpt.com/c/68817407-2c1c-8323-b8cf-ea38d5c09827
+Fortune https://chatgpt.com/c/68817407-2c1c-8323-b8cf-ea38d5c09827
 GPT REACT : https://chatgpt.com/c/687c549e-6a34-8001-af6d-ae0bbec390c9
 
 

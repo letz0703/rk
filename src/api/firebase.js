@@ -18,7 +18,7 @@ const firebaseConfig = {
 const _app = initializeApp(firebaseConfig)
 const auth = getAuth(_app)
 const provider = new GoogleAuthProvider()
-console.log(process.env.NEXT_PUBLIC_FIREBASE_API_KEY)
+//console.log(process.env.NEXT_PUBLIC_FIREBASE_API_KEY)
 
 provider.setCustomParameters({prompt: "select_account"}) // 팝업 매번 뜨게
 

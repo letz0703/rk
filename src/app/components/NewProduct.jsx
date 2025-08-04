@@ -1,6 +1,7 @@
 "use client"
 import {Button} from "@/components/ui/button"
 import {useState} from "react"
+import {uploadImage} from "../../api/uploader"
 
 export default function NewProduct() {
   const [product, setProduct] = useState({})
@@ -16,6 +17,9 @@ export default function NewProduct() {
   const handleSubmit = e => {
     e.preventDefault = e => {
       e.preventDefault()
+      uploadImage(file).then(url => {
+        console.log(url)
+      })
     }
   }
 
@@ -55,14 +59,14 @@ export default function NewProduct() {
             required
             onChange={handleChange}
           />
-          <input
+          {/*<input
             type="text"
             name="option"
             value={product.options ?? ""}
             placeholder="options, comma"
             required
             onChange={handleChange}
-          />
+          />*/}
           <Button text={"제품 등록하기"} />
         </form>
       </section>
