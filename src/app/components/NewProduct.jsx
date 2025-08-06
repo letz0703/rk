@@ -1,12 +1,14 @@
 "use client"
 import {Button} from "@/components/ui/button"
-import {useState} from "react"
+import {use, useState} from "react"
 import {uploadImage} from "../../api/uploader"
 import {addNewProduct} from "@/api/firebase"
 
 export default function NewProduct() {
   const [product, setProduct] = useState({})
   const [file, setFile] = useState()
+  const [isUploading, setIsUploading] = useState()
+  const [success, setSuccess] = useState("")
 
   const handleChange = e => {
     const {name, value, files} = e.target
@@ -19,16 +21,15 @@ export default function NewProduct() {
 
   const handleSubmit = async e => {
     e.preventDefault()
-    console.log("실행됨 handle submit")
+    setIsUploading(true)
+
     if (!file) return alert("이미지를 선택하세요")
 
     try {
       const url = await uploadImage(file).then(url => {
-        //console.log(url)
         addNewProduct(product, url)
         console.log(" add New Don submit")
       })
-      //console.log("Cloudinary URL:", url)
 
       const newProduct = {
         ...product,
@@ -44,6 +45,8 @@ export default function NewProduct() {
 
   return (
     <section>
+      <h2 className="text-4xl text-white">NEW BGM</h2>
+      {success && <p>success!</p>}
       {file && (
         <img src={URL.createObjectURL(file)} alt="local file" width={200} />
       )}
@@ -79,8 +82,11 @@ export default function NewProduct() {
           required
           onChange={handleChange}
         />
-        <Button text={"제품 등록하기"} />
+        <Button disabled={isUploading}>
+          {isUploading ? "uploading..." : "add"}
+        </Button>
       </form>
     </section>
   )
 }
+//upload notice 2025.08.07 목

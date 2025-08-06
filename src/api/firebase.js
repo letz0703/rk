@@ -63,3 +63,6 @@ export async function addNewProduct(product, imgUrl) {
   })
   return
 }
+
+
+
