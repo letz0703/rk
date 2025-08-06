@@ -2,6 +2,7 @@
 import {Button} from "@/components/ui/button"
 import {useState} from "react"
 import {uploadImage} from "../../api/uploader"
+import {addNewProduct} from "@/api/firebase"
 
 export default function NewProduct() {
   const [product, setProduct] = useState({})
@@ -17,12 +18,17 @@ export default function NewProduct() {
   }
 
   const handleSubmit = async e => {
-    e.preventDefault() // ✅ 여기서 그냥 호출해야 함
+    e.preventDefault()
+    console.log("실행됨 handle submit")
     if (!file) return alert("이미지를 선택하세요")
 
     try {
-      const url = await uploadImage(file)
-      console.log("Cloudinary URL:", url)
+      const url = await uploadImage(file).then(url => {
+        //console.log(url)
+        addNewProduct(product, url)
+        console.log(" add New Don submit")
+      })
+      //console.log("Cloudinary URL:", url)
 
       const newProduct = {
         ...product,

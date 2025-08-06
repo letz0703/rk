@@ -1,3 +1,6 @@
+firebase bgm rule database rule
+https://chatgpt.com/c/6892ca6b-5644-8333-8563-a0fcede57fcd park
+
 After Chopin
 https://chatgpt.com/c/689149c9-78dc-832e-9457-8f24db87b960
 2025.08.05 화
