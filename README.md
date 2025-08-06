@@ -1,3 +1,8 @@
+After Chopin
+https://chatgpt.com/c/689149c9-78dc-832e-9457-8f24db87b960
+2025.08.05 화
+
+
 https://chatgpt.com/c/687c549e-6a34-8001-af6d-ae0bbec390c9
 - 2025.08.04 월 : UPLOAD TO CLOUD
 
