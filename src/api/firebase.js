@@ -1,3 +1,5 @@
+// firebase.js
+
 import {initializeApp} from "firebase/app"
 import {v4 as uuid} from "uuid"
 import {
@@ -7,8 +9,13 @@ import {
   signOut,
   onAuthStateChanged
 } from "firebase/auth"
-
-import {getDatabase, ref, get, set} from "firebase/database"
+import {
+  getDatabase,
+  ref,
+  get,
+  set,
+  onValue // ✅ 추가됨
+} from "firebase/database"
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -20,17 +27,15 @@ const _app = initializeApp(firebaseConfig)
 const auth = getAuth(_app)
 const provider = new GoogleAuthProvider()
 const database = getDatabase(_app)
-//console.log(process.env.NEXT_PUBLIC_FIREBASE_API_KEY)
 
-provider.setCustomParameters({prompt: "select_account"}) // 팝업 매번 뜨게
+provider.setCustomParameters({prompt: "select_account"})
 
 export async function login() {
   return signInWithPopup(auth, provider)
     .then(result => {
       const user = result.user
       localStorage.setItem("user", JSON.stringify(user))
-      window.dispatchEvent(new Event("admin-check")) // 🔥 트리거
-      //console.log(user)
+      window.dispatchEvent(new Event("admin-check"))
       return user
     })
     .catch(err => {
@@ -40,7 +45,7 @@ export async function login() {
 
 export async function logout() {
   localStorage.removeItem("user")
-  window.dispatchEvent(new Event("admin-check")) // 🔥 트리거
+  window.dispatchEvent(new Event("admin-check"))
   return signOut(auth).then(() => null)
 }
 
@@ -51,18 +56,23 @@ export function onUserStateChange(callback) {
 }
 
 export async function addNewProduct(product, imgUrl) {
-  console.log("product", product)
-  console.log("image URL", imgUrl)
   const id = uuid()
-  set(ref(database, `product/${id}`), {
+  return set(ref(database, `product/${id}`), {
     ...product,
     id,
     price: parseInt(product.price),
-    image: imgUrl
-    //options: product.options.split(",")
+    image: imgUrl,
+    link: product.link
   })
-  return
 }
 
-
-
+// ✅ 🔽 새로 추가된 함수
+export function getProducts(callback) {
+  const productRef = ref(database, "product")
+  onValue(productRef, snapshot => {
+    const data = snapshot.val()
+    if (!data) return callback([])
+    const list = Object.values(data)
+    callback(list)
+  })
+}
