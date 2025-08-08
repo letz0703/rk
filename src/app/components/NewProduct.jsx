@@ -3,6 +3,7 @@ import {useState, useEffect} from "react"
 import {Button} from "@/components/ui/button"
 import {uploadImage} from "../../api/uploader"
 import {addNewProduct, getProducts} from "@/api/firebase"
+import ListBgm from "./ListBgm" // ✅ 분리한 리스트 컴포넌트
 
 export default function NewProduct() {
   const [product, setProduct] = useState({})
@@ -23,24 +24,20 @@ export default function NewProduct() {
   const handleSubmit = async e => {
     e.preventDefault()
     setIsUploading(true)
-
     if (!file) return alert("이미지를 선택하세요")
 
     try {
       const url = await uploadImage(file)
         .then(url => {
-          addNewProduct(product, url).then(() => {
+          return addNewProduct(product, url).then(() => {
             setSuccess("BGM 업로드 완료")
-            setTimeout(() => setSuccess(null), 3000)
+            setTimeout(() => setSuccess(""), 3000)
+            return url
           })
-          return url
         })
         .finally(() => setIsUploading(false))
 
-      const newProduct = {
-        ...product,
-        image: url
-      }
+      const newProduct = {...product, image: url}
       console.log("등록할 상품:", newProduct)
     } catch (error) {
       console.error("업로드 실패:", error)
@@ -48,6 +45,8 @@ export default function NewProduct() {
   }
 
   useEffect(() => {
+    // getProducts가 onValue 구독 형태라면 setProductList를 넘겨주는 기존 방식 유지
+    // (필요하면 firebase 쪽에서 unsubscribe 반환하도록 개선 가능)
     getProducts(setProductList)
   }, [])
 
@@ -58,10 +57,7 @@ export default function NewProduct() {
 
       <div className="flex flex-col md:flex-row justify-center items-start gap-8 max-w-5xl mx-auto">
         {/* 입력 폼 */}
-        <form
-          onSubmit={handleSubmit}
-          className="w-full md:w-1/3 max-w-md space-y-4"
-        >
+        <form onSubmit={handleSubmit} className="w-full md:w-1/3 max-w-md space-y-4">
           <input
             type="file"
             accept="image/*"
@@ -108,7 +104,6 @@ export default function NewProduct() {
             onChange={handleChange}
             className="w-full p-2 rounded bg-[#3b4355] text-white placeholder-gray-400 border border-gray-600"
           />
-          {/* ✅ 링크 입력 필드 추가 */}
           <input
             type="url"
             name="link"
@@ -143,44 +138,8 @@ export default function NewProduct() {
         </div>
       </div>
 
-      {/* BGM 리스트 */}
-      <div className="mt-12 max-w-5xl mx-auto">
-        <h3 className="text-2xl font-semibold mb-4">등록된 BGM 목록</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {productList.map(p => (
-            <div
-              key={p.id}
-              className="bg-[#3b4355] p-4 rounded-lg shadow hover:shadow-lg"
-            >
-              <img
-                src={p.image}
-                alt={p.title}
-                className="w-full h-40 object-cover rounded mb-2"
-              />
-              <h4 className="text-lg font-bold">{p.title}</h4>
-              <p className="text-sm">price:☕️ x {p.price} </p>
-              <p className="text-sm">장르: {p.genre}</p>
-              {p.link && (
-                <p className="text-sm mt-1">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      window.open(
-                        p.link,
-                        "_blank",
-                        "width=800,height=600,noopener,noreferrer"
-                      )
-                    }
-                    className="text-blue-400 underline hover:text-blue-300"
-                  >
-                    링크 열기
-                  </button>
-                </p>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* ✅ 분리된 컴포넌트로 리스트 렌더 */}
+      <ListBgm items={productList} />
     </section>
   )
 }
