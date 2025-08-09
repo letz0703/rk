@@ -1,6 +1,7 @@
 "use client"
 
-import {useAuthContext} from "./context/AuthContext"
+//import {useAuthContext} from "../../components/context/AuthContext"
+import {useAuthContext} from "@/components/context/AuthContext"
 import {useRouter} from "next/navigation"
 import {useEffect} from "react"
 

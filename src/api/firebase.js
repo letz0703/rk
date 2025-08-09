@@ -1,21 +1,16 @@
-// firebase.js
-
-import {initializeApp} from "firebase/app"
-import {v4 as uuid} from "uuid"
+// Firebase client (singleton)
+import {initializeApp, getApps, getApp} from "firebase/app"
 import {
   getAuth,
-  signInWithPopup,
   GoogleAuthProvider,
+  signInWithPopup,
   signOut,
-  onAuthStateChanged
+  onAuthStateChanged,
+  setPersistence,
+  browserLocalPersistence
 } from "firebase/auth"
-import {
-  getDatabase,
-  ref,
-  get,
-  set,
-  onValue // ✅ 추가됨
-} from "firebase/database"
+import {getDatabase, ref, set, onValue, off} from "firebase/database"
+import {v4 as uuid} from "uuid"
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -23,56 +18,51 @@ const firebaseConfig = {
   databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
 }
-const _app = initializeApp(firebaseConfig)
-const auth = getAuth(_app)
-const provider = new GoogleAuthProvider()
-const database = getDatabase(_app)
 
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig)
+export const auth = getAuth(app)
+export const database = getDatabase(app)
+
+setPersistence(auth, browserLocalPersistence).catch(() => {})
+
+const provider = new GoogleAuthProvider()
 provider.setCustomParameters({prompt: "select_account"})
 
-export async function login() {
-  return signInWithPopup(auth, provider)
-    .then(result => {
-      const user = result.user
-      localStorage.setItem("user", JSON.stringify(user))
-      window.dispatchEvent(new Event("admin-check"))
-      return user
-    })
-    .catch(err => {
-      console.error("Login error:", err)
-    })
+export function login() {
+  return signInWithPopup(auth, provider).then(res => res.user)
 }
-
-export async function logout() {
-  localStorage.removeItem("user")
-  window.dispatchEvent(new Event("admin-check"))
-  return signOut(auth).then(() => null)
+export function logout() {
+  return signOut(auth)
 }
-
 export function onUserStateChange(callback) {
-  return onAuthStateChanged(auth, user => {
-    callback(user)
-  })
+  // returns unsubscribe
+  return onAuthStateChanged(auth, callback)
 }
 
 export async function addNewProduct(product, imgUrl) {
   const id = uuid()
-  return set(ref(database, `product/${id}`), {
+  const payload = {
     ...product,
     id,
-    price: parseInt(product.price),
+    price: Number(product.price) || 0,
     image: imgUrl,
-    link: product.link
-  })
+    link: product.link || "",
+    createdAt: Date.now()
+  }
+  return set(ref(database, `product/${id}`), payload)
 }
 
-// ✅ 🔽 새로 추가된 함수
-export function getProducts(callback) {
+export function getProducts(onData, onError) {
   const productRef = ref(database, "product")
-  onValue(productRef, snapshot => {
-    const data = snapshot.val()
-    if (!data) return callback([])
-    const list = Object.values(data)
-    callback(list)
-  })
+  const listener = snap => {
+    const data = snap.val()
+    const list = data ? Object.entries(data).map(([id, v]) => ({id, ...v})) : []
+    // 최신순
+    list.sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0))
+    onData(list)
+  }
+  const err = e => onError?.(e)
+  onValue(productRef, listener, err)
+  // unsubscribe
+  return () => off(productRef, "value", listener)
 }

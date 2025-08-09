@@ -1,46 +1,68 @@
-//npm i next-cloudinary
-//https://chatgpt.com/c/688d67e7-28bc-8329-aeab-2da1bdba9a3d
-//https://drive.google.com/file/d/1UartVpf6hcRaWsotXcQrTXgUid6RkRdX/view?usp=drive_link
+// Firebase client (singleton)
+import {initializeApp, getApps, getApp} from "firebase/app"
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged,
+  setPersistence,
+  browserLocalPersistence
+} from "firebase/auth"
+import {getDatabase, ref, set, onValue, off} from "firebase/database"
+import {v4 as uuid} from "uuid"
 
-"use client"
-import {CldImage} from "next-cloudinary"
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
+}
 
-export async function uploadImage(file) {
-  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
-  const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
-  //console.log(
-  //  `https://console.cloudinary.com/app/${cloudName}/image/getting-started`
-  //)
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig)
+export const auth = getAuth(app)
+export const database = getDatabase(app)
 
-  const data = new FormData()
-  data.append("file", file)
-  data.append("upload_preset", uploadPreset)
+setPersistence(auth, browserLocalPersistence).catch(() => {})
 
-  const res = await fetch(
-    `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-    {
-      method: "POST",
-      body: data
-    }
-  )
+const provider = new GoogleAuthProvider()
+provider.setCustomParameters({prompt: "select_account"})
 
-  const result = await res.json()
-  return result.secure_url
+export function login() {
+  return signInWithPopup(auth, provider).then(res => res.user)
+}
+export function logout() {
+  return signOut(auth)
+}
+export function onUserStateChange(callback) {
+  // returns unsubscribe
+  return onAuthStateChanged(auth, callback)
+}
 
-  //return fetch(process.env.NEXT_PUBLIC_CLOUDINARY_URL, {
-  //  method: "POST",
-  //  body: data
-  //}).then(res => res.json().then(data => data.url))
+export async function addNewProduct(product, imgUrl) {
+  const id = uuid()
+  const payload = {
+    ...product,
+    id,
+    price: Number(product.price) || 0,
+    image: imgUrl,
+    link: product.link || "",
+    createdAt: Date.now()
+  }
+  return set(ref(database, `product/${id}`), payload)
+}
 
-  //return (
-  //  //<CldImage
-  //  //  src="cld-sample-5" // Use this sample image or upload your own via the Media Explorer
-  //  //  width="500" // Transform the image: auto-crop to square aspect_ratio
-  //  //  height="500"
-  //  //  crop={{
-  //  //    type: "auto",
-  //  //    source: true
-  //  //  }}
-  //  ///>
-  //)
+export function getProducts(onData, onError) {
+  const productRef = ref(database, "product")
+  const listener = snap => {
+    const data = snap.val()
+    const list = data ? Object.entries(data).map(([id, v]) => ({id, ...v})) : []
+    // 최신순
+    list.sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0))
+    onData(list)
+  }
+  const err = e => onError?.(e)
+  onValue(productRef, listener, err)
+  // unsubscribe
+  return () => off(productRef, "value", listener)
 }
