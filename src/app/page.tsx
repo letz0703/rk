@@ -5,6 +5,7 @@ import AlertClient from "./components/AlertDynamic"
 import LoginButton from "./components/LoginButton"
 import User from "./components/User"
 import CheckAdminButton from "./admin/CheckAdmin"
+import Banner from "./components/Banner"
 
 export default function Home() {
   let a = "rainskiss.m"
@@ -15,7 +16,9 @@ export default function Home() {
         <script src="http://localhost:8097"></script>
       </Head>
 
-      <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+      {/*<div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">*/}
+      <div className="grid grid-rows-[auto_1fr_auto] justify-items-center">
+        <Banner />
         <AlertClient />
         <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
           <nav className="flex">
@@ -73,7 +76,7 @@ export default function Home() {
           </div>
           <div>
             If you are satisfied with the result or want another, buy me a
-            coffee 😃
+            coffee ☕️
           </div>
         </main>
         <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">

@@ -43,20 +43,20 @@ export default function ListBgm() {
     return (
       <div className="p-8 text-center">
         <p className="mb-4">로그인 후 이용하세요.</p>
-        <AuthButtons /> {/* ✅ 로그인 버튼 표시 */}
+        <AuthButtons />
       </div>
     )
   }
 
   if (loading) return <div className="p-8">Loading…</div>
-  if (error) return <div className="p-8 text-red-300">에러: {error}</div>
-  if (!items.length) return <div className="p-8">등록된 BGM이 없습니다.</div>
+  if (error) return <div className="p-8 text-red-300">ERROR CODE: {error}</div>
+  if (!items.length) return <div className="p-8">No BGM Here</div>
 
   return (
     <div className="mt-12 max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-2xl font-semibold">등록된 BGM 목록</h3>
-        <AuthButtons /> {/* ✅ 로그인 상태일 땐 프로필+로그아웃 표시 */}
+        <h3 className="text-2xl font-semibold">RainsKiss Cloud Download </h3>
+        <AuthButtons />
       </div>
       <ul className="grid grid-cols-1 lg:grid-cols-4 sm:grid-cols-2 md:grid-cols-3 gap-6 py-4">
         {items.map(p => (
