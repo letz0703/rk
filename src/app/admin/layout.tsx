@@ -1,3 +1,7 @@
+export const dynamic = "force-dynamic"
+export const runtime = "nodejs"
+export const revalidate = 0
+
 import {Nav, NavLink} from "../components/Nav"
 
 export default function AdminLayout({children}: {children: React.ReactNode}) {
