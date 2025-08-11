@@ -66,3 +66,9 @@ export function getProducts(onData, onError) {
   // unsubscribe
   return () => off(productRef, "value", listener)
 }
+export async function uploadImage(file) {
+  const filePath = `images/${Date.now()}_${file.name}`
+  const fileRef = sRef(storage, filePath)
+  await uploadBytes(fileRef, file)
+  return await getDownloadURL(fileRef)
+}

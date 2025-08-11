@@ -11,6 +11,7 @@ import {
 } from "firebase/auth"
 import {getDatabase, ref, set, onValue, off} from "firebase/database"
 import {v4 as uuid} from "uuid"
+import {getStorage} from "firebase/storage"
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -22,6 +23,7 @@ const firebaseConfig = {
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig)
 export const auth = getAuth(app)
 export const database = getDatabase(app)
+export const storage = getStorage(app)
 
 setPersistence(auth, browserLocalPersistence).catch(() => {})
 
