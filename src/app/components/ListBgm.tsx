@@ -5,11 +5,20 @@ import {getProducts} from "@/api/firebase"
 import AuthButtons from "./AuthButton"
 import {useAuthContext} from "@/components/context/AuthContext"
 
+type Product = {
+  id: string
+  title: string
+  price: number
+  genre: string
+  image: string
+  link?: string | null
+}
+
 export default function ListBgm() {
   const {user} = useAuthContext()
-  const [items, setItems] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
+  const [items, setItems] = useState<Product[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string>("")
 
   useEffect(() => {
     if (!user) {
@@ -21,17 +30,23 @@ export default function ListBgm() {
     const timeout = setTimeout(() => setLoading(false), 7000)
 
     const detach = getProducts(
-      (arr = []) => {
+      (arr: Product[] = []) => {
         clearTimeout(timeout)
         setItems(arr)
         setLoading(false)
       },
-      err => {
+      (err: unknown) => {
         clearTimeout(timeout)
-        setError(err?.message || "권한/네트워크 오류")
+        const msg =
+          err instanceof Error
+            ? err.message
+            : typeof err === "string"
+            ? err
+            : "권한/네트워크 오류"
+        setError(msg)
         setLoading(false)
       }
-    )
+    ) as void | (() => void)
 
     return () => {
       clearTimeout(timeout)
@@ -55,9 +70,10 @@ export default function ListBgm() {
   return (
     <div className="mt-12 max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-2xl font-semibold">RainsKiss Cloud Download </h3>
+        <h3 className="text-2xl font-semibold">RainsKiss Cloud Download</h3>
         <AuthButtons />
       </div>
+
       <ul className="grid grid-cols-1 lg:grid-cols-4 sm:grid-cols-2 md:grid-cols-3 gap-6 py-4">
         {items.map(p => (
           <li
@@ -74,13 +90,14 @@ export default function ListBgm() {
             </div>
             <p className="px-2 text-sm">Price: ☕️ x {p.price}</p>
             <p className="mb-2 px-2 text-gray-100 text-sm">Genre: {p.genre}</p>
+
             {!!p.link && (
               <p className="text-sm mt-1 px-2">
                 <button
                   type="button"
                   onClick={() =>
                     window.open(
-                      p.link,
+                      p.link!,
                       "_blank",
                       "width=800,height=600,noopener,noreferrer"
                     )
