@@ -1,13 +1,7 @@
 import {PrismaClient} from "@prisma/client"
 
-const prismaClientSingleton = () => {
-  return new PrismaClient()
-}
-
+const prismaClientSingleton = () => new PrismaClient()
 const db = globalThis.prisma ?? prismaClientSingleton()
-
-if (process.env.NODE_ENV !== "production") {
-  globalThis.prisma = db
-}
+if (process.env.NODE_ENV !== "production") globalThis.prisma = db
 
 export default db
