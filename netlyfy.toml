@@ -1,0 +1,6 @@
+# netlify.toml (루트 or 베이스 디렉터리)
+[build]
+  command = "node -v && npm -v && npm ci && npm run build"
+
+[build.environment]
+  NODE_VERSION = "18.20.3"  # 또는 "20.x" LTS
