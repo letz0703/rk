@@ -23,24 +23,18 @@ export default function NewProduct() {
 
   const handleSubmit = async e => {
     e.preventDefault()
-    setIsUploading(true)
     if (!file) return alert("이미지를 선택하세요")
-
+    setIsUploading(true)
     try {
-      const url = await uploadImage(file)
-        .then(url => {
-          return addNewProduct(product, url).then(() => {
-            setSuccess("BGM 업로드 완료")
-            setTimeout(() => setSuccess(""), 3000)
-            return url
-          })
-        })
-        .finally(() => setIsUploading(false))
-
-      const newProduct = {...product, image: url}
-      console.log("등록할 상품:", newProduct)
-    } catch (error) {
-      console.error("업로드 실패:", error)
+      const url = await uploadImage(file) // <- 여기서 import 정합성만 맞추면 OK
+      await addNewProduct(product, url)
+      setSuccess("BGM 업로드 완료")
+      setTimeout(() => setSuccess(""), 3000)
+      setProductList(prev => prev) // 필요 시 갱신
+    } catch (err) {
+      console.error("업로드 실패:", err)
+    } finally {
+      setIsUploading(false)
     }
   }
 
@@ -57,7 +51,10 @@ export default function NewProduct() {
 
       <div className="flex flex-col md:flex-row justify-center items-start gap-8 max-w-5xl mx-auto">
         {/* 입력 폼 */}
-        <form onSubmit={handleSubmit} className="w-full md:w-1/3 max-w-md space-y-4">
+        <form
+          onSubmit={handleSubmit}
+          className="w-full md:w-1/3 max-w-md space-y-4"
+        >
           <input
             type="file"
             accept="image/*"
