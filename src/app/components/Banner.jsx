@@ -21,10 +21,10 @@ export default function Banner() {
       {/* 텍스트 레이어 */}
       <div className="absolute inset-0 flex items-center">
         <div className="mx-auto w-full max-w-5xl px-6">
-          <h2 className="text-5xl md:text-6xl font-bold text-white drop-shadow">
+          <h2 className="text-5xl md:text-6xl font-bold  text-[#c10002]">
             RAINSKISS
           </h2>
-          <p className="mt-3 text-lg md:text-2xl text-white/90 max-w-2xl drop-shadow">
+          <p className="mt-3 text-sm md:text-xl max-w-2xl drop-shadow-lg text-gray-800 drop-shado-md">
             The sound of rain kissing the earth, <br />
             the most beautiful music in the world.
           </p>
