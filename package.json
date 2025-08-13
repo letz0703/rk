@@ -6,8 +6,8 @@
   },
   "scripts": {
     "dev": "next dev",
-    "postinstall": "prisma generate",
     "build": "prisma db push && next build",
+    "postinstall": "prisma generate",
     "start": "next start",
     "lint": "next lint"
   },
