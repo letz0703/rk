@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
-import {Check, ChevronRight, Circle} from "lucide-react"
+//import {Check, ChevronRight, Circle} from "lucide-react"
 
 import {cn} from "@/lib/utils"
 import {cva} from "class-variance-authority"
@@ -35,7 +35,7 @@ const DropdownMenuSubTrigger = React.forwardRef<
     {...props}
   >
     {children}
-    <ChevronRight className="ml-auto" />
+    {/*<ChevronRight className="ml-auto" />*/}
   </DropdownMenuPrimitive.SubTrigger>
 ))
 DropdownMenuSubTrigger.displayName =
