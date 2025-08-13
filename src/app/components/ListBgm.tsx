@@ -4,6 +4,7 @@ import {useEffect, useState} from "react"
 import {getProducts} from "@/api/firebase"
 import AuthButtons from "./AuthButton"
 import {useAuthContext} from "@/components/context/AuthContext"
+import Nav from "./Nav"
 
 type Product = {
   id: string
@@ -73,6 +74,7 @@ export default function ListBgm() {
         <h3 className="text-2xl font-semibold">RainsKiss Cloud Download</h3>
         <AuthButtons />
       </div>
+      <Nav />
 
       <ul className="grid grid-cols-1 lg:grid-cols-4 sm:grid-cols-2 md:grid-cols-3 gap-6 py-4">
         {items.map(p => (

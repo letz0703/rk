@@ -8,8 +8,8 @@ export default function New() {
 
   return (
     <>
-      {/*{isAdmin && <NewProduct />}*/}
-      <NewProduct />
+      {isAdmin && <NewProduct />}
+      {/*<NewProduct />*/}
       <ListBgm />
     </>
   )

@@ -1,13 +1,18 @@
 GPT REACT : https://chatgpt.com/c/687c549e-6a34-8001-af6d-ae0bbec390c9
 GPT DESIGN : https://chatgpt.com/c/6893fcd5-953c-8321-b7e6-e3e570a0d10e
 
-2025.08.11 월 : Banner Design 
+2025.08.12 화 : 
+
+2025.08.11 월 : Banner Design
 
 2025.08.07 목
 Lucide-react 제거 am https://chatgpt.com/c/6893f2ee-e704-8328-a0a8-0ec0a8ff2b8f
 
 new music 2025.08.07 목
-//https://chatgpt.com/c/6893fcd5-953c-8321-b7e6-e3e570a0d10e 2025.08.07 목
+//
+
+
+https://chatgpt.com/c/6893fcd5-953c-8321-b7e6-e3e570a0d10e 2025.08.07 목
 
 firebase bgm rule database rule
 https://chatgpt.com/c/6892ca6b-5644-8333-8563-a0fcede57fcd park

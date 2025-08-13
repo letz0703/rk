@@ -40,7 +40,10 @@ export default function User() {
   return (
     <>
       <Link href="/downloads" className="hidden md:block mr-2">
-        download
+        BGM
+      </Link>
+      <Link href="/bgm" className="hidden md:block mr-2">
+        Lofi·Classic
       </Link>
     </>
   )

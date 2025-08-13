@@ -1,5 +1,7 @@
 "use client"
 
+import Nav from "./Nav"
+
 export default function BGMPage() {
   const bgms = [
     {
@@ -21,7 +23,16 @@ export default function BGMPage() {
 
   return (
     <div className="max-w-6xl mx-auto p-8">
-      <h1 className="text-4xl font-bold mb-10">Free BGM Library</h1>
+      <div>
+        <h1 className="text-4xl font-bold mb-10">RainsKiss Free BGM </h1>
+        <Nav />
+      </div>
+      <div className="p-5">
+        🎧 Non-commercial use allowed after subscription 🦋
+        youtube.com/@rainskiss.m © 2025 rainskiss 🌈 All rights reserved by the
+        creator 🫧 Commercial use (DSP uploads, monetized content, resale, paid
+        apps) is strictly prohibited without written permission
+      </div>
 
       {Object.entries(grouped).map(([genre, items]) => (
         <div key={genre} className="mb-12">
