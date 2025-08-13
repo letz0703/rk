@@ -1,19 +1,19 @@
-export const dynamic = "force-dynamic"
-export const runtime = "nodejs"
-export const revalidate = 0
+//export const dynamic = "force-dynamic"
+//export const runtime = "nodejs"
+//export const revalidate = 0
 
-import {Nav, NavLink} from "../components/Nav"
+////import {Nav, NavLink} from "../components/Nav"
 
-export default function AdminLayout({children}: {children: React.ReactNode}) {
-  return (
-    <>
-      <Nav>
-        <NavLink href="/admin">Admin Board</NavLink>
-        <NavLink href="/admin/products">Products</NavLink>
-        <NavLink href="/admin/users">Customers</NavLink>
-        <NavLink href="/admin/orders">Orders</NavLink>
-      </Nav>
-      <div className="container my-6">{children}</div>
-    </>
-  )
-}
+//export default function AdminLayout({children}: {children: React.ReactNode}) {
+//  return (
+//    <>
+//      <Nav>
+//        <NavLink href="/admin">Admin Board</NavLink>
+//        <NavLink href="/admin/products">Products</NavLink>
+//        <NavLink href="/admin/users">Customers</NavLink>
+//        <NavLink href="/admin/orders">Orders</NavLink>
+//      </Nav>
+//      <div className="container my-6">{children}</div>
+//    </>
+//  )
+//}
