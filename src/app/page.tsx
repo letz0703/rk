@@ -20,14 +20,8 @@ export default function Home() {
       </Head>
 
       {/* 오른쪽 상단 고정 영역 */}
-      <div
-        className="fixed top-0 right-0 z-50 pointer-events-none
-                pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)]"
-      >
-        <div
-          className="mr-4 mt-4 flex flex-col items-end text-right gap-2
-                  pointer-events-auto select-none"
-        >
+      <div className="fixed top-0 right-0 z-50 pointer-events-none pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)]">
+        <div className="mr-4 mt-4 flex flex-col items-end text-right gap-2 pointer-events-auto select-none">
           <a href="/" aria-label="rainskiss home" className="inline-block">
             <img
               src="/logo-rk.svg"
@@ -59,22 +53,30 @@ export default function Home() {
           <AlertClient />
           <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start p-3">
             <h1 className="text-2xl text-orange-500 font-bold">
-              Optimize Volume for Youtube
+              Perfect Music, For Tomorrow
               <div className="text-sm text-white m-2 p-1">
-                https://youtubue.com/@rasinskiss.m <br />
+                <a
+                  href="https://youtube.com/@rainskiss.m"
+                  className="underline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://youtube.com/@rainskiss.m
+                </a>
+                <br />
                 <a href="https://suno.com/invite/@rainskiss_o">
                   https://suno.com/invite/@rainskiss_o
                 </a>
                 <p className="text-gray-400 text-sm">
-                  When you signs up and creates 10 songs, we both receive 250
-                  free credits. Limit of 2500 credits per person.
+                  When you sign up and create 10 songs, we both receive 250 free
+                  credits. Limit of 2500 credits per person.
                 </p>
               </div>
             </h1>
 
             <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
               <li className="mb-2">
-                I normalize songs for best volume on youtube.
+                I normalize songs for best volume on YouTube.
               </li>
               <li className="mb-2">I colorize clips I like.</li>
               <li>
@@ -85,89 +87,77 @@ export default function Home() {
               <li>One free on subscription</li>
             </ol>
 
-            {/* 후원 설명 블록 */}
-            <div className="mx-auto max-w-3xl rounded-2xl border border-yellow-400/40 bg-yellow-50/90 dark:bg-yellow-100/10 p-6 shadow-lg space-y-6">
-              {/* 영어 */}
-              <div>
-                <h2 className="text-lg sm:text-xl font-semibold text-yellow-800 dark:text-yellow-300 mb-2">
-                  <span className="text-orange-700"> New Classic Project</span>{" "}
+            {/* 후원 설명 블록 — 영어만 남김 */}
+            <div className="mx-auto max-w-3xl rounded-2xl ring-1 ring-amber-300/50 bg-yellow-50/95 dark:bg-zinc-800/40 p-6 shadow-lg space-y-8">
+              <div className="text-neutral-900 dark:text-neutral-100">
+                <p className="leading-relaxed text-sm">
+                  On YouTube, there are beautiful legendary songs whose volume
+                  balance is a little less than ideal. With the latest
+                  technology and my own ear (intuition), I restore their
+                  loudness and balance to the fullest possible quality—bringing
+                  back their original feel and emotion for future generations.
+                </p>
+                <p className="mt-2 leading-relaxed text-sm">
+                  I work using the YouTube “Stats for Nerds” reference, aiming
+                  for Volume 100% / Loudness 0.0, so every track plays exactly
+                  as intended without the platform’s automatic gain changes.
+                </p>
+
+                <h2 className="mt-4 text-lg sm:text-xl font-semibold text-yellow-800 dark:text-yellow-300">
+                  <span className="text-orange-700">
+                    rainskiss LoFi · classic · Project
+                  </span>
                   <br />
                   Your support helps create tomorrow’s classics
                 </h2>
-                <p className="text-neutral-800 dark:text-neutral-200 leading-relaxed text-sm">
-                  On YouTube, there are beautiful legendary songs whose volume
-                  balance is a little less than ideal. <br />
-                  With the latest technology and my own ear (intuition), I
-                  restore their loudness and balance to the fullest possible
-                  quality—bringing back their original feel and emotion for
-                  future generations.
-                </p>
-                <p className="mt-2 text-neutral-800 dark:text-neutral-200 leading-relaxed text-sm">
-                  I work using the YouTube “Stats for Nerds” reference, aiming
-                  for Volume 100% / Loudness 0.0, so every track plays exactly
-                  as intended without the platform’s automatic gain changes.{" "}
-                  <br />
-                  <br />
+
+                <p className="mt-2 leading-relaxed text-sm">
                   In addition, I create and share free music based on public
                   domain classical works—pieces not bound by the copyright of
                   major labels—allowing everyone to enjoy and use them freely.
                 </p>
-                <p className="mt-2 text-neutral-800 dark:text-neutral-200 leading-relaxed text-sm">
-                  This is how “New Classics” are born. 💛 Join me on this
-                  journey that started in a small studio.
+                <p className="mt-2 leading-relaxed text-sm">
+                  This is how “rainskiss LoFi · classic · Projects” are born. 💛
+                  Join me on this journey that started in a small studio.
                 </p>
-                <a
-                  href="https://www.buymeacoffee.com/rainskiss"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center rounded-xl px-5 py-2.5 mt-2 text-sm font-semibold bg-yellow-400 hover:bg-yellow-300 active:bg-yellow-500 text-black shadow-md transition"
-                >
-                  ☕ Support via Buy Me A Coffee
-                </a>
-              </div>
 
-              {/* 일본어 */}
-              <div>
-                <h2 className="text-lg sm:text-xl font-semibold text-yellow-800 dark:text-yellow-300 mb-2">
-                  🎧 New Classic Project —
-                  あなたの支援が未来のクラシックを生み出します。
-                </h2>
-                <p className="text-neutral-800 dark:text-neutral-200 leading-relaxed text-sm">
-                  YouTubeには、美しいのに音量バランスがやや物足りない名曲が多くあります。
-                  私は最新の技術と自分の耳（感覚）を用いて、ラウドネスとバランスを可能な限り高品質に整え、曲本来の感情と質感を未来へ残す復元を行います。
-                </p>
-                <p className="mt-2 text-neutral-800 dark:text-neutral-200 leading-relaxed text-sm">
-                  作業は YouTube「Stats for Nerds」の基準を使用し、Volume 100% /
-                  Loudness 0.0 を目標にしています。
-                  さらに、大手レーベルの著作権に縛られないクラシックの名曲を基に、無料で使える音楽を制作・配布しています。
-                </p>
-                <p className="mt-2 text-neutral-800 dark:text-neutral-200 leading-relaxed text-sm">
-                  こうして「New Classics」が誕生します。 💛
-                  小さなスタジオから始まったこの旅に、ぜひご参加ください。
-                </p>
-              </div>
-
-              {/* 한국어 */}
-              <div>
-                <h2 className="text-lg sm:text-xl font-semibold text-yellow-800 dark:text-yellow-300 mb-2">
-                  🎧 New Classic Project — 당신의 후원이 미래의 클래식을
-                  만듭니다.
-                </h2>
-                <p className="text-neutral-800 dark:text-neutral-200 leading-relaxed text-sm">
-                  유튜브에는 아름답지만 볼륨 밸런스가 조금 아쉬운 명곡들이
-                  있습니다. 저는 최신 기술과 제 귀(느낌)으로 라우드니스와
-                  밸런스를 가능한 최고 품질로 복원해, 곡이 지닌 원래의 감정과
-                  질감을 후세에 남깁니다.
-                </p>
-                <p className="mt-2 text-neutral-800 dark:text-neutral-200 leading-relaxed text-sm">
-                  작업은 유튜브 ‘stats for nerds’ 기준으로, Volume 100% /
-                  Loudness 0.0을 목표로 합니다. 또한, 거대 레이블의 저작권이
-                  없는 클래식 명곡을 기반으로 무료 음악을 제작·배포합니다.
-                </p>
-                <p className="mt-2 text-neutral-800 dark:text-neutral-200 leading-relaxed text-sm">
-                  이렇게 해서 “New Classic”이 탄생합니다. 💛 작은 스튜디오에서
-                  시작된 이 여정에 함께해주세요.
-                </p>
+                {/* 추가 조건 안내 (영) */}
+                <div className="mt-4 rounded-2xl p-4 sm:p-5 ring-1 ring-amber-300/60 bg-amber-50/90 dark:bg-zinc-900/70 text-neutral-900 dark:text-neutral-100">
+                  <strong className="block">
+                    All songs available for download on our site{" "}
+                    <a
+                      href="https://rainskiss.com"
+                      className="underline text-blue-700 dark:text-blue-300 underline-offset-2"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      rainskiss.com
+                    </a>{" "}
+                    can be freely used under the following conditions:
+                  </strong>
+                  <ul className="mt-2 list-disc list-inside space-y-1 marker:text-amber-700 dark:marker:text-amber-300">
+                    <li>🎧 Non-commercial use allowed after subscription</li>
+                    <li>
+                      🦋{" "}
+                      <a
+                        href="https://youtube.com/@rainskiss.m"
+                        className="underline text-blue-700 dark:text-blue-300 underline-offset-2"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        youtube.com/@rainskiss.m
+                      </a>
+                    </li>
+                    <li>
+                      © 2025 rainskiss 🌈 All rights reserved by the creator
+                    </li>
+                    <li>
+                      🫧 Commercial use (DSP uploads, monetized content, resale,
+                      paid apps) is strictly prohibited without written
+                      permission
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
 
@@ -192,7 +182,11 @@ export default function Home() {
           </main>
 
           <footer className="pt-6 row-start-3 flex gap-6 flex-wrap items-center justify-center">
-            <a href="https://www.buymeacoffee.com/rainskiss" target="_blank">
+            <a
+              href="https://www.buymeacoffee.com/rainskiss"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <Image
                 src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
                 alt="Buy Me A Coffee"
