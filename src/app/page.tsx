@@ -37,7 +37,7 @@ export default function Home() {
           </div>
           <div className="rounded-xl bg-black/30 backdrop-blur-sm px-3 py-2">
             <div className="text-white drop-shadow-lg text-sm sm:text-base leading-snug">
-              Aim to loudness zero • 0.0
+              Aim to 100% volume & loudness zero • 0.0
             </div>
             <code className="block text-blue-200 drop-shadow-lg text-xs sm:text-sm mt-0.5 tracking-wide">
               100% Volume • Beyond Generations
@@ -53,39 +53,37 @@ export default function Home() {
           <AlertClient />
           <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start p-3">
             <h1 className="text-2xl text-orange-500 font-bold">
-              Perfect Music, For Tomorrow
-              <div className="text-sm text-white m-2 p-1">
-                <a
-                  href="https://youtube.com/@rainskiss.m"
-                  className="underline"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  https://youtube.com/@rainskiss.m
-                </a>
-                <br />
-                <a href="https://suno.com/invite/@rainskiss_o">
-                  https://suno.com/invite/@rainskiss_o
-                </a>
-                <p className="text-gray-400 text-sm">
-                  When you sign up and create 10 songs, we both receive 250 free
-                  credits. Limit of 2500 credits per person.
-                </p>
-              </div>
+              Perfect Volume for next Generation, 100 Volume - Zero Loudness
             </h1>
 
-            <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-              <li className="mb-2">
-                I normalize songs for best volume on YouTube.
-              </li>
-              <li className="mb-2">I colorize clips I like.</li>
-              <li>
-                I create copyright-free music and wallpapers for subscribers
-                (for non-commercial use only.)
-              </li>
-              <li>I will make a 3D doll(picture) of you.</li>
-              <li>One free on subscription</li>
-            </ol>
+            <div className="max-w-4xl mx-auto">
+              <ol className="list-inside list-decimal text-sm text-left font-[family-name:var(--font-geist-mono)] space-y-3 leading-relaxed">
+                <li>
+                  <div>
+                    I preserve every track’s true peak, optimizing it to 99–100%
+                    without clipping, and normalize loudness to 0.0 — ensuring
+                    that great music is passed on to the next generation exactly
+                    as it was meant to be heard.
+                  </div>
+                  <small className="block text-gray-400">
+                    Side Effect: Slightly quieter but crystal clear, natural
+                    dynamics, and playable louder without ear fatigue.
+                  </small>
+                </li>
+                <li>
+                  I colorize clips I like. Colors tuned to my eyes, not presets.
+                </li>
+                <li>
+                  I create copyright-free music and wallpapers for subscribers
+                  <small className="text-gray-400">
+                    (non-commercial use only)
+                  </small>
+                  .
+                </li>
+                <li>I will make a 3D doll (picture) of you.</li>
+                <li>One free on subscription</li>
+              </ol>
+            </div>
 
             {/* 후원 설명 블록 — 영어만 남김 */}
             <div className="mx-auto max-w-3xl rounded-2xl ring-1 ring-amber-300/50 bg-yellow-50/95 dark:bg-zinc-800/40 p-6 shadow-lg space-y-8">
@@ -182,6 +180,24 @@ export default function Home() {
           </main>
 
           <footer className="pt-6 row-start-3 flex gap-6 flex-wrap items-center justify-center">
+            <div className="text-sm text-white m-2 p-1">
+              <a
+                href="https://youtube.com/@rainskiss.m"
+                className="underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                https://youtube.com/@rainskiss.m
+              </a>
+              <br />
+              <a href="https://suno.com/invite/@rainskiss_o">
+                https://suno.com/invite/@rainskiss_o
+              </a>
+              <p className="text-gray-400 text-sm">
+                When you sign up and create 10 songs, we both receive 250 free
+                credits. Limit of 2500 credits per person.
+              </p>
+            </div>
             <a
               href="https://www.buymeacoffee.com/rainskiss"
               target="_blank"
