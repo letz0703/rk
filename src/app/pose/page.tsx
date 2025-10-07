@@ -103,7 +103,7 @@ export default function PoseHome() {
     `https://drive.google.com/file/d/${id}/preview` // 안정적 임베드 URL
 
   return (
-    <main className="mx-auto max-w-5xl p-6">
+    <main className="mx-auto max-w-5xl p-6 w-full">
       <h1 className="mb-6 text-3xl font-bold">Pose • Google Drive 연결</h1>
 
       <LoginButton />
