@@ -1,3 +1,4 @@
+
 [link](https://chatgpt.com/c/687c549e-6a34-8001-af6d-ae0bbec390c9)
 [link](https://chatgpt.com/c/6893fcd5-953c-8321-b7e6-e3e570a0d10e)
 
@@ -17,6 +18,7 @@ new music 2025.08.07 목
 
 firebase bgm rule database rule
 [link](https://chatgpt.com/c/6892ca6b-5644-8333-8563-a0fcede57fcd) park
+SUNO. ART
 
 After Chopin
 [link](https://chatgpt.com/c/689149c9-78dc-832e-9457-8f24db87b960)
@@ -37,7 +39,6 @@ GPT REACT : [link](https://chatgpt.com/c/687c549e-6a34-8001-af6d-ae0bbec390c9)
 
 2025.07.20 SUN
 AM
-SUNO. ART
 [link](https://suno.com/playlist/441109ec-84f5-49df-82f0-9e6cc8bc127f)
 GPT.스트라빈스키, 피카소, 장콕도
 [link](https://chatgpt.com/c/687c40a7-134c-8001-8483-2412a9119ca0)
