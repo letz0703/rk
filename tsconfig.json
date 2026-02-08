@@ -22,6 +22,13 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/admin/CheckAdmin.jsx", "src/app/downloads/page.jsx", "src/app/todo/page.jsx"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "src/app/downloads/page.jsx",
+    "src/app/todo/page.jsx"
+  ],
   "exclude": ["node_modules"]
 }
