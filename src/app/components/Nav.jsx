@@ -1,5 +1,4 @@
 "use client"
-import CheckAdminButton from "../admin/CheckAdmin"
 import LoginButton from "./LoginButton"
 import User from "./User"
 
