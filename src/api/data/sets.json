@@ -3,18 +3,49 @@
     "id": "set-001",
     "title": "African Village Series",
     "description": "Primitive tribe cinematic sensual arc",
-    "tags": ["tribe", "jungle", "cinematic"]
+    "tags": ["tribe", "jungle", "cinematic"],
+    "downloads": [
+      {
+        "label": "Download TXT",
+        "type": "text",
+        "url": "https://docs.google.com/document/d/FILE_ID_1/export?format=txt"
+      },
+      {
+        "label": "Download PDF",
+        "type": "pdf",
+        "url": "https://docs.google.com/document/d/FILE_ID_1/export?format=pdf"
+      }
+    ]
   },
   {
     "id": "set-002",
     "title": "1972 LA Housewife",
     "description": "Vintage film aesthetic domestic mood",
-    "tags": ["1972", "LA", "film"]
+    "tags": ["1972", "LA", "film", "retro"],
+    "downloads": [
+      {
+        "label": "Download TXT",
+        "type": "text",
+        "url": "https://docs.google.com/document/d/FILE_ID_2/export?format=txt"
+      },
+      {
+        "label": "Download MD",
+        "type": "markdown",
+        "url": "https://docs.google.com/document/d/FILE_ID_2/export?format=txt"
+      }
+    ]
   },
   {
     "id": "set-003",
     "title": "Korean Office Candid",
-    "description": "Scanned film, intimate cafe snapshot",
-    "tags": ["korean", "cafe", "candid"]
+    "description": "Scanned film original, intimate cafe snapshot",
+    "tags": ["korean", "cafe", "candid", "film"],
+    "downloads": [
+      {
+        "label": "Download TXT",
+        "type": "text",
+        "url": "https://docs.google.com/document/d/FILE_ID_3/export?format=txt"
+      }
+    ]
   }
 ]
