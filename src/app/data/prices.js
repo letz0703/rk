@@ -2,7 +2,16 @@ export const prices = [
   // =====================
   // 🚬 Cigarettes
   // =====================
-
+  {
+    id: "seven-star",
+    category: "cigarette",
+    brand: "Seven-star",
+    name: "세븐스",
+    price: "52",
+    purchasePrice: null,
+    quantity: 1,
+    purchasedAt: "2026-01-01"
+  },
   {
     id: "esse-prime",
     category: "cigarette",
