@@ -2,6 +2,7 @@
 
 import {useState} from "react"
 import {ref, push} from "firebase/database"
+import {database} from "../../../api/firebase"
 
 function generateSearchText(title: string, content: string) {
   const clean = (text: string) =>
@@ -26,7 +27,7 @@ export default function NewPromptPage() {
 
     const searchText = generateSearchText(title, content)
 
-    await push(ref(db, "prompts"), {
+    await push(ref(database, "prompts"), {
       title,
       content,
       searchText,
