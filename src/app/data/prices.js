@@ -3,6 +3,16 @@ export const prices = [
   // 🚬 Cigarettes
   // =====================
   {
+    id: "the-one",
+    category: "cigarette",
+    brand: "The-one",
+    name: "더원",
+    price: "37",
+    purchasePrice: null,
+    quantity: 1,
+    purchasedAt: "2026-01-01"
+  },
+  {
     id: "seven-star",
     category: "cigarette",
     brand: "Seven-star",
