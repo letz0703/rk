@@ -1,4 +1,8 @@
+2026.02.21.Sat prompts 
+
  F12. AAM 8.44 : https://chatgpt.com/c/698d0fac-b584-83a2-912e-f9eacd21f86b
+
+
 
  working
  매일 남기기로 한다.

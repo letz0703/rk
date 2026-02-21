@@ -2,6 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  box-sizing: border-box;
+}
+html {
+  overflow-y: scroll;
+}
 :root {
   --background: #ffffff;
   --foreground: #171717;

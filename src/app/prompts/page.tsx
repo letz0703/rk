@@ -12,7 +12,6 @@ export default function PromptSearchPage() {
   const [isSaving, setIsSaving] = useState(false)
   const [copiedId, setCopiedId] = useState<string | null>(null)
 
-  /* ---------------- FETCH ---------------- */
   const fetchPrompts = useCallback(async () => {
     const snapshot = await get(ref(database, "prompts"))
     if (snapshot.exists()) {
@@ -20,7 +19,7 @@ export default function PromptSearchPage() {
         id: key,
         ...value
       }))
-      setPrompts(data.sort((a, b) => b.createdAt - a.createdAt))
+      setPrompts(data.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)))
     } else {
       setPrompts([])
     }
@@ -30,7 +29,6 @@ export default function PromptSearchPage() {
     fetchPrompts()
   }, [fetchPrompts])
 
-  /* ---------------- SEARCH ENGINE ---------------- */
   const fuse = useMemo(() => {
     return new Fuse(prompts, {
       keys: ["title", "searchText", "content"],
@@ -44,9 +42,14 @@ export default function PromptSearchPage() {
     return fuse.search(query).map(r => r.item)
   }, [query, fuse, prompts])
 
-  /* ---------------- SAVE ---------------- */
+  const exactMatch = useMemo(() => {
+    return prompts.some(p => p.content?.trim() === query.trim())
+  }, [prompts, query])
+
   const handleSave = async () => {
     if (!query.trim()) return
+    if (exactMatch) return alert("Already exists")
+
     setIsSaving(true)
 
     await push(ref(database, "prompts"), {
@@ -61,9 +64,9 @@ export default function PromptSearchPage() {
     setIsSaving(false)
   }
 
-  /* ---------------- UPDATE ---------------- */
   const handleUpdate = async () => {
     if (!selected) return
+
     setIsSaving(true)
 
     await update(ref(database, `prompts/${selected.id}`), {
@@ -78,49 +81,27 @@ export default function PromptSearchPage() {
     setIsSaving(false)
   }
 
-  /* ---------------- CANCEL ---------------- */
-  const handleCancel = () => {
-    setSelected(null)
-    setQuery("")
-  }
-
-  /* ---------------- COPY ---------------- */
   const handleCopy = (e: any, content: string, id: string) => {
     e.stopPropagation()
     navigator.clipboard.writeText(content)
     setCopiedId(id)
-    setTimeout(() => setCopiedId(null), 1200)
+    setTimeout(() => setCopiedId(null), 1000)
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white flex justify-center overflow-y-scroll">
-      <div className="w-[1100px] px-10 py-12">
-        {/* TEXTAREA (레이아웃 흔들림 방지 설정) */}
+    <div className="w-full min-h-screen bg-slate-900 text-white">
+      <div className="w-full px-8 py-10">
+        {/* TEXTAREA */}
         <textarea
           placeholder="Search or paste your full prompt here..."
           value={query}
           onChange={e => setQuery(e.target.value)}
-          rows={12}
-          className="
-            w-full
-            p-6
-            text-sm
-            bg-slate-800
-            border border-slate-700
-            rounded-xl
-            resize-none
-            overflow-y-scroll
-            focus:outline-none
-            focus:ring-2
-            focus:ring-blue-500
-            transition-none
-            mb-6
-          "
+          className="w-full h-64 p-6 bg-slate-800 border border-slate-700 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 mb-8"
         />
 
         {/* BUTTONS */}
-        <div className="flex gap-4 mb-8">
-          {query && results.length === 0 && !selected && (
+        <div className="flex gap-4 mb-10 min-h-[48px]">
+          {!selected && !exactMatch && (
             <button
               onClick={handleSave}
               disabled={isSaving}
@@ -139,13 +120,6 @@ export default function PromptSearchPage() {
               >
                 {isSaving ? "Updating..." : "Update Prompt"}
               </button>
-
-              <button
-                onClick={handleCancel}
-                className="px-6 py-2 bg-slate-600 hover:bg-slate-700 rounded-md transition"
-              >
-                Cancel
-              </button>
             </>
           )}
         </div>
@@ -153,7 +127,7 @@ export default function PromptSearchPage() {
         <hr className="border-slate-700 mb-10" />
 
         {/* RESULTS */}
-        <div className="space-y-8">
+        <div className="w-full space-y-6 min-h-[300px]">
           {results.map(prompt => (
             <div
               key={prompt.id}
@@ -161,27 +135,17 @@ export default function PromptSearchPage() {
                 setSelected(prompt)
                 setQuery(prompt.content)
               }}
-              className="
-                p-6
-                bg-slate-800
-                border border-slate-700
-                rounded-xl
-                cursor-pointer
-                hover:border-blue-500
-                transition
-              "
+              className="w-full p-6 bg-slate-800 border border-slate-700 rounded-xl hover:border-blue-500 transition cursor-pointer"
             >
-              <h3 className="text-lg font-semibold mb-3 truncate">
-                {prompt.title}
-              </h3>
+              <h3 className="font-semibold mb-4">{prompt.title}</h3>
 
-              <pre className="whitespace-pre-wrap text-xs text-slate-300 mb-4">
+              <pre className="whitespace-pre-wrap break-words text-xs text-slate-300 mb-4">
                 {prompt.content}
               </pre>
 
               <button
                 onClick={e => handleCopy(e, prompt.content, prompt.id)}
-                className="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded-md text-xs transition"
+                className="px-3 py-1 bg-blue-600 rounded-md text-xs"
               >
                 {copiedId === prompt.id ? "Copied!" : "Copy"}
               </button>
