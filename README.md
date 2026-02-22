@@ -1,12 +1,10 @@
-2026.02.21.Sat prompts 
+F22
+cmdshift-1 : search engine
+youtube bookmark: cmdshift-6
 
  F12. AAM 8.44 : https://chatgpt.com/c/698d0fac-b584-83a2-912e-f9eacd21f86b
 
-
-
- working
- 매일 남기기로 한다.
-
+---
 [link](https://chatgpt.com/c/687c549e-6a34-8001-af6d-ae0bbec390c9)
 [link](https://chatgpt.com/c/6893fcd5-953c-8321-b7e6-e3e570a0d10e)
 
