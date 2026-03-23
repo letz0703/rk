@@ -1,4 +1,5 @@
 import Image from "next/image"
+import Link from "next/link"
 
 export default function Page() {
   return (
@@ -31,7 +32,7 @@ export default function Page() {
         </h2>
 
         <p className="mt-4 text-base sm:text-lg text-gray-300 leading-relaxed max-w-xl">
-          Please introduce the timeless songs you’ve lived with all your life.
+          Please introduce the timeless songs you&apos;ve lived with all your life.
           <br />
           <span className="text-orange-400 font-semibold">rainskiss</span> knows
           how to bring them back.
@@ -39,32 +40,77 @@ export default function Page() {
 
         <div className="flex flex-wrap gap-4 mt-6 justify-center">
           <a
-            href="https://youtube.com/@rainskiss.m"
+            href="https://youtube.com/@rainskiss"
             target="_blank"
-            className="px-5 py-2 rounded-full bg-black text-white hover:bg-zinc-700 text-sm"
+            rel="noopener noreferrer"
+            className="px-5 py-2 rounded-full bg-red-600 text-white hover:bg-red-700 text-sm transition"
           >
-            .m: YouTube
+            ▶ YouTube
           </a>
           <a
-            href="https://deviantart.com/rainskiss"
+            href="https://deviantart.com/rainskiss-x"
             target="_blank"
-            className="px-5 py-2 rounded-full border border-white/20 hover:bg-white hover:text-black text-sm"
+            rel="noopener noreferrer"
+            className="px-5 py-2 rounded-full border border-white/20 hover:bg-white hover:text-black text-sm transition"
           >
-            .x: DeviantArt(18+)
+            DeviantArt (18+)
           </a>
           <a
             href="https://suno.com/invite/@rainskiss_o"
             target="_blank"
-            className="px-5 py-2 rounded-full bg-yellow-300 text-black hover:bg-yellow-400 text-sm"
+            rel="noopener noreferrer"
+            className="px-5 py-2 rounded-full bg-yellow-300 text-black hover:bg-yellow-400 text-sm transition"
           >
-            ☀️ suno invite
+            ☀️ Suno
           </a>
+          <Link
+            href="/shop"
+            className="px-5 py-2 rounded-full bg-white text-black hover:bg-gray-200 text-sm font-semibold transition"
+          >
+            🛒 Shop
+          </Link>
         </div>
       </main>
 
+      {/* Patreon 섹션 */}
+      <section className="bg-orange-950/40 border-t border-orange-900/30 px-6 py-14">
+        <div className="max-w-xl mx-auto text-center">
+          <p className="text-orange-400 text-xs font-bold uppercase tracking-widest mb-3">Support the creator</p>
+          <h3 className="text-2xl font-bold text-white mb-3">
+            Join on Patreon
+          </h3>
+          <p className="text-gray-400 text-sm leading-relaxed mb-8">
+            Get exclusive music downloads, adult photobooks, behind-the-scenes content,
+            and commercial use rights. Every membership goes directly to creating more.
+          </p>
+          <a
+            href="https://patreon.com/rainskiss"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block px-8 py-3 bg-orange-500 text-white font-bold rounded-full hover:bg-orange-400 transition text-base"
+          >
+            Become a Patron
+          </a>
+          <p className="mt-4 text-xs text-gray-600">
+            Also available on{" "}
+            <a
+              href="https://buymeacoffee.com/rainskiss"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-yellow-500 hover:underline"
+            >
+              Buy Me a Coffee
+            </a>
+          </p>
+        </div>
+      </section>
+
       {/* 푸터 */}
-      <footer className="py-6 text-xs text-gray-500 text-center">
-        © 2025 rainskiss · All rights reserved
+      <footer className="py-6 text-xs text-gray-500 text-center border-t border-white/5">
+        © 2025 rainskiss · All rights reserved ·{" "}
+        <Link href="/letters" className="hover:text-gray-300 transition">
+          Send a Letter
+        </Link>
       </footer>
     </div>
   )

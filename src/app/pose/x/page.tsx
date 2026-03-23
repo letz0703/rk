@@ -58,7 +58,7 @@ export default function PoseXListPage() {
   // RTDB 실시간 구독
   useEffect(() => {
     const r = dbRef(database, ROOT)
-    const listener = (snap: any) => {
+    const listener = (snap: { val: () => Record<string, Item> | null }) => {
       const val = snap.val() || {}
       setItemsMap(val)
       setLoading(false)

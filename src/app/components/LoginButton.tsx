@@ -1,46 +1,36 @@
 "use client"
 
-import {useState, useEffect} from "react"
-import {login, logout} from "../../api/firebase"
-import {User} from "firebase/auth"
+import { useAuthContext } from "@/components/context/AuthContext"
 
 export default function LoginButton() {
-  const [user, setUser] = useState<User | null>(null)
+  const { user, login, logout } = useAuthContext()
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user")
-    if (storedUser) {
-      setUser(JSON.parse(storedUser))
-    }
-  }, [])
-
-  const handleLogin = async () => {
-    const userData = await login()
-    if (userData) {
-      setUser(userData)
-      localStorage.setItem("user", JSON.stringify(userData))
-      window.dispatchEvent(new Event("userChanged"))
-    }
-  }
-
-  const handleLogout = () => {
-    localStorage.removeItem("user")
-    logout()
-    setUser(null)
-    window.dispatchEvent(new Event("userChanged"))
+  if (user) {
+    return (
+      <div className="flex items-center gap-2">
+        {user.photoURL && (
+          <img
+            src={user.photoURL}
+            alt={user.displayName || "user"}
+            className="w-7 h-7 rounded-full"
+          />
+        )}
+        <button
+          onClick={logout}
+          className="text-red-400 text-sm hover:text-red-300 transition"
+        >
+          logout
+        </button>
+      </div>
+    )
   }
 
   return (
-    <div>
-      {user ? (
-        <button className="text-red-500" onClick={handleLogout}>
-          logout
-        </button>
-      ) : (
-        <button className="text-blue-700" onClick={handleLogin}>
-          login
-        </button>
-      )}
-    </div>
+    <button
+      onClick={login}
+      className="text-blue-400 text-sm hover:text-blue-300 transition"
+    >
+      login
+    </button>
   )
 }

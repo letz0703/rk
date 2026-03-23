@@ -1,12 +1,8 @@
 import Head from "next/head"
 import Image from "next/image"
+import Link from "next/link"
 import Script from "next/script"
 import AlertClient from "./components/AlertDynamic"
-import LoginButton from "./components/LoginButton"
-import User from "./components/User"
-import Banner from "./components/Banner"
-import BGMPage from "./components/BGMPage"
-import ListBgm from "./components/ListBgm"
 import Nav from "./components/Nav"
 
 export default function Home() {
@@ -15,22 +11,21 @@ export default function Home() {
     <>
       <Head>
         <title>{a}</title>
-        <script src="http://localhost:8097"></script>
       </Head>
 
       {/* 오른쪽 상단 고정 영역 */}
       <div className="fixed top-0 right-0 z-50 pointer-events-none pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)]">
         <div className="mr-4 mt-4 flex flex-col items-end text-right gap-2 pointer-events-auto select-none">
-          <a href="/" aria-label="rainskiss home" className="inline-block">
-            <img
+          <Link href="/" aria-label="rainskiss home" className="inline-block">
+            <Image
               src="/logo-rk.svg"
               alt="rainskiss logo"
               width={96}
               height={44}
-              loading="eager"
+              priority
               className="block"
             />
-          </a>
+          </Link>
           <div>
             <Nav />
           </div>
@@ -48,7 +43,6 @@ export default function Home() {
       {/* 본문 */}
       <div className="relative min-h-screen">
         <div className="grid grid-rows-[auto_1fr_auto] justify-items-center">
-          <Banner />
           <AlertClient />
           <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start p-3">
             <h1 className="text-2xl text-orange-500 font-bold">

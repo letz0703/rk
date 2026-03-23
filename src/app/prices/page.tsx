@@ -25,7 +25,7 @@ export default function PublicPriceSearchPage() {
     const snapshot = await get(ref(database, "products"))
 
     if (snapshot.exists()) {
-      const data = Object.entries(snapshot.val()).map(([key, value]: any) => ({
+      const data = Object.entries(snapshot.val() as Record<string, Omit<Product, "id">>).map(([key, value]) => ({
         id: key,
         ...value
       }))

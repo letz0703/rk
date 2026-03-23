@@ -1,25 +1,34 @@
 "use client"
 
-import {useEffect, useState, useMemo, useCallback} from "react"
+import React, {useEffect, useState, useMemo, useCallback} from "react"
 import {ref, get, push, update} from "firebase/database"
 import {database} from "../../api/firebase"
 import Fuse from "fuse.js"
 
+type Prompt = {
+  id: string
+  title: string
+  content: string
+  searchText: string
+  createdAt?: number
+  updatedAt?: number
+}
+
 export default function PromptSearchPage() {
-  const [prompts, setPrompts] = useState<any[]>([])
+  const [prompts, setPrompts] = useState<Prompt[]>([])
   const [query, setQuery] = useState("")
-  const [selected, setSelected] = useState<any | null>(null)
+  const [selected, setSelected] = useState<Prompt | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [copiedId, setCopiedId] = useState<string | null>(null)
 
   const fetchPrompts = useCallback(async () => {
     const snapshot = await get(ref(database, "prompts"))
     if (snapshot.exists()) {
-      const data = Object.entries(snapshot.val()).map(([key, value]: any) => ({
+      const data = Object.entries(snapshot.val() as Record<string, Omit<Prompt, "id">>).map(([key, value]) => ({
         id: key,
         ...value
       }))
-      setPrompts(data.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)))
+      setPrompts(data.sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0)))
     } else {
       setPrompts([])
     }
@@ -81,7 +90,7 @@ export default function PromptSearchPage() {
     setIsSaving(false)
   }
 
-  const handleCopy = (e: any, content: string, id: string) => {
+  const handleCopy = (e: React.MouseEvent, content: string, id: string) => {
     e.stopPropagation()
     navigator.clipboard.writeText(content)
     setCopiedId(id)

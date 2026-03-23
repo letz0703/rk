@@ -41,7 +41,7 @@ export default function AlertAll() {
               <h2 className="text-xl font-bold">
                 Let me have your picture
                 <br />
-                and I'll make a cute 3D character of you.
+                and I&apos;ll make a cute 3D character of you.
                 <br />
                 One Character Free
               </h2>
