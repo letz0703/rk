@@ -9,9 +9,9 @@ import {
   setPersistence,
   browserLocalPersistence
 } from "firebase/auth"
-import {getDatabase, ref, set, onValue, off} from "firebase/database"
+import {getDatabase, ref, set, get, push, remove, update, onValue, off} from "firebase/database"
 import {v4 as uuid} from "uuid"
-import {getStorage} from "firebase/storage"
+import {getStorage, ref as storageRef, listAll, uploadBytes, getDownloadURL, deleteObject} from "firebase/storage"
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -53,6 +53,85 @@ export async function addNewProduct(product, imgUrl) {
   }
   return set(ref(database, `product/${id}`), payload)
 }
+
+// ── Model functions ────────────────────────────────────────────────────────
+
+export async function uploadModelImage(slug, file) {
+  const id = uuid()
+  const ext = file.name.split(".").pop() || "jpg"
+  const sRef = storageRef(storage, `models/${slug}/${id}.${ext}`)
+  const snap = await uploadBytes(sRef, file)
+  return getDownloadURL(snap.ref)
+}
+
+export async function setModelProfileImage(slug, url) {
+  return set(ref(database, `models/${slug}/profileImage`), url)
+}
+
+export async function addModelImage(slug, url) {
+  return push(ref(database, `models/${slug}/images`), url)
+}
+
+export async function removeModelImage(slug, key, url) {
+  await remove(ref(database, `models/${slug}/images/${key}`))
+  try {
+    const urlObj = new URL(url)
+    const path = decodeURIComponent((urlObj.pathname.split("/o/")[1] ?? "").split("?")[0])
+    if (path) await deleteObject(storageRef(storage, path))
+  } catch (_) {}
+}
+
+export async function saveModelMeta(slug, meta) {
+  return update(ref(database, `models/${slug}`), meta)
+}
+
+export function onModelData(slug, callback) {
+  const r = ref(database, `models/${slug}`)
+  const listener = snap => callback(snap.val())
+  onValue(r, listener)
+  return () => off(r, "value", listener)
+}
+
+export async function seedModelData(slug, meta) {
+  return update(ref(database, `models/${slug}`), meta)
+}
+
+// Storage-only model functions (no Realtime DB)
+
+export async function listModelImages(slug) {
+  try {
+    const folder = storageRef(storage, `models/${slug}`)
+    const { items } = await listAll(folder)
+    const urls = await Promise.all(
+      items.map(item => getDownloadURL(item).then(url => ({ name: item.name, url })))
+    )
+    const profileEntry = urls.find(f => f.name.startsWith("profile."))
+    const gallery = urls.filter(f => !f.name.startsWith("profile.")).map(f => f.url)
+    return { profileImage: profileEntry?.url ?? null, gallery }
+  } catch {
+    return { profileImage: null, gallery: [] }
+  }
+}
+
+export async function uploadModelFile(slug, type, file) {
+  const ext = (file.name.split(".").pop() ?? "jpg").toLowerCase()
+  const filename =
+    type === "profile"
+      ? `profile.${ext}`
+      : `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
+  const sRef = storageRef(storage, `models/${slug}/${filename}`)
+  const snap = await uploadBytes(sRef, file)
+  return getDownloadURL(snap.ref)
+}
+
+export async function deleteModelFile(url) {
+  const path = decodeURIComponent(
+    new URL(url).pathname.split("/o/")[1]?.split("?")[0] ?? ""
+  )
+  if (path) await deleteObject(storageRef(storage, path))
+}
+
+// ── Product functions ──────────────────────────────────────────────────────
 
 export function getProducts(onData, onError) {
   const productRef = ref(database, "product")

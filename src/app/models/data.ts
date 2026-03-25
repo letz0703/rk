@@ -1,47 +1,25 @@
-// TODO: Firebase로 이전 예정
+import rawData from "./models-data.json"
+
+export type GalleryItem = {
+  id: string
+  thumbnail: string
+  deviantartUrl: string
+  easelUrl: string
+  memo: string
+}
+
 export type Model = {
   slug: string
   name: string
   nameKo: string
   nationality: "KR" | "US"
-  profileImage: string // Cloudinary URL
+  profileImage: string
   bio: string
-  gallery: string[] // Cloudinary URLs
+  gallery: GalleryItem[]
   deviantArtUrl: string
 }
 
-export const models: Model[] = [
-  {
-    slug: "minju",
-    name: "Minju",
-    nameKo: "민주",
-    nationality: "KR",
-    profileImage: "",
-    bio: "서울 출신의 신비로운 분위기를 가진 모델. 차분하고 깊은 눈빛이 특징이며, 도시적인 감성과 한국 전통미를 동시에 담아냅니다.",
-    gallery: [],
-    deviantArtUrl: "https://www.deviantart.com/rainskiss-x",
-  },
-  {
-    slug: "hana",
-    name: "Hana",
-    nameKo: "하나",
-    nationality: "KR",
-    profileImage: "",
-    bio: "밝고 생기 넘치는 에너지가 매력인 모델. 자연스러운 미소와 활동적인 스타일로 다양한 무드를 소화합니다.",
-    gallery: [],
-    deviantArtUrl: "https://www.deviantart.com/rainskiss-x",
-  },
-  {
-    slug: "elizabeth",
-    name: "Elizabeth",
-    nameKo: "엘리자베스",
-    nationality: "US",
-    profileImage: "",
-    bio: "동부 출신의 클래식한 미를 지닌 모델. 우아한 분위기와 강렬한 눈빛이 인상적이며, 고급스러운 패션 무드를 연출합니다.",
-    gallery: [],
-    deviantArtUrl: "https://www.deviantart.com/rainskiss-x",
-  },
-]
+export const models: Model[] = rawData as Model[]
 
 export function getModel(slug: string): Model | undefined {
   return models.find((m) => m.slug === slug)

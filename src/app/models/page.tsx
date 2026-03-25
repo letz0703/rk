@@ -16,13 +16,12 @@ export default function ModelsPage() {
         <p className="text-gray-400 text-sm mb-12">rainskiss의 AI 모델들을 만나보세요.</p>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          {models.map((model) => (
+          {models.map(model => (
             <Link
               key={model.slug}
               href={`/${model.slug}`}
               className="group block rounded-2xl border border-white/10 bg-white/5 overflow-hidden hover:border-white/25 hover:bg-white/10 transition"
             >
-              {/* 프로필 이미지 */}
               <div className="relative w-full aspect-[3/4] bg-white/5">
                 {model.profileImage ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -37,7 +36,6 @@ export default function ModelsPage() {
                   </div>
                 )}
               </div>
-
               <div className="p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-lg font-bold">{model.nameKo}</span>
