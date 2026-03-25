@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { models, type Model, type GalleryItem } from "./data"
+import { database } from "@/api/firebase"
+import { ref, set } from "firebase/database"
 
 const flagMap = { KR: "🇰🇷", US: "🇺🇸" }
 const labelMap = { KR: "한국 여성", US: "미국 여성" }
@@ -81,6 +83,34 @@ export default function ModelPageContent({ model, isAdmin }: { model: Model; isA
   const [thumbUploading, setThumbUploading] = useState(false)
   const [itemSaving, setItemSaving] = useState(false)
   const thumbRef = useRef<HTMLInputElement>(null)
+  const [dragOver, setDragOver] = useState(false)
+  const [dropUploading, setDropUploading] = useState(false)
+
+  const uploadFileToGallery = async (file: File) => {
+    const form = new FormData()
+    form.append("slug", slug); form.append("type", "gallery"); form.append("file", file)
+    const res = await fetch("/api/model-images", { method: "POST", body: form })
+    const data = await res.json()
+    if (!data.url) { alert(`업로드 실패: ${data.error ?? "unknown"}`); return }
+    const newItem: GalleryItem = { id: crypto.randomUUID(), thumbnail: data.url, deviantartUrl: "", easelUrl: "", memo: "" }
+    setGallery(g => [...g, newItem])
+    fetch("/api/model-meta", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ slug, action: "add-gallery-item", item: { thumbnail: data.url, deviantartUrl: "", easelUrl: "", memo: "" } }),
+    })
+  }
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault()
+    setDragOver(false)
+    if (!isAdmin) return
+    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith("image/"))
+    if (!files.length) return
+    setDropUploading(true)
+    for (const file of files) await uploadFileToGallery(file)
+    setDropUploading(false)
+  }
 
   const handleThumbUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -310,9 +340,31 @@ export default function ModelPageContent({ model, isAdmin }: { model: Model; isA
           )}
 
           {gallery.length === 0 && !editItem && (
-            <div className="rounded-2xl border border-white/10 bg-white/5 py-20 text-center">
-              <p className="text-gray-600 text-sm">이미지 준비 중입니다.</p>
-            </div>
+            isAdmin ? (
+              <div
+                onDragOver={e => { e.preventDefault(); setDragOver(true) }}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={handleDrop}
+                className={`rounded-2xl border-2 border-dashed py-24 text-center transition-colors ${
+                  dragOver
+                    ? "border-white/50 bg-white/10"
+                    : "border-white/15 bg-white/5"
+                }`}
+              >
+                {dropUploading ? (
+                  <p className="text-gray-400 text-sm">업로드 중...</p>
+                ) : (
+                  <>
+                    <p className="text-gray-400 text-sm">{dragOver ? "놓으면 업로드됩니다" : "이미지를 여기에 드래그하세요"}</p>
+                    <p className="text-gray-600 text-xs mt-1">여러 장 동시 업로드 가능</p>
+                  </>
+                )}
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-white/10 bg-white/5 py-20 text-center">
+                <p className="text-gray-600 text-sm">이미지 준비 중입니다.</p>
+              </div>
+            )
           )}
 
           {/* 어드민 추가/편집 폼 */}
@@ -395,6 +447,9 @@ export default function ModelPageContent({ model, isAdmin }: { model: Model; isA
           )}
         </div>
 
+        {/* 어드민: 멤버 비밀번호 변경 */}
+        {isAdmin && <MemberPasswordAdmin />}
+
         {/* Other Models */}
         <div className="pt-10 border-t border-white/10">
           <h2 className="text-xl font-bold mb-6">Other Models</h2>
@@ -423,5 +478,61 @@ export default function ModelPageContent({ model, isAdmin }: { model: Model; isA
         </div>
       </div>
     </main>
+  )
+}
+
+function MemberPasswordAdmin() {
+  const [open, setOpen] = useState(false)
+  const [input, setInput] = useState("")
+  const [saving, setSaving] = useState(false)
+  const [msg, setMsg] = useState("")
+
+  const handleSave = async () => {
+    if (!input.trim()) return
+    setSaving(true)
+    setMsg("")
+    try {
+      await set(ref(database, "config/memberPassword"), input.trim())
+      setMsg("저장됐습니다.")
+      setInput("")
+      setTimeout(() => { setMsg(""); setOpen(false) }, 1500)
+    } catch {
+      setMsg("저장 실패")
+    }
+    setSaving(false)
+  }
+
+  return (
+    <div className="my-8 pt-8 border-t border-white/10">
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-gray-600 uppercase tracking-widest font-bold">멤버 비밀번호</p>
+        <button
+          onClick={() => { setOpen(o => !o); setMsg(""); setInput("") }}
+          className="text-xs text-gray-500 hover:text-gray-300 border border-white/10 px-2 py-1 rounded transition"
+        >
+          {open ? "취소" : "변경"}
+        </button>
+      </div>
+      {open && (
+        <div className="mt-3 flex gap-2 items-center">
+          <input
+            type="text"
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            placeholder="새 비밀번호"
+            className="flex-1 max-w-xs rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:outline-none focus:border-white/30"
+            autoFocus
+          />
+          <button
+            onClick={handleSave}
+            disabled={saving || !input.trim()}
+            className="px-4 py-2 rounded-lg bg-blue-600 text-sm hover:bg-blue-500 disabled:opacity-40 transition"
+          >
+            {saving ? "저장 중..." : "저장"}
+          </button>
+          {msg && <span className="text-xs text-green-400">{msg}</span>}
+        </div>
+      )}
+    </div>
   )
 }

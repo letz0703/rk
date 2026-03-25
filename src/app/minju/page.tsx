@@ -3,6 +3,7 @@
 import { useAuthContext } from "@/components/context/AuthContext"
 import { getModel } from "@/app/models/data"
 import ModelPageContent from "@/app/models/ModelPageContent"
+import PasswordGate from "@/app/components/PasswordGate"
 import { notFound } from "next/navigation"
 
 const ADMIN_EMAIL = "rainskiss@gmail.com"
@@ -12,5 +13,9 @@ export default function MinjuPage() {
   const isAdmin = user?.email === ADMIN_EMAIL
   const model = getModel("minju")
   if (!model) notFound()
-  return <ModelPageContent model={model} isAdmin={isAdmin} />
+  return (
+    <PasswordGate>
+      <ModelPageContent model={model} isAdmin={isAdmin} />
+    </PasswordGate>
+  )
 }
