@@ -37,7 +37,7 @@ export function AuthContextProvider({children}: {children: ReactNode}) {
     () => ({
       user: user ?? null,
       isLoading: user === undefined,
-      isAdmin: !!user && String(user.uid) === String(adminUid),
+      isAdmin: !!user && !!adminUid && String(user.uid) === String(adminUid),
       login,
       logout
     }),

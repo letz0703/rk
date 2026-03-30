@@ -17,7 +17,8 @@ const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
   databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECTID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
 }
 
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig)
@@ -129,6 +130,128 @@ export async function deleteModelFile(url) {
     new URL(url).pathname.split("/o/")[1]?.split("?")[0] ?? ""
   )
   if (path) await deleteObject(storageRef(storage, path))
+}
+
+// ── Gallery Entry functions (imageUrl + linkUrl pairs) ─────────────────────
+
+/**
+ * Add a gallery entry with image URL and an external link URL.
+ * Stored at: models/{slug}/gallery/{id}
+ */
+export async function addGalleryEntry(slug, imageUrl, linkUrl) {
+  const id = uuid()
+  return set(ref(database, `models/${slug}/gallery/${id}`), {
+    id,
+    imageUrl,
+    linkUrl: linkUrl || "",
+    addedAt: Date.now()
+  })
+}
+
+/**
+ * Remove a gallery entry.
+ */
+export async function removeGalleryEntry(slug, entryId) {
+  return remove(ref(database, `models/${slug}/gallery/${entryId}`))
+}
+
+/**
+ * Listen to gallery entries, sorted by addedAt ascending.
+ */
+export function onGalleryEntries(slug, callback) {
+  const r = ref(database, `models/${slug}/gallery`)
+  const listener = snap => {
+    const data = snap.val()
+    const list = data
+      ? Object.values(data).sort((a, b) => (a.addedAt ?? 0) - (b.addedAt ?? 0))
+      : []
+    callback(list)
+  }
+  onValue(r, listener)
+  return () => off(r, "value", listener)
+}
+
+// ── Lookbook Request functions ─────────────────────────────────────────────
+
+/**
+ * Submit a new lookbook request.
+ * @param {string} modelSlug
+ * @param {{ userId: string|null, userName: string, content: string, type: "standard"|"tier_priority", visibility: "public"|"private" }} request
+ */
+export async function submitRequest(modelSlug, request) {
+  const id = uuid()
+  const payload = {
+    id,
+    userId: request.userId ?? null,
+    userName: request.userName,
+    content: request.content,
+    type: request.type ?? "standard",          // "standard" | "tier_priority"
+    visibility: request.visibility ?? "public", // "public" | "private"
+    status: "pending",                          // "pending" | "in_progress" | "completed"
+    createdAt: Date.now()
+  }
+  return set(ref(database, `lookbook_requests/${modelSlug}/${id}`), payload)
+}
+
+/**
+ * Listen to all requests for a model, sorted: tier_priority first, then by createdAt.
+ * @param {string} modelSlug
+ * @param {(list: object[]) => void} callback
+ * @param {(err: Error) => void} [onError]
+ */
+export function onRequests(modelSlug, callback, onError) {
+  const r = ref(database, `lookbook_requests/${modelSlug}`)
+  const listener = snap => {
+    const data = snap.val()
+    const list = data
+      ? Object.entries(data).map(([id, v]) => ({...v, id}))
+      : []
+    list.sort((a, b) => {
+      if (a.type === "tier_priority" && b.type !== "tier_priority") return -1
+      if (b.type === "tier_priority" && a.type !== "tier_priority") return 1
+      return (a.createdAt ?? 0) - (b.createdAt ?? 0)
+    })
+    callback(list)
+  }
+  onValue(r, listener, err => onError?.(err))
+  return () => off(r, "value", listener)
+}
+
+/**
+ * Update request status (admin only).
+ */
+export async function updateRequestStatus(modelSlug, reqId, status) {
+  return update(ref(database, `lookbook_requests/${modelSlug}/${reqId}`), {status})
+}
+
+/**
+ * Delete a request.
+ */
+export async function deleteRequest(modelSlug, reqId) {
+  return remove(ref(database, `lookbook_requests/${modelSlug}/${reqId}`))
+}
+
+/**
+ * Add a reply to a request.
+ * @param {string} modelSlug
+ * @param {string} reqId
+ * @param {{ content: string, authorName: string }} reply
+ */
+export async function addRequestReply(modelSlug, reqId, reply) {
+  const id = uuid()
+  return set(ref(database, `lookbook_requests/${modelSlug}/${reqId}/replies/${id}`), {
+    id,
+    content: reply.content,
+    authorName: reply.authorName,
+    createdAt: Date.now()
+  })
+}
+
+/**
+ * Delete a reply from a request.
+ */
+export async function deleteRequestReply(modelSlug, reqId, replyId) {
+  return remove(ref(database, `lookbook_requests/${modelSlug}/${reqId}/replies/${replyId}`))
 }
 
 // ── Product functions ──────────────────────────────────────────────────────
