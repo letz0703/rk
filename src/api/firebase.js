@@ -256,6 +256,58 @@ export async function deleteRequestReply(modelSlug, reqId, replyId) {
 
 // ── Product functions ──────────────────────────────────────────────────────
 
+// ── Life Song functions ────────────────────────────────────────────────────
+
+export async function submitLifeSong({ name, songTitle, artist, youtubeUrl, story }) {
+  const id = uuid()
+  return set(ref(database, `lifesongs/${id}`), {
+    id,
+    name: name || "Anonymous",
+    songTitle,
+    artist,
+    youtubeUrl: youtubeUrl || "",
+    story,
+    approved: false,
+    createdAt: Date.now()
+  })
+}
+
+export function onApprovedLifeSongs(callback) {
+  const r = ref(database, "lifesongs")
+  const listener = snap => {
+    const data = snap.val()
+    const list = data
+      ? Object.values(data)
+          .filter(s => s.approved)
+          .sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0))
+      : []
+    callback(list)
+  }
+  onValue(r, listener)
+  return () => off(r, "value", listener)
+}
+
+export function onAllLifeSongs(callback) {
+  const r = ref(database, "lifesongs")
+  const listener = snap => {
+    const data = snap.val()
+    const list = data
+      ? Object.values(data).sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0))
+      : []
+    callback(list)
+  }
+  onValue(r, listener)
+  return () => off(r, "value", listener)
+}
+
+export async function approveLifeSong(id) {
+  return update(ref(database, `lifesongs/${id}`), { approved: true })
+}
+
+export async function deleteLifeSong(id) {
+  return remove(ref(database, `lifesongs/${id}`))
+}
+
 export function getProducts(onData, onError) {
   const productRef = ref(database, "product")
   const listener = snap => {

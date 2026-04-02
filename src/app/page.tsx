@@ -1,6 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import HeaderAuth from "./components/HeaderAuth"
+import TodaysSong from "./components/TodaysSong"
 
 export default function Page() {
   return (
@@ -51,14 +52,7 @@ export default function Page() {
           >
             ▶ YouTube
           </a>
-          <a
-            href="https://deviantart.com/rainskiss-x"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-5 py-2 rounded-full border border-white/20 hover:bg-white hover:text-black text-sm transition"
-          >
-            DeviantArt (18+)
-          </a>
+
           <a
             href="https://suno.com/invite/@rainskiss_o"
             target="_blank"
@@ -73,8 +67,19 @@ export default function Page() {
           >
             🛒 Shop
           </Link>
+          <a
+            href="https://deviantart.com/rainskiss-x"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-5 py-2 rounded-full border border-white/20 hover:bg-white hover:text-black text-sm transition"
+          >
+            DeviantArt (18+)
+          </a>
         </div>
       </main>
+
+      {/* Today's Life Song */}
+      <TodaysSong />
 
       {/* Members 섹션 */}
       <section className="px-6 py-14 border-t border-white/5">
@@ -126,6 +131,10 @@ export default function Page() {
         © 2025 rainskiss · All rights reserved ·{" "}
         <Link href="/letters" className="hover:text-gray-300 transition">
           Send a Letter
+        </Link>{" "}
+        ·{" "}
+        <Link href="/lifesong" className="hover:text-gray-300 transition">
+          인생곡
         </Link>
       </footer>
     </div>
