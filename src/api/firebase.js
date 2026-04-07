@@ -322,3 +322,46 @@ export function getProducts(onData, onError) {
   // unsubscribe
   return () => off(productRef, "value", listener)
 }
+
+// ── Inquiry (1:1 문의) functions ───────────────────────────────────────────
+
+export async function submitInquiry({ name, title, content }) {
+  const id = uuid()
+  return set(ref(database, `inquiries/${id}`), {
+    id,
+    name: name.trim() || "Anonymous",
+    title: title.trim(),
+    content: content.trim(),
+    createdAt: Date.now(),
+  })
+}
+
+export function onInquiries(callback) {
+  const r = ref(database, "inquiries")
+  const listener = snap => {
+    const data = snap.val()
+    const list = data
+      ? Object.values(data).sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0))
+      : []
+    callback(list)
+  }
+  onValue(r, listener)
+  return () => off(r, "value", listener)
+}
+
+export async function addInquiryReply(inquiryId, content) {
+  const id = uuid()
+  return set(ref(database, `inquiries/${inquiryId}/replies/${id}`), {
+    id,
+    content: content.trim(),
+    createdAt: Date.now(),
+  })
+}
+
+export async function toggleInquiryResolved(inquiryId, resolved) {
+  return update(ref(database, `inquiries/${inquiryId}`), { resolved })
+}
+
+export async function deleteInquiry(inquiryId) {
+  return remove(ref(database, `inquiries/${inquiryId}`))
+}

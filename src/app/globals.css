@@ -4,19 +4,18 @@
 
 @layer base {
   :root {
-    --background: #131313 !important;
-    --foreground: #e5e2e1 !important;
+    --background: #ffffff;
+    --foreground: #1d1d1f;
   }
 
   body {
-    background-color: #131313 !important;
-    color: #e5e2e1 !important;
+    background-color: #ffffff;
+    color: #1d1d1f;
     margin: 0;
     padding: 0;
   }
 
-  /* 모든 입력창의 글자색을 검은색으로 강제 (배경이 흰색일 경우 대비) */
   input {
-    color: #000000 !important;
+    color: #1d1d1f;
   }
 }
