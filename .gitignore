@@ -44,3 +44,15 @@ next-env.d.ts
 /public/products
 .env
 #/prisma/dev.db
+
+# agent metadata
+.claude/
+
+# ide
+.vscode/
+
+# next.js build
+.next/
+
+# Claude Defuddle (로컬 스크립트 도구 - 배포 제외)
+claude-defuddle/

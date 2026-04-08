@@ -256,6 +256,58 @@ export async function deleteRequestReply(modelSlug, reqId, replyId) {
 
 // ── Product functions ──────────────────────────────────────────────────────
 
+// ── Life Song functions ────────────────────────────────────────────────────
+
+export async function submitLifeSong({ name, songTitle, artist, youtubeUrl, story }) {
+  const id = uuid()
+  return set(ref(database, `lifesongs/${id}`), {
+    id,
+    name: name || "Anonymous",
+    songTitle,
+    artist,
+    youtubeUrl: youtubeUrl || "",
+    story,
+    approved: false,
+    createdAt: Date.now()
+  })
+}
+
+export function onApprovedLifeSongs(callback) {
+  const r = ref(database, "lifesongs")
+  const listener = snap => {
+    const data = snap.val()
+    const list = data
+      ? Object.values(data)
+          .filter(s => s.approved)
+          .sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0))
+      : []
+    callback(list)
+  }
+  onValue(r, listener)
+  return () => off(r, "value", listener)
+}
+
+export function onAllLifeSongs(callback) {
+  const r = ref(database, "lifesongs")
+  const listener = snap => {
+    const data = snap.val()
+    const list = data
+      ? Object.values(data).sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0))
+      : []
+    callback(list)
+  }
+  onValue(r, listener)
+  return () => off(r, "value", listener)
+}
+
+export async function approveLifeSong(id) {
+  return update(ref(database, `lifesongs/${id}`), { approved: true })
+}
+
+export async function deleteLifeSong(id) {
+  return remove(ref(database, `lifesongs/${id}`))
+}
+
 export function getProducts(onData, onError) {
   const productRef = ref(database, "product")
   const listener = snap => {
@@ -269,4 +321,47 @@ export function getProducts(onData, onError) {
   onValue(productRef, listener, err)
   // unsubscribe
   return () => off(productRef, "value", listener)
+}
+
+// ── Inquiry (1:1 문의) functions ───────────────────────────────────────────
+
+export async function submitInquiry({ name, title, content }) {
+  const id = uuid()
+  return set(ref(database, `inquiries/${id}`), {
+    id,
+    name: name.trim() || "Anonymous",
+    title: title.trim(),
+    content: content.trim(),
+    createdAt: Date.now(),
+  })
+}
+
+export function onInquiries(callback) {
+  const r = ref(database, "inquiries")
+  const listener = snap => {
+    const data = snap.val()
+    const list = data
+      ? Object.values(data).sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0))
+      : []
+    callback(list)
+  }
+  onValue(r, listener)
+  return () => off(r, "value", listener)
+}
+
+export async function addInquiryReply(inquiryId, content) {
+  const id = uuid()
+  return set(ref(database, `inquiries/${inquiryId}/replies/${id}`), {
+    id,
+    content: content.trim(),
+    createdAt: Date.now(),
+  })
+}
+
+export async function toggleInquiryResolved(inquiryId, resolved) {
+  return update(ref(database, `inquiries/${inquiryId}`), { resolved })
+}
+
+export async function deleteInquiry(inquiryId) {
+  return remove(ref(database, `inquiries/${inquiryId}`))
 }
