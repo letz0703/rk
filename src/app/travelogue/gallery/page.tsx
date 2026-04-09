@@ -65,7 +65,7 @@ export default function GuideGalleryPage() {
             {['All', 'Present', 'Historical'].map((f) => (
               <button
                 key={f}
-                onClick={() => setFilter(f as any)}
+                onClick={() => setFilter(f as "All" | "Present" | "Historical")}
                 className={`px-6 py-2 rounded-full text-xs font-bold tracking-widest transition-all ${filter === f ? 'bg-purple-600 text-white' : 'bg-white/5 text-slate-500 hover:text-white'}`}
               >
                 {f.toUpperCase()}

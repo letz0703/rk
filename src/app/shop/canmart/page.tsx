@@ -3,7 +3,7 @@
 import {useState, useEffect, useMemo} from "react"
 
 export default function CanMartPage() {
-  const [inventory, setInventory] = useState([])
+  const [inventory, setInventory] = useState<{category: string; nameKR: string; nameEN: string; detail: string; price: string}[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [isLoading, setIsLoading] = useState(true)
 

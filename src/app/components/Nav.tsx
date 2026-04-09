@@ -1,5 +1,5 @@
 "use client"
-import LoginButton from "./LoginButton"
+import Link from "next/link"
 import User from "./User"
 
 export default function Nav() {
@@ -7,11 +7,9 @@ export default function Nav() {
     <>
       <nav className="flex">
         <div className="px-2">
-          <a href="/">Home </a>
+          <Link href="/">Home </Link>
         </div>
         <User />
-        {/*<LoginButton />*/}
-        <CheckAdminButton />
       </nav>
     </>
   )

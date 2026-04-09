@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 /**
  * Minimal inline SVG icons — drop-in replacement for lucide-react subset.
  * All icons: size prop (default 16), className passthrough.

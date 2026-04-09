@@ -33,10 +33,11 @@ export async function POST(req: Request) {
     })
 
     return NextResponse.json({success: true})
-  } catch (error: any) {
-    console.error("Sheet Error:", error.message)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error"
+    console.error("Sheet Error:", message)
     return NextResponse.json(
-      {success: false, error: "시트 기록 실패: " + error.message},
+      {success: false, error: "시트 기록 실패: " + message},
       {status: 500}
     )
   }

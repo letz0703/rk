@@ -6,13 +6,13 @@ import {addNewProduct, getProducts} from "@/api/firebase"
 import ListBgm from "./ListBgm" // ✅ 분리한 리스트 컴포넌트
 
 export default function NewProduct() {
-  const [product, setProduct] = useState({})
-  const [file, setFile] = useState()
+  const [product, setProduct] = useState<Record<string, string>>({})
+  const [file, setFile] = useState<File | null>(null)
   const [isUploading, setIsUploading] = useState(false)
   const [success, setSuccess] = useState("")
   const [productList, setProductList] = useState([])
 
-  const handleChange = e => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {name, value, files} = e.target
     if (name === "file") {
       setFile(files && files[0])
@@ -21,7 +21,7 @@ export default function NewProduct() {
     setProduct(prev => ({...prev, [name]: value}))
   }
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!file) return alert("이미지를 선택하세요")
     setIsUploading(true)
@@ -136,7 +136,7 @@ export default function NewProduct() {
       </div>
 
       {/* ✅ 분리된 컴포넌트로 리스트 렌더 */}
-      <ListBgm items={productList} />
+      <ListBgm />
     </section>
   )
 }

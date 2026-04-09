@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     async start(controller) {
-      const sendEvent = (event: string, data: any) => {
+      const sendEvent = (event: string, data: unknown) => {
         controller.enqueue(encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`));
       };
 
@@ -43,7 +43,6 @@ export async function POST(req: NextRequest) {
         });
 
         // 6. 텍스트 생성 시작
-        // @ts-ignore
         const aiStream = await llm.stream([
           { role: 'system', content: finalPrompt },
           { role: 'user', content: finalQuery }
@@ -62,8 +61,9 @@ export async function POST(req: NextRequest) {
           citations: ragContext.substring(0, 100) + '... (FAISS Context Extract)' // 간단히 첫 100자만 인용구로 노출
         });
 
-      } catch (error: any) {
-        sendEvent('error', { detail: error.message });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Unknown error"
+        sendEvent('error', { detail: message });
       } finally {
         controller.close();
       }

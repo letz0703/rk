@@ -44,8 +44,18 @@ export function AuthContextProvider({children}: {children: ReactNode}) {
     [user, adminUid]
   )
 
-  if (user === undefined) return null
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  return (
+    <AuthContext.Provider value={value}>
+      {user === undefined ? (
+        <div className="fixed inset-0 bg-slate-950 flex flex-col items-center justify-center z-[9999]">
+          <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mb-4" />
+          <p className="text-purple-500 font-mono text-xs tracking-widest animate-pulse">AUTHENTICATING...</p>
+        </div>
+      ) : (
+        children
+      )}
+    </AuthContext.Provider>
+  )
 }
 
 export function useAuthContext(): AuthContextValue {

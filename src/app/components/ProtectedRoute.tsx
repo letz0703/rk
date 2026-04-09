@@ -4,19 +4,20 @@
 import {useAuthContext} from "@/components/context/AuthContext"
 import {useRouter} from "next/navigation"
 import {useEffect} from "react"
+import React from "react"
 
-export default function ProtectedRoute({children, requireAdmin = false}) {
-  const {user} = useAuthContext()
+export default function ProtectedRoute({children, requireAdmin = false}: {children: React.ReactNode; requireAdmin?: boolean}) {
+  const {user, isAdmin} = useAuthContext()
   const router = useRouter()
 
   useEffect(() => {
-    if (!user || (requireAdmin && !user.isAdmin)) {
-      router.replace("/") // redirect to home if not logged in or not admin
+    if (!user || (requireAdmin && !isAdmin)) {
+      router.replace("/")
     }
-  }, [user, requireAdmin, router])
+  }, [user, isAdmin, requireAdmin, router])
 
-  if (!user || (requireAdmin && !user.isAdmin)) {
-    return null // block rendering
+  if (!user || (requireAdmin && !isAdmin)) {
+    return null
   }
 
   return <>{children}</>
