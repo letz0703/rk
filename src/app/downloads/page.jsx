@@ -1,7 +1,7 @@
 "use client"
 
 import BGMPage from "../components/BGMPage.tsx"
-import ProtectedRoute from "../components/ProtectedRoute.jsx"
+import ProtectedRoute from "../components/ProtectedRoute"
 
 export default function DownloadsPage() {
   return (

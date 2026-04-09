@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useAuthContext } from "../../components/AuthContext"
+import { useAuthContext } from "@/components/context/AuthContext"
 import { onAllLifeSongs, approveLifeSong, deleteLifeSong } from "../../../api/firebase"
 
 type Song = {
