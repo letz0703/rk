@@ -4,29 +4,35 @@
     "name": "Minju",
     "nameKo": "민주",
     "nationality": "KR",
-    "profileImage": "",
+    "profileImage": "/models/minju.png",
     "bio": "서울 출신의 신비로운 분위기를 가진 모델. 차분하고 깊은 눈빛이 특징이며, 도시적인 감성과 한국 전통미를 동시에 담아냅니다.",
     "gallery": [],
-    "deviantArtUrl": "https://www.deviantart.com/rainskiss-x/art/rainskiss-150-M-J-1278948399"
+    "deviantArtUrl": "https://www.deviantart.com/rainskiss-x/art/rainskiss-150-M-J-1278948399",
+    "nsfwUrl": "https://www.patreon.com/rainskiss",
+    "nsfwPreview": "/models/minju.png"
   },
   {
     "slug": "hana",
     "name": "Hana",
     "nameKo": "하나",
     "nationality": "KR",
-    "profileImage": "",
+    "profileImage": "/models/hana.png",
     "bio": "밝고 생기 넘치는 에너지가 매력인 모델. 자연스러운 미소와 활동적인 스타일로 다양한 무드를 소화합니다.",
     "gallery": [],
-    "deviantArtUrl": "https://www.deviantart.com/rainskiss-x"
+    "deviantArtUrl": "https://www.deviantart.com/rainskiss-x",
+    "nsfwUrl": "https://www.deviantart.com/rainskiss-x/subscriptions",
+    "nsfwPreview": "/models/hana.png"
   },
   {
     "slug": "elizabeth",
     "name": "Elizabeth",
     "nameKo": "엘리자베스",
     "nationality": "US",
-    "profileImage": "",
+    "profileImage": "/models/elizabeth.png",
     "bio": "동부 출신의 클래식한 미를 지닌 모델. 우아한 분위기와 강렬한 눈빛이 인상적이며, 고급스러운 패션 무드를 연출합니다.",
     "gallery": [],
-    "deviantArtUrl": "https://www.deviantart.com/rainskiss-x"
+    "deviantArtUrl": "https://www.deviantart.com/rainskiss-x",
+    "nsfwUrl": "https://www.deviantart.com/rainskiss-x/shop",
+    "nsfwPreview": "/models/elizabeth.png"
   }
 ]

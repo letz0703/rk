@@ -17,6 +17,8 @@ export type Model = {
   bio: string
   gallery: GalleryItem[]
   deviantArtUrl: string
+  nsfwUrl?: string
+  nsfwPreview?: string
 }
 
 export const models: Model[] = rawData as Model[]
