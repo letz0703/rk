@@ -18,7 +18,12 @@ export async function POST(req: NextRequest) {
 
   const langName = LANG_NAME[targetLang] ?? "English";
 
-  const prompt = `Translate the following YouTube video titles to ${langName}.
+  const prompt = `You are a YouTube search keyword translator.
+Translate or transliterate the following search keywords to ${langName} so they can be used as YouTube search queries.
+Rules:
+- Person names: use the standard romanization or transliteration for the target language (e.g. "이정현" → "Lee Jung-hyun" in English, "イ・ジョンヒョン" in Japanese)
+- Common words: translate naturally
+- If the input is already in the target language, keep it as-is
 Return ONLY a JSON array of translated strings in the exact same order as the input.
 Do not add explanations, numbering, or any other text.
 

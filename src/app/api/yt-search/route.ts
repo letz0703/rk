@@ -17,8 +17,11 @@ export async function GET(req: NextRequest) {
 
   const hl = searchParams.get("hl") ?? "ko";
 
+  const regionCode = searchParams.get("regionCode") ?? "KR";
+  const relevanceLanguage = searchParams.get("relevanceLanguage") ?? "ko";
+
   if (endpoint === "search") {
-    url = `${YT_BASE}/search?part=id&type=video&q=${encodeURIComponent(query)}&maxResults=50&key=${API_KEY}`;
+    url = `${YT_BASE}/search?part=id&type=video&q=${encodeURIComponent(query)}&maxResults=50&regionCode=${regionCode}&relevanceLanguage=${relevanceLanguage}&key=${API_KEY}`;
   } else if (endpoint === "videos") {
     url = `${YT_BASE}/videos?part=statistics,snippet,localizations&id=${ids}&hl=${hl}&key=${API_KEY}`;
   } else if (endpoint === "channels") {

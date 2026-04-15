@@ -27,6 +27,11 @@ const LANG_PLACEHOLDER: Record<Lang, string> = {
   en: "e.g. lee jung hyun, mukbang, senior",
   ja: "例) イ・ジョンヒョン, 料理, シニア",
 };
+const LANG_REGION: Record<Lang, { regionCode: string; relevanceLanguage: string }> = {
+  ko: { regionCode: "KR", relevanceLanguage: "ko" },
+  en: { regionCode: "US", relevanceLanguage: "en" },
+  ja: { regionCode: "JP", relevanceLanguage: "ja" },
+};
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -57,6 +62,7 @@ async function translateKeyword(keyword: string, targetLang: Lang): Promise<stri
 export default function YtAnalyzerPage() {
   const [keyword, setKeyword] = useState("");
   const [searchedKeyword, setSearchedKeyword] = useState(""); // 실제로 사용된 검색어
+  const [translatedKeywords, setTranslatedKeywords] = useState<Record<Lang, string>>({ ko: "", en: "", ja: "" });
   const [rows, setRows] = useState<VideoRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [translatingKeyword, setTranslatingKeyword] = useState(false);
@@ -92,12 +98,19 @@ export default function YtAnalyzerPage() {
   // ── Language switch: 입력창 키워드 즉시 번역 ─────────────────────────────
 
   async function switchLang(newLang: Lang) {
+    if (newLang === lang) {
+      // 같은 언어 버튼 재클릭 → 그냥 검색만
+      if (keyword.trim()) runAnalysis();
+      return;
+    }
     setLang(newLang);
-    if (!keyword.trim() || newLang === lang) return;
+    if (!keyword.trim()) return;
     setTranslatingKeyword(true);
     try {
       const translated = await translateKeyword(keyword.trim(), newLang);
       setKeyword(translated);
+      // 번역 완료 후 자동 검색
+      await runAnalysis(translated);
     } finally {
       setTranslatingKeyword(false);
     }
@@ -105,8 +118,9 @@ export default function YtAnalyzerPage() {
 
   // ── Core analysis ────────────────────────────────────────────────────────
 
-  async function runAnalysis() {
-    if (!keyword.trim()) {
+  async function runAnalysis(overrideKeyword?: string) {
+    const raw = (typeof overrideKeyword === "string" ? overrideKeyword : keyword).trim();
+    if (!raw) {
       setError("Please enter a search keyword.");
       return;
     }
@@ -115,11 +129,23 @@ export default function YtAnalyzerPage() {
     setLoading(true);
 
     try {
-      // 1. YouTube 검색 (키워드는 이미 버튼 클릭 시 번역됨)
-      const searchQuery = keyword.trim();
+      // 1. 선택된 언어로 번역 (overrideKeyword가 없을 때만, 이미 번역된 경우 스킵)
+      let searchQuery = raw;
+      if (!overrideKeyword && lang !== "ko") {
+        setProgress(`"${raw}" → ${LANG_LABELS[lang]} 번역 중…`);
+        try {
+          searchQuery = await translateKeyword(raw, lang);
+          setKeyword(searchQuery); // 입력창도 업데이트
+          setSearchedKeyword(searchQuery);
+        } catch {
+          // 번역 실패 시 원문으로 검색
+          searchQuery = raw;
+        }
+      }
       setSearchedKeyword(searchQuery);
       setProgress(`Searching "${searchQuery}"…`);
-      const searchData = await ytFetch("search", { q: searchQuery });
+      const { regionCode, relevanceLanguage } = LANG_REGION[lang];
+      const searchData = await ytFetch("search", { q: searchQuery, regionCode, relevanceLanguage });
 
       const videoIds: string[] = (searchData.items ?? [])
         .map((item: { id: { videoId: string } }) => item.id.videoId)
@@ -180,6 +206,25 @@ export default function YtAnalyzerPage() {
 
       setRows(result);
       setProgress("");
+
+      // 3개국어 번역 (백그라운드)
+      const originalKeyword = raw;
+      const langs: Lang[] = ["ko", "en", "ja"];
+      const translations: Record<Lang, string> = { ko: "", en: "", ja: "" };
+      await Promise.all(
+        langs.map(async (l) => {
+          if (l === lang) {
+            translations[l] = searchQuery; // 현재 언어는 이미 번역된 검색어
+          } else {
+            try {
+              translations[l] = await translateKeyword(originalKeyword, l);
+            } catch {
+              translations[l] = originalKeyword;
+            }
+          }
+        })
+      );
+      setTranslatedKeywords(translations);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "An unknown error occurred.";
       setError(msg);
@@ -278,7 +323,7 @@ export default function YtAnalyzerPage() {
 
           <div className="flex items-center gap-3 flex-wrap">
             <button
-              onClick={runAnalysis}
+              onClick={() => runAnalysis()}
               disabled={loading}
               className="px-6 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-sm font-semibold transition"
             >
@@ -306,6 +351,21 @@ export default function YtAnalyzerPage() {
           )}
         </div>
 
+        {/* Translated Keywords */}
+        {rows.length > 0 && (translatedKeywords.ko || translatedKeywords.en || translatedKeywords.ja) && (
+          <div className="bg-[#1a1a1a] rounded-2xl p-4 border border-white/10 flex items-center gap-6 flex-wrap">
+            <span className="text-xs text-gray-500 font-medium uppercase tracking-wider">Search Keywords</span>
+            {(["ko", "en", "ja"] as Lang[]).map((l) =>
+              translatedKeywords[l] ? (
+                <span key={l} className={`text-sm ${lang === l ? "text-red-400 font-bold" : "text-gray-300"}`}>
+                  <span className="text-gray-500 text-xs mr-1">{LANG_LABELS[l]}</span>
+                  {translatedKeywords[l]}
+                </span>
+              ) : null
+            )}
+          </div>
+        )}
+
         {/* Results Table */}
         {rows.length > 0 && (
           <div className="space-y-3">
@@ -313,11 +373,6 @@ export default function YtAnalyzerPage() {
               <p className="text-sm text-gray-400">
                 <span className="text-white font-semibold">{rows.length}</span> videos analyzed
               </p>
-              {searchedKeyword && searchedKeyword !== keyword && (
-                <p className="text-xs text-gray-500">
-                  Searched as: <span className="text-gray-300">&ldquo;{searchedKeyword}&rdquo;</span>
-                </p>
-              )}
             </div>
 
             <div className="overflow-x-auto rounded-2xl border border-white/10">
