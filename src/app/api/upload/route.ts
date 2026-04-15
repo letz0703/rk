@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     // 폴더가 없으면 생성
     try {
       await mkdir(uploadDir, { recursive: true });
-    } catch (e) {
+    } catch {
       // 이미 있으면 무시
     }
     
@@ -55,7 +55,7 @@ export async function POST(request: Request) {
         await rename(path, backupPath);
         console.log(`기존 파일 백업 완료: ${backupPath}`);
       }
-    } catch (e) {
+    } catch {
       // 파일이 없으면 그냥 통과
     }
 

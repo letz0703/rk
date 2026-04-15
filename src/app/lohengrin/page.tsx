@@ -114,7 +114,7 @@ export default function LohengrinPage() {
               <button onClick={() => handleAssessment('insight')} className="group text-left p-6 rounded-xl border border-neutral-700 bg-neutral-950 hover:border-amber-500 hover:bg-neutral-800 transition-all duration-300">
                 <div className="text-amber-500 mb-4 group-hover:scale-110 transition-transform"><HelpCircleIcon /></div>
                 <h4 className="text-lg font-medium text-white mb-2">철학과 AI 시대의 은유</h4>
-                <p className="text-sm text-neutral-500">'완벽한 결과'와 '불완전한 인간의 과정'에 대한 심도 깊은 통찰을 원한다면.</p>
+                <p className="text-sm text-neutral-500">&apos;완벽한 결과&apos;와 &apos;불완전한 인간의 과정&apos;에 대한 심도 깊은 통찰을 원한다면.</p>
               </button>
               <button onClick={() => handleAssessment('climax')} className="group text-left p-6 rounded-xl border border-neutral-700 bg-neutral-950 hover:border-amber-500 hover:bg-neutral-800 transition-all duration-300">
                 <div className="text-amber-500 mb-4 group-hover:scale-110 transition-transform"><VideoIcon /></div>

@@ -79,7 +79,7 @@ export async function removeModelImage(slug, key, url) {
     const urlObj = new URL(url)
     const path = decodeURIComponent((urlObj.pathname.split("/o/")[1] ?? "").split("?")[0])
     if (path) await deleteObject(storageRef(storage, path))
-  } catch (_) {}
+  } catch { }
 }
 
 export async function saveModelMeta(slug, meta) {
