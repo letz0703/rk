@@ -9,9 +9,26 @@ import {
   setPersistence,
   browserLocalPersistence
 } from "firebase/auth"
-import {getDatabase, ref, set, get, push, remove, update, onValue, off} from "firebase/database"
+import {
+  getDatabase,
+  ref,
+  set,
+  get,
+  push,
+  remove,
+  update,
+  onValue,
+  off
+} from "firebase/database"
 import {v4 as uuid} from "uuid"
-import {getStorage, ref as storageRef, listAll, uploadBytes, getDownloadURL, deleteObject} from "firebase/storage"
+import {
+  getStorage,
+  ref as storageRef,
+  listAll,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject
+} from "firebase/storage"
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -77,9 +94,11 @@ export async function removeModelImage(slug, key, url) {
   await remove(ref(database, `models/${slug}/images/${key}`))
   try {
     const urlObj = new URL(url)
-    const path = decodeURIComponent((urlObj.pathname.split("/o/")[1] ?? "").split("?")[0])
+    const path = decodeURIComponent(
+      (urlObj.pathname.split("/o/")[1] ?? "").split("?")[0]
+    )
     if (path) await deleteObject(storageRef(storage, path))
-  } catch { }
+  } catch {}
 }
 
 export async function saveModelMeta(slug, meta) {
@@ -102,15 +121,19 @@ export async function seedModelData(slug, meta) {
 export async function listModelImages(slug) {
   try {
     const folder = storageRef(storage, `models/${slug}`)
-    const { items } = await listAll(folder)
+    const {items} = await listAll(folder)
     const urls = await Promise.all(
-      items.map(item => getDownloadURL(item).then(url => ({ name: item.name, url })))
+      items.map(item =>
+        getDownloadURL(item).then(url => ({name: item.name, url}))
+      )
     )
     const profileEntry = urls.find(f => f.name.startsWith("profile."))
-    const gallery = urls.filter(f => !f.name.startsWith("profile.")).map(f => f.url)
-    return { profileImage: profileEntry?.url ?? null, gallery }
+    const gallery = urls
+      .filter(f => !f.name.startsWith("profile."))
+      .map(f => f.url)
+    return {profileImage: profileEntry?.url ?? null, gallery}
   } catch {
-    return { profileImage: null, gallery: [] }
+    return {profileImage: null, gallery: []}
   }
 }
 
@@ -185,9 +208,9 @@ export async function submitRequest(modelSlug, request) {
     userId: request.userId ?? null,
     userName: request.userName,
     content: request.content,
-    type: request.type ?? "standard",          // "standard" | "tier_priority"
+    type: request.type ?? "standard", // "standard" | "tier_priority"
     visibility: request.visibility ?? "public", // "public" | "private"
-    status: "pending",                          // "pending" | "in_progress" | "completed"
+    status: "pending", // "pending" | "in_progress" | "completed"
     createdAt: Date.now()
   }
   return set(ref(database, `lookbook_requests/${modelSlug}/${id}`), payload)
@@ -203,9 +226,7 @@ export function onRequests(modelSlug, callback, onError) {
   const r = ref(database, `lookbook_requests/${modelSlug}`)
   const listener = snap => {
     const data = snap.val()
-    const list = data
-      ? Object.entries(data).map(([id, v]) => ({...v, id}))
-      : []
+    const list = data ? Object.entries(data).map(([id, v]) => ({...v, id})) : []
     list.sort((a, b) => {
       if (a.type === "tier_priority" && b.type !== "tier_priority") return -1
       if (b.type === "tier_priority" && a.type !== "tier_priority") return 1
@@ -221,7 +242,9 @@ export function onRequests(modelSlug, callback, onError) {
  * Update request status (admin only).
  */
 export async function updateRequestStatus(modelSlug, reqId, status) {
-  return update(ref(database, `lookbook_requests/${modelSlug}/${reqId}`), {status})
+  return update(ref(database, `lookbook_requests/${modelSlug}/${reqId}`), {
+    status
+  })
 }
 
 /**
@@ -239,26 +262,37 @@ export async function deleteRequest(modelSlug, reqId) {
  */
 export async function addRequestReply(modelSlug, reqId, reply) {
   const id = uuid()
-  return set(ref(database, `lookbook_requests/${modelSlug}/${reqId}/replies/${id}`), {
-    id,
-    content: reply.content,
-    authorName: reply.authorName,
-    createdAt: Date.now()
-  })
+  return set(
+    ref(database, `lookbook_requests/${modelSlug}/${reqId}/replies/${id}`),
+    {
+      id,
+      content: reply.content,
+      authorName: reply.authorName,
+      createdAt: Date.now()
+    }
+  )
 }
 
 /**
  * Delete a reply from a request.
  */
 export async function deleteRequestReply(modelSlug, reqId, replyId) {
-  return remove(ref(database, `lookbook_requests/${modelSlug}/${reqId}/replies/${replyId}`))
+  return remove(
+    ref(database, `lookbook_requests/${modelSlug}/${reqId}/replies/${replyId}`)
+  )
 }
 
 // ── Product functions ──────────────────────────────────────────────────────
 
 // ── Life Song functions ────────────────────────────────────────────────────
 
-export async function submitLifeSong({ name, songTitle, artist, youtubeUrl, story }) {
+export async function submitLifeSong({
+  name,
+  songTitle,
+  artist,
+  youtubeUrl,
+  story
+}) {
   const id = uuid()
   return set(ref(database, `lifesongs/${id}`), {
     id,
@@ -292,7 +326,9 @@ export function onAllLifeSongs(callback) {
   const listener = snap => {
     const data = snap.val()
     const list = data
-      ? Object.values(data).sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0))
+      ? Object.values(data).sort(
+          (a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0)
+        )
       : []
     callback(list)
   }
@@ -301,7 +337,7 @@ export function onAllLifeSongs(callback) {
 }
 
 export async function approveLifeSong(id) {
-  return update(ref(database, `lifesongs/${id}`), { approved: true })
+  return update(ref(database, `lifesongs/${id}`), {approved: true})
 }
 
 export async function deleteLifeSong(id) {
@@ -325,14 +361,14 @@ export function getProducts(onData, onError) {
 
 // ── Inquiry (1:1 문의) functions ───────────────────────────────────────────
 
-export async function submitInquiry({ name, title, content }) {
+export async function submitInquiry({name, title, content}) {
   const id = uuid()
   return set(ref(database, `inquiries/${id}`), {
     id,
     name: name.trim() || "Anonymous",
     title: title.trim(),
     content: content.trim(),
-    createdAt: Date.now(),
+    createdAt: Date.now()
   })
 }
 
@@ -341,7 +377,9 @@ export function onInquiries(callback) {
   const listener = snap => {
     const data = snap.val()
     const list = data
-      ? Object.values(data).sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0))
+      ? Object.values(data).sort(
+          (a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0)
+        )
       : []
     callback(list)
   }
@@ -354,14 +392,46 @@ export async function addInquiryReply(inquiryId, content) {
   return set(ref(database, `inquiries/${inquiryId}/replies/${id}`), {
     id,
     content: content.trim(),
-    createdAt: Date.now(),
+    createdAt: Date.now()
   })
 }
 
 export async function toggleInquiryResolved(inquiryId, resolved) {
-  return update(ref(database, `inquiries/${inquiryId}`), { resolved })
+  return update(ref(database, `inquiries/${inquiryId}`), {resolved})
 }
 
 export async function deleteInquiry(inquiryId) {
   return remove(ref(database, `inquiries/${inquiryId}`))
+}
+
+// ─── Suno Playlist ───────────────────────────────────────────────
+
+export function onSunoPlaylist(callback) {
+  const playlistRef = ref(database, "sunoPlaylist")
+  return onValue(playlistRef, snapshot => {
+    const data = snapshot.val()
+    if (!data) {
+      callback([])
+      return
+    }
+    const tracks = Object.entries(data).map(([id, val]) => ({
+      id,
+      ...val
+    }))
+    tracks.sort((a, b) => a.addedAt - b.addedAt)
+    callback(tracks)
+  })
+}
+
+export async function addSunoTrack(url) {
+  const playlistRef = ref(database, "sunoPlaylist")
+  const newRef = push(playlistRef)
+  await set(newRef, {
+    url,
+    addedAt: Date.now()
+  })
+}
+
+export async function deleteSunoTrack(id) {
+  await remove(ref(database, `sunoPlaylist/${id}`))
 }

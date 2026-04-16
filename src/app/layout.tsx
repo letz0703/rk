@@ -1,21 +1,31 @@
 import type {Metadata} from "next"
+
 import {Geist, Geist_Mono, Inter} from "next/font/google"
+
 import "./globals.css"
+
 import {cn} from "@/lib/utils"
+
 import {AuthContextProvider} from "@/components/context/AuthContext"
+import SunoPlayer from "@/app/components/SunoPlayer" // ← 추가
+
 const inter = Inter({subsets: ["latin"], variable: "--font-sans"})
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"]
 })
+
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"]
 })
+
 export const metadata: Metadata = {
   title: "rainskiss",
   description: "100% Volume for YOUTUBE"
 }
+
 export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang="en" suppressHydrationWarning>
@@ -28,7 +38,10 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
           inter.variable
         )}
       >
-        <AuthContextProvider>{children}</AuthContextProvider>
+        <AuthContextProvider>
+          {children}
+          <SunoPlayer /> {/* ← 추가 */}
+        </AuthContextProvider>
       </body>
     </html>
   )

@@ -2,6 +2,7 @@ import Image from "next/image"
 import Link from "next/link"
 import HeaderAuth from "./components/HeaderAuth"
 import TodaysSong from "./components/TodaysSong"
+import GemsButton from "./components/GemsButton"
 
 export default function Page() {
   return (
@@ -32,28 +33,78 @@ export default function Page() {
       </div>
 
       {/* 본문 */}
-      <main className="flex flex-col items-center text-center px-6 py-16">
-        <h2 className="text-2xl sm:text-3xl font-semibold text-[#1d1d1f] tracking-tight">
-          Perfect Volume for next Generation,{" "}
-          <span style={{ color: "#c10002" }}>100 Volume – Zero Loudness</span>
-        </h2>
-        <p className="mt-4 text-base sm:text-lg text-[#6e6e73] leading-relaxed max-w-xl">
-          Please introduce the timeless songs you&apos;ve lived with all your
-          life.
-          <br />
-          <span style={{ color: "#c10002" }} className="font-semibold">rainskiss</span> knows
-          how to bring them back.
-        </p>
-        <div className="flex flex-wrap gap-3 mt-8 justify-center">
+      <main className="px-6 py-16 max-w-5xl mx-auto">
+        {/* 타이틀 */}
+        <div className="text-center mb-12">
+          <h2 className="text-2xl sm:text-3xl font-semibold text-[#1d1d1f] tracking-tight">
+            rainskiss — <span style={{color: "#c10002"}}>My Playground</span>
+          </h2>
+          <p className="mt-3 text-sm text-[#6e6e73]">
+            Music · Dance · Beauty · History
+          </p>
+        </div>
+
+        {/* 3 구역 카드 */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          {/* Cafe Rainskiss */}
           <a
             href="https://youtube.com/@rainskiss.m"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-5 py-2 rounded-full text-white text-sm font-medium transition hover:opacity-80"
-            style={{ backgroundColor: "#c10002" }}
+            className="group flex flex-col gap-3 p-7 rounded-2xl border border-[#d2d2d7] bg-[#f5f5f7] hover:bg-[#eaeaef] transition"
           >
-            ▶ YouTube
+            <span className="text-2xl">☕</span>
+            <h3 className="text-base font-semibold text-[#1d1d1f]">
+              Cafe Rainskiss
+            </h3>
+            <p className="text-sm text-[#6e6e73] leading-relaxed">
+              BGM &amp; OST — music for quiet moments, handcrafted at 14 LUFS.
+            </p>
+            <span className="mt-auto text-xs text-[#6e6e73] group-hover:text-[#1d1d1f] transition">
+              YouTube ↗
+            </span>
           </a>
+
+          {/* Club Rainskiss */}
+          <a
+            href="https://youtube.com/@rainskiss-x"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex flex-col gap-3 p-7 rounded-2xl border border-[#d2d2d7] bg-[#f5f5f7] hover:bg-[#eaeaef] transition"
+          >
+            <span className="text-2xl">🎧</span>
+            <h3 className="text-base font-semibold text-[#1d1d1f]">
+              Club Rainskiss
+            </h3>
+            <p className="text-sm text-[#6e6e73] leading-relaxed">
+              Dance music with choreography — where the beat never stops.
+            </p>
+            <span className="mt-auto text-xs text-[#6e6e73] group-hover:text-[#1d1d1f] transition">
+              YouTube ↗
+            </span>
+          </a>
+
+          {/* rainskiss-x */}
+          <a
+            href="https://deviantart.com/rainskiss-x"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex flex-col gap-3 p-7 rounded-2xl border border-[#d2d2d7] bg-[#1d1d1f] hover:bg-[#2d2d2f] transition"
+          >
+            <span className="text-2xl">✦</span>
+            <h3 className="text-base font-semibold text-white">rainskiss-x</h3>
+            <p className="text-sm text-white/60 leading-relaxed">
+              Time-leap through history&apos;s most stunning places, guided by
+              the beauties who defined each era.
+            </p>
+            <span className="mt-auto text-xs text-white/40 group-hover:text-white/80 transition">
+              DeviantArt · 18+ ↗
+            </span>
+          </a>
+        </div>
+
+        {/* 보조 링크 */}
+        <div className="flex flex-wrap gap-3 mt-8 justify-center">
           <a
             href="https://suno.com/invite/@rainskiss_o"
             target="_blank"
@@ -68,39 +119,12 @@ export default function Page() {
           >
             🛒 Shop
           </Link>
-          <a
-            href="https://deviantart.com/rainskiss-x"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-5 py-2 rounded-full border border-[#d2d2d7] text-[#1d1d1f] hover:bg-[#f5f5f7] text-sm font-medium transition"
-          >
-            DeviantArt (18+)
-          </a>
+          <GemsButton />
         </div>
       </main>
 
       {/* Today's Life Song */}
       <TodaysSong />
-
-      {/* Members 섹션 */}
-      <section className="px-6 py-14 border-t border-[#d2d2d7]">
-        <div className="max-w-4xl mx-auto flex flex-col items-center text-center gap-4">
-          <p className="text-xs font-semibold text-[#6e6e73] uppercase tracking-widest">
-            Members Only
-          </p>
-          <Link
-            href="/models"
-            className="group inline-flex items-center gap-3 px-8 py-4 rounded-full border border-[#d2d2d7] bg-[#f5f5f7] hover:bg-[#e8e8ed] transition"
-          >
-            <span className="text-[#1d1d1f] font-semibold text-base">
-              AI Models 입장
-            </span>
-            <span className="text-[#6e6e73] group-hover:text-[#1d1d1f] transition text-lg">
-              →
-            </span>
-          </Link>
-        </div>
-      </section>
 
       {/* Patreon 섹션 */}
       <section className="bg-[#f5f5f7] border-t border-[#d2d2d7] px-6 py-14">
@@ -121,7 +145,7 @@ export default function Page() {
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block px-8 py-3 text-white font-semibold rounded-full transition hover:opacity-80 text-base"
-            style={{ backgroundColor: "#c10002" }}
+            style={{backgroundColor: "#c10002"}}
           >
             Become a Patron
           </a>
