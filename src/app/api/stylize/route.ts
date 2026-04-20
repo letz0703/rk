@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server"
-import { GoogleGenAI } from "@google/genai"
 
 const STYLE_PROMPT = `You are an expert AI artist. Transform the provided photo into an illustration in this exact art style:
 
@@ -28,44 +27,55 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "이미지를 첨부해주세요." }, { status: 400 })
     }
 
-    const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY! })
+    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY!
+    const model = "gemini-3.1-flash-image-preview"
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash-exp",
+    const body = {
       contents: [
         {
           role: "user",
           parts: [
             {
-              inlineData: {
-                mimeType: mimeType || "image/jpeg",
+              inline_data: {
+                mime_type: mimeType || "image/jpeg",
                 data: imageBase64,
               },
             },
-            {
-              text: STYLE_PROMPT,
-            },
+            { text: STYLE_PROMPT },
           ],
         },
       ],
-      config: {
+      generationConfig: {
         responseModalities: ["TEXT", "IMAGE"],
       },
+    }
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
     })
 
-    const parts = response.candidates?.[0]?.content?.parts ?? []
+    const data = await res.json()
+
+    if (!res.ok) {
+      return NextResponse.json({ error: JSON.stringify(data.error ?? data) }, { status: res.status })
+    }
+
+    const parts = data.candidates?.[0]?.content?.parts ?? []
 
     for (const part of parts) {
-      if (part.inlineData?.data) {
+      if (part.inline_data?.data) {
         return NextResponse.json({
-          imageBase64: part.inlineData.data,
-          mimeType: part.inlineData.mimeType || "image/png",
+          imageBase64: part.inline_data.data,
+          mimeType: part.inline_data.mime_type || "image/png",
         })
       }
     }
 
-    const textParts = parts.filter((p) => p.text).map((p) => p.text).join("\n")
-    return NextResponse.json({ error: "이미지 생성에 실패했습니다. " + textParts }, { status: 500 })
+    const textParts = parts.filter((p: { text?: string }) => p.text).map((p: { text?: string }) => p.text).join("\n")
+    return NextResponse.json({ error: "이미지 생성 실패: " + textParts }, { status: 500 })
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err)
     console.error("Stylize API error:", msg)
