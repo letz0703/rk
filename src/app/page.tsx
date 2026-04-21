@@ -91,7 +91,7 @@ export default function Page() {
             rel="noopener noreferrer"
             className="group flex flex-col gap-3 p-7 rounded-2xl border border-[#d2d2d7] bg-[#1d1d1f] hover:bg-[#2d2d2f] transition"
           >
-            <span className="text-2xl">✦</span>
+            {/*<span className="text-2xl">✦</span>
             <h3 className="text-base font-semibold text-white">rainskiss-x</h3>
             <p className="text-sm text-white/60 leading-relaxed">
               Time-leap through history&apos;s most stunning places, guided by
@@ -99,7 +99,7 @@ export default function Page() {
             </p>
             <span className="mt-auto text-xs text-white/40 group-hover:text-white/80 transition">
               DeviantArt · 18+ ↗
-            </span>
+            </span>*/}
           </a>
         </div>
 
