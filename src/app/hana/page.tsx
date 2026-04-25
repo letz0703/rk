@@ -3,7 +3,7 @@
 import { useAuthContext } from "@/components/context/AuthContext"
 import { getModel } from "@/app/models/data"
 import ModelPageContent from "@/app/models/ModelPageContent"
-import PasswordGate from "@/app/components/PasswordGate"
+import AgeGate from "@/components/AgeGate"
 import { notFound } from "next/navigation"
 
 const ADMIN_EMAIL = "rainskiss@gmail.com"
@@ -14,8 +14,8 @@ export default function HanaPage() {
   const model = getModel("hana")
   if (!model) notFound()
   return (
-    <PasswordGate>
+    <AgeGate>
       <ModelPageContent model={model} isAdmin={isAdmin} />
-    </PasswordGate>
+    </AgeGate>
   )
 }
