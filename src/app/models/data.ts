@@ -12,7 +12,7 @@ export type Model = {
   slug: string
   name: string
   nameKo: string
-  nationality: "KR" | "US"
+  nationality: string
   profileImage: string
   bio: string
   gallery: GalleryItem[]

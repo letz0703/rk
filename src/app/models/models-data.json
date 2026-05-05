@@ -24,6 +24,17 @@
     "nsfwPreview": "/models/hana.png"
   },
   {
+    "slug": "cleo",
+    "name": "Cleo",
+    "nameKo": "클레오",
+    "nationality": "EG",
+    "profileImage": "",
+    "bio": "기원전 69년, 알렉산드리아. 7개 언어를 구사하고 함대를 지휘했으며 로마를 두 번 손에 쥐었다. 그녀는 여왕이 아니라 전략이었다.",
+    "gallery": [],
+    "deviantArtUrl": "https://www.deviantart.com/rainskiss-x",
+    "nsfwUrl": "https://www.patreon.com/rainskiss"
+  },
+  {
     "slug": "elizabeth",
     "name": "Elizabeth",
     "nameKo": "엘리자베스",

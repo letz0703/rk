@@ -1,8 +1,21 @@
 import Link from "next/link"
 import { models } from "./data"
 
-const flagMap = { KR: "🇰🇷", US: "🇺🇸" }
-const labelMap = { KR: "한국", US: "미국" }
+const nationalityMap: Record<string, { flag: string; label: string }> = {
+  KR: { flag: "🇰🇷", label: "한국" },
+  US: { flag: "🇺🇸", label: "미국" },
+  EG: { flag: "🇪🇬", label: "이집트" },
+  FR: { flag: "🇫🇷", label: "프랑스" },
+  GB: { flag: "🇬🇧", label: "영국" },
+  JP: { flag: "🇯🇵", label: "일본" },
+  CN: { flag: "🇨🇳", label: "중국" },
+  IT: { flag: "🇮🇹", label: "이탈리아" },
+  GR: { flag: "🇬🇷", label: "그리스" },
+  RU: { flag: "🇷🇺", label: "러시아" },
+}
+function getNationality(code: string) {
+  return nationalityMap[code] ?? { flag: "🌍", label: code }
+}
 
 export default function ModelsPage() {
   return (
@@ -22,7 +35,7 @@ export default function ModelsPage() {
           {models.map(model => (
             <Link
               key={model.slug}
-              href={`/${model.slug}`}
+              href={`/models/${model.slug}`}
               className="group relative block"
             >
               {/* Card Container */}
@@ -47,7 +60,7 @@ export default function ModelsPage() {
                 {/* Status Badge */}
                 <div className="absolute top-4 right-4">
                   <span className="px-3 py-1 bg-white/80 backdrop-blur-md rounded-full text-[10px] font-bold uppercase tracking-widest text-[#c10002] border border-[#c10002]/10">
-                    {model.nationality}
+                    {getNationality(model.nationality).flag} {getNationality(model.nationality).label}
                   </span>
                 </div>
               </div>

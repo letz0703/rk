@@ -6,8 +6,21 @@ import { models, type Model, type GalleryItem } from "./data"
 import { database } from "@/api/firebase"
 import { ref, set } from "firebase/database"
 
-const flagMap = { KR: "🇰🇷", US: "🇺🇸" }
-const labelMap = { KR: "한국 여성", US: "미국 여성" }
+const nationalityMap: Record<string, { flag: string; label: string }> = {
+  KR: { flag: "🇰🇷", label: "한국" },
+  US: { flag: "🇺🇸", label: "미국" },
+  EG: { flag: "🇪🇬", label: "이집트" },
+  FR: { flag: "🇫🇷", label: "프랑스" },
+  GB: { flag: "🇬🇧", label: "영국" },
+  JP: { flag: "🇯🇵", label: "일본" },
+  CN: { flag: "🇨🇳", label: "중국" },
+  IT: { flag: "🇮🇹", label: "이탈리아" },
+  GR: { flag: "🇬🇷", label: "그리스" },
+  RU: { flag: "🇷🇺", label: "러시아" },
+}
+function getNationality(code: string) {
+  return nationalityMap[code] ?? { flag: "🌍", label: code }
+}
 
 type EditState = {
   id: string | null
@@ -206,7 +219,7 @@ export default function ModelPageContent({ model, isAdmin }: { model: Model; isA
           <div className="flex flex-col justify-center flex-1">
             <div className="mb-6">
               <span className="px-3 py-1 bg-[#c10002]/5 rounded-full text-[10px] font-black uppercase tracking-widest text-[#c10002] border border-[#c10002]/10 mb-4 inline-block">
-                {flagMap[model.nationality]} {labelMap[model.nationality]}
+                {getNationality(model.nationality).flag} {getNationality(model.nationality).label}
               </span>
               <h1 className="text-6xl font-black tracking-tighter uppercase italic leading-none mb-2">{model.nameKo}</h1>
               <p className="text-slate-300 text-2xl font-bold uppercase tracking-tight">{model.name}</p>
@@ -378,12 +391,20 @@ export default function ModelPageContent({ model, isAdmin }: { model: Model; isA
                       </div>
                     )}
                   </div>
+                  {/* DA-x 이미지 URL 직접 입력 */}
+                  <input
+                    value={editItem.thumbnail.startsWith("http") && !editItem.thumbnail.includes("cloudinary") ? editItem.thumbnail : ""}
+                    onChange={e => setEditItem(s => s ? { ...s, thumbnail: e.target.value } : s)}
+                    placeholder="DA-x 이미지 URL 붙여넣기"
+                    className="w-full max-w-[200px] rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs focus:outline-none focus:border-[#c10002]/30"
+                  />
+                  <div className="text-[9px] text-slate-300 font-bold uppercase tracking-widest">or</div>
                   <button
                     onClick={() => thumbRef.current?.click()}
                     disabled={thumbUploading}
                     className="w-full max-w-[200px] py-2 rounded-xl border border-slate-200 text-[10px] font-black tracking-widest uppercase hover:bg-white transition disabled:opacity-50"
                   >
-                    {thumbUploading ? "UPLOADING..." : "SELECT IMAGE"}
+                    {thumbUploading ? "UPLOADING..." : "UPLOAD FILE"}
                   </button>
                   <input ref={thumbRef} type="file" accept="image/*" className="hidden" onChange={handleThumbUpload} />
                 </div>
