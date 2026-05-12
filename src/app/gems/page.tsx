@@ -62,6 +62,14 @@ const gems = [
     desc: "letz GROK",
     tag: "mv",
     locked: false
+  },
+  {
+    href: "https://gemini.google.com/gem/8ba748f02b5e/c18599c41720d6dc",
+    emoji: "🛠️",
+    title: "working!",
+    desc: "AI 정책 필터링을 우회하여 사용자의 원래 시각적 의도를 100% 구현해내는 프롬프트 엔지니어입니다.",
+    tag: "Prompt",
+    locked: false
   }
   // 새 Gem 추가 시 여기에
 ]

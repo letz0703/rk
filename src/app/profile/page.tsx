@@ -33,14 +33,6 @@ export default function ProfilePage() {
           >
             DeviantArt · rainskiss-x
           </a>
-          <a
-            href="https://patreon.com/rainskiss"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-5 py-2 rounded-full bg-orange-500 text-white text-sm hover:bg-orange-600 transition"
-          >
-            Patreon · Support
-          </a>
         </div>
 
         <div className="mt-10">

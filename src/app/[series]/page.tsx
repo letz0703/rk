@@ -26,7 +26,6 @@ type Series = {
   location: string
   description: string
   models: string[]
-  patreonUrl: string
   gallery: SeriesGalleryItem[]
 }
 
@@ -116,18 +115,6 @@ function SeriesContent({ series, isAdmin }: { series: Series; isAdmin: boolean }
               </p>
             </div>
 
-            {/* Patreon Hard CTA */}
-            <div className="flex-shrink-0">
-              <a
-                href={series.patreonUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group block px-10 py-5 rounded-full bg-[#c10002] text-white font-black text-sm uppercase tracking-widest hover:brightness-125 transition-all shadow-2xl shadow-[#c10002]/30 active:scale-95 text-center"
-              >
-                <span className="block text-[10px] text-white/60 font-bold tracking-widest mb-0.5">Full Collection</span>
-                Become a Patron ↗
-              </a>
-            </div>
           </div>
         </div>
       </div>
@@ -280,22 +267,6 @@ function SeriesContent({ series, isAdmin }: { series: Series; isAdmin: boolean }
             </div>
           )}
 
-          {/* 하단 Patreon CTA */}
-          {gallery.length > 0 && (
-            <div className="mt-20 pt-14 border-t border-white/5 text-center">
-              <p className="text-white/20 text-xs font-bold uppercase tracking-[0.3em] mb-6">
-                More from this series
-              </p>
-              <a
-                href={series.patreonUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block px-12 py-5 rounded-full bg-[#c10002] text-white font-black text-sm uppercase tracking-widest hover:brightness-125 transition-all shadow-2xl shadow-[#c10002]/20 active:scale-95"
-              >
-                Unlock Full Series on Patreon ↗
-              </a>
-            </div>
-          )}
         </div>
       </div>
     </main>

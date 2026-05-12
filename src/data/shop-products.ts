@@ -15,7 +15,6 @@ export type ShopProduct = {
   stylingTipsLang: { ko: string[]; ja: string[]; en: string[] }
   previewImage: string
   price: string
-  patreonUrl: string
   gallery: string[]
   content: {
     clothingPrompt: string
@@ -74,7 +73,6 @@ export const shopProducts: ShopProduct[] = [
     },
     previewImage: "/shop/white-halter-mini-01.jpg",
     price: "$15",
-    patreonUrl: "https://www.patreon.com/posts/white-halter-ai-156456753",
     gallery: [
       "/shop/white-halter-mini-01.jpg",
       "/shop/white-halter-mini-02.jpg",

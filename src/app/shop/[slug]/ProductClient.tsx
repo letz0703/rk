@@ -219,18 +219,6 @@ export default function ProductClient({product}: {product: ShopProduct}) {
               <p className="text-4xl font-extrabold text-white mb-4">
                 {product.price}
               </p>
-              <a
-                href={product.patreonUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full text-center py-4 rounded-full font-bold text-white text-base transition hover:opacity-80"
-                style={{backgroundColor: "#c10002"}}
-              >
-                Purchase on Patreon →
-              </a>
-              <p className="text-xs text-white/20 text-center mt-3">
-                Payment & delivery handled on Patreon
-              </p>
             </div>
           </div>
         </div>
