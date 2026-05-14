@@ -1,6 +1,5 @@
 import Image from "next/image"
 import Link from "next/link"
-import HeaderAuth from "./components/HeaderAuth"
 import TodaysSong from "./components/TodaysSong"
 import GemsButton from "./components/GemsButton"
 
@@ -25,10 +24,6 @@ export default function Page() {
             <br />
             the most beautiful music in the world.
           </p>
-        </div>
-        {/* 우상단 인증 버튼 */}
-        <div className="absolute top-4 right-4">
-          <HeaderAuth />
         </div>
       </div>
 
@@ -103,6 +98,67 @@ export default function Page() {
           {/*</a>*/}
         </div>
 
+        {/* Featured Product */}
+        <div className="mt-16 mb-12 text-center">
+          <h2 className="text-xl font-semibold text-[#1d1d1f] tracking-tight mb-2">
+            🔥 AI Clothing Prompt Store
+          </h2>
+          <p className="text-sm text-[#6e6e73] mb-8">
+            Professional AI prompts that actually work
+          </p>
+
+          <Link
+            href="/shop/white-halter-mini"
+            className="group inline-block bg-[#1d1d1f] rounded-2xl overflow-hidden hover:scale-105 transition-transform duration-300 max-w-sm mx-auto"
+          >
+            <div className="relative w-full h-64 bg-[#f5f5f7]">
+              <Image
+                src="/shop/white-halter-mini-01.jpg"
+                alt="White Halter Dress"
+                fill
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              <div className="absolute bottom-4 left-4 right-4">
+                <h3 className="text-lg font-bold text-white leading-tight">
+                  White Halter Dress
+                </h3>
+                <p className="text-xs text-white/80 mt-1">
+                  Flow Preview
+                </p>
+              </div>
+            </div>
+            <div className="p-4 text-left">
+              <p className="text-sm text-white/70 mb-2">
+                Pure yet sophisticated — standing in the light
+              </p>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-white/50">✨ 100% working prompt</span>
+                <span
+                  className="text-sm font-bold px-3 py-1 rounded-full text-white"
+                  style={{backgroundColor: "#c10002"}}
+                >
+                  $15
+                </span>
+              </div>
+            </div>
+          </Link>
+
+          <div className="mt-6 text-center">
+            <p className="text-xs text-[#6e6e73] mb-2">
+              Free Flow previews available daily on
+            </p>
+            <a
+              href="https://deviantart.com/rainskiss-x"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-[#6e6e73] hover:text-[#1d1d1f] transition underline"
+            >
+              DeviantArt / rainskiss-x ↗
+            </a>
+          </div>
+        </div>
+
         {/* 보조 링크 */}
         <div className="flex flex-wrap gap-3 mt-8 justify-center">
           <a
@@ -114,7 +170,7 @@ export default function Page() {
             ☀️ Suno
           </a>
           <Link
-            href="/ic"
+            href="/shop"
             className="px-5 py-2 rounded-full bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e8e8ed] text-sm font-medium transition"
           >
             🛒 Shop

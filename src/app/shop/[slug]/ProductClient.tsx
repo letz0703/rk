@@ -5,14 +5,13 @@ import Image from "next/image"
 import Link from "next/link"
 import {database} from "@/api/firebase"
 import {ref, onValue, push, remove} from "firebase/database"
-import {useAuthContext} from "@/components/context/AuthContext"
 import type {ShopProduct} from "@/data/shop-products"
 import AdaptiveGallery from "@/app/components/AdaptiveGallery"
 
 type GalleryItem = {id: string; url: string}
 
 export default function ProductClient({product}: {product: ShopProduct}) {
-  const {isAdmin} = useAuthContext()
+  const isAdmin = false // 로그인 기능 제거로 어드민 기능 비활성화
 
   const [gallery, setGallery] = useState<GalleryItem[]>(
     product.gallery.map((url, i) => ({id: `static-${i}`, url}))
@@ -219,6 +218,33 @@ export default function ProductClient({product}: {product: ShopProduct}) {
               <p className="text-4xl font-extrabold text-white mb-4">
                 {product.price}
               </p>
+
+              <div className="space-y-3">
+                {/* DeviantArt 구매 버튼 */}
+                <a
+                  href={product.content.slideshowUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full bg-[#c10002] hover:bg-[#a00002] text-white font-bold py-4 px-6 rounded-2xl transition duration-300 text-center block"
+                >
+                  🛒 Buy Now on DeviantArt
+                </a>
+
+                {/* 무료 미리보기 안내 */}
+                <div className="text-center pt-2">
+                  <p className="text-xs text-white/40 mb-1">
+                    Free Flow previews available on
+                  </p>
+                  <a
+                    href="https://deviantart.com/rainskiss-x"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-white/60 hover:text-white transition underline"
+                  >
+                    DeviantArt / rainskiss-x ↗
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -78,15 +78,15 @@ export const shopProducts: ShopProduct[] = [
       "/shop/white-halter-mini-02.jpg",
     ],
     content: {
-      clothingPrompt: "COMING SOON",
-      modelPrompt: "COMING SOON",
+      clothingPrompt: "white halter neck mini dress, asymmetrical draping, flowing fabric, crisp details, natural cotton blend, minimalist design, bright minimal setting, natural lighting, full-body portrait, elegant pose, soft bokeh background, 4K editorial look",
+      modelPrompt: "professional portrait lighting, golden hour natural light, soft shadows, confident feminine pose, elegant standing position, minimal background, high fashion editorial style, crisp focus on subject",
       videoPrompts: {
-        editorial: "COMING SOON",
-        iphone: "COMING SOON",
-        cinematic: "COMING SOON",
+        editorial: "high fashion editorial style, studio lighting, dramatic poses, fabric movement, professional model walking",
+        iphone: "casual smartphone video, natural movement, everyday styling, natural lighting, relatable poses",
+        cinematic: "film grain, color graded, dramatic lighting, fashion film aesthetic, slow motion fabric details"
       },
-      slideshowUrl: "",
-      bonusImageUrl: "",
+      slideshowUrl: "https://www.deviantart.com/rainskiss/art/rainskiss-a-halter-1324765275",
+      bonusImageUrl: "/shop/white-halter-bonus.jpg",
     },
   },
 ]
