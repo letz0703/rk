@@ -6,8 +6,11 @@ export type MultiLang = {
   en: string
 }
 
+export type Category = "Historical" | "Street & Modern" | "Fantasy & Armour"
+
 export type ShopProduct = {
   slug: string
+  category: Category
   title: MultiLang
   tagline: MultiLang
   description: MultiLang
@@ -32,6 +35,7 @@ export type ShopProduct = {
 export const shopProducts: ShopProduct[] = [
   {
     slug: "white-halter-mini",
+    category: "Street & Modern",
     title: {
       ko: "화이트 홀터넥 미니 드레스",
       ja: "ホワイト ホルターネック ミニドレス",
@@ -87,6 +91,60 @@ export const shopProducts: ShopProduct[] = [
       },
       slideshowUrl: "https://www.deviantart.com/rainskiss/art/rainskiss-a-halter-1324765275",
       bonusImageUrl: "/shop/white-halter-bonus.jpg",
+    },
+  },
+  {
+    slug: "beige-ribbed-mini",
+    category: "Street & Modern",
+    title: {
+      ko: "베이지 리브 미니 드레스",
+      ja: "ベージュ リブ ミニドレス",
+      en: "Beige Ribbed Mini Dress",
+    },
+    tagline: {
+      ko: "매끄럽고 역동적인 — 일상의 우아함",
+      ja: "滑らかでダイナミック — 日常のエレガンス",
+      en: "Sleek and Dynamic — Everyday Elegance",
+    },
+    description: {
+      ko: "부드러운 베이지 컬러의 리브 텍스처가 돋보이는 미니 드레스입니다. 타이트한 핏과 스파게티 스트랩, 그리고 한쪽의 하이 슬릿 디테일이 역동적인 포즈에서도 완벽한 라인을 유지해줍니다. 자연스러운 구김과 섬세한 원단 질감이 사진에 생동감을 더합니다.",
+      ja: "柔らかいベージュカラーのリブテクスチャが際立つミニドレスです。タイトなフィット感とスパゲッティストラップ、そして片側のハイスリットが、ダイナ믹なポーズでも完璧なラインを保ちます。自然なシワと繊細な生地の質감이、写真に生命力を与えます。",
+      en: "A soft beige ribbed mini dress designed for dynamic movement and sleek silhouettes. Featuring thin spaghetti straps, a low plunging neckline, and a high side slit, it perfectly hugs the body while maintaining a clean, high-fashion look. The realistic ribbed texture and natural draping make it a masterpiece for photorealistic AI photography.",
+    },
+    stylingTips: [],
+    stylingTipsLang: {
+      ko: [
+        "화이트 스니커즈나 캔버스 뮤즈로 경쾌한 룩을 완성하세요",
+        "미니멀한 주머니나 액세서리로 포인트를 줄 수 있습니다",
+        "야외 콘크리트 배경이나 미니멀한 건축물 앞에서 촬영할 때 가장 돋보입니다",
+      ],
+      ja: [
+        "ホワイトのスニーカーやキャンバスミュールで軽やかなルックに",
+        "ミニマルなアクセサリーでアクセントを加えてください",
+        "屋外のコンクリート背景やミニマルな建築物の前での撮影に最適です",
+      ],
+      en: [
+        "Pair with white canvas mules or sneakers for a fresh summer look",
+        "Keep accessories minimal to focus on the dress's sleek texture",
+        "Best suited for outdoor settings with minimalist concrete or architectural backgrounds",
+      ],
+    },
+    previewImage: "/shop/beige-ribbed-mini-01.jpeg",
+    price: "$15",
+    gallery: [
+      "/shop/beige-ribbed-mini-01.jpeg",
+      "/shop/beige-ribbed-mini-02.jpeg",
+    ],
+    content: {
+      clothingPrompt: "summer ribbed mini dress in soft beige color, thin spaghetti straps, low plunging neckline, high side slit on one leg only, realistic ribbed texture, natural creases, clean short dress silhouette",
+      modelPrompt: "beautiful young Korean woman in a dynamic low crouching pose, one knee bent up, the other leg extended, body slightly twisted toward camera, joyful laughing expression, perfect anatomy, soft natural outdoor lighting, 8k, sharp focus",
+      videoPrompts: {
+        editorial: "high fashion editorial style, dynamic crouching poses, concrete minimalist background, sharp focus, 8k",
+        iphone: "casual walk in minimalist setting, beige mini dress details, natural laughter, handheld movement",
+        cinematic: "dramatic low angle shots, sunlight hitting the ribbed texture, slow motion movement, fashion film aesthetic"
+      },
+      slideshowUrl: "https://www.deviantart.com/rainskiss/art/1333194158",
+      bonusImageUrl: "/shop/beige-ribbed-bonus.jpg",
     },
   },
 ]

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Guide from './components/Guide';
 
 const scenes = [
@@ -62,8 +62,10 @@ export default function TraveloguePage() {
   const [currentScene, setCurrentScene] = useState(0);
   const [timeMode, setTimeMode] = useState<'present' | 'past'>('present');
   const [customImages, setCustomImages] = useState<Record<string, string>>({});
+  // ref로 최신 currentScene 추적 — scroll 핸들러 재등록 방지
+  const sceneRef = useRef(0);
 
-  // 이미지 드롭 및 서버 저장 핸들러
+  // timeMode를 deps에 포함 — stale closure 버그 수정
   const handleDrop = useCallback(async (e: React.DragEvent, index: number) => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
@@ -85,7 +87,6 @@ export default function TraveloguePage() {
         });
         const data = await res.json();
         if (data.success) {
-          console.log(`장면 ${index} (${timeMode}) 저장 완료!`);
           setCustomImages(prev => ({ ...prev, [`${index}_${timeMode}`]: data.url }));
         }
       } catch (err) {
@@ -93,26 +94,26 @@ export default function TraveloguePage() {
         alert('이미지 저장 중 오류가 발생했습니다.');
       }
     }
-  }, []);
+  }, [timeMode]);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
   };
 
   useEffect(() => {
+    // ref 덕분에 deps [] 가능 — 스크롤마다 리스너 재등록 없음
     const handleScroll = () => {
-      const scrollY = window.scrollY;
-      const windowHeight = window.innerHeight;
-      const sceneIndex = Math.floor(scrollY / windowHeight);
-      
-      if (sceneIndex < scenes.length && sceneIndex !== currentScene) {
-        setCurrentScene(sceneIndex);
+      const idx = Math.floor(window.scrollY / window.innerHeight);
+      if (idx < scenes.length && idx !== sceneRef.current) {
+        sceneRef.current = idx;
+        setCurrentScene(idx);
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    // passive: true — 스크롤 성능 향상 (모바일 특히 효과적)
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [currentScene]);
+  }, []);
 
   return (
     <div className="bg-slate-900 text-white selection:bg-purple-500">

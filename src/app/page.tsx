@@ -1,196 +1,279 @@
+"use client"
+
+import { useState, useEffect, useMemo } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import TodaysSong from "./components/TodaysSong"
-import GemsButton from "./components/GemsButton"
+import { useRouter, useSearchParams } from "next/navigation"
+import { shopProducts, type Category } from "@/data/shop-products"
+
+const categories: Category[] = ["Historical", "Street & Modern", "Fantasy & Armour"]
 
 export default function Page() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "")
+  const [selectedCategory, setSelectedCategory] = useState<Category | "all">("all")
+
+  // URL 파라미터 동기화
+  useEffect(() => {
+    const params = new URLSearchParams()
+    if (searchQuery.trim()) {
+      params.set("q", searchQuery.trim())
+    }
+    if (selectedCategory !== "all") {
+      params.set("category", selectedCategory)
+    }
+
+    const queryString = params.toString()
+    const newUrl = queryString ? `/?${queryString}` : "/"
+    router.replace(newUrl, { scroll: false })
+  }, [searchQuery, selectedCategory, router])
+
+  // 초기 URL 파라미터 읽기
+  useEffect(() => {
+    const q = searchParams.get("q")
+    const category = searchParams.get("category") as Category | null
+
+    if (q) setSearchQuery(q)
+    if (category && categories.includes(category)) setSelectedCategory(category)
+  }, [searchParams])
+
+  // 검색 및 필터링
+  const filteredProducts = useMemo(() => {
+    let filtered = shopProducts
+
+    // 검색 필터링 (OR 방식, case-insensitive)
+    if (searchQuery.trim()) {
+      const searchTerms = searchQuery.toLowerCase().trim().split(/\s+/)
+      filtered = filtered.filter(product => {
+        const searchableText = `${product.title.en} ${product.description.en}`.toLowerCase()
+        return searchTerms.some(term => searchableText.includes(term))
+      })
+    }
+
+    // 카테고리 필터링
+    if (selectedCategory !== "all") {
+      filtered = filtered.filter(product => product.category === selectedCategory)
+    }
+
+    return filtered
+  }, [searchQuery, selectedCategory])
+
+  // 기본 표시용 (검색어 없을 때)
+  const defaultProducts = shopProducts.slice(0, 6)
+
+  const displayProducts = searchQuery.trim() || selectedCategory !== "all" ? filteredProducts : defaultProducts
+
   return (
-    <div className="bg-white text-[#1d1d1f]">
-      {/* HERO 배너 */}
-      <div className="relative w-full h-[70vh]">
+    <div className="bg-[#0e0e0e] text-white min-h-screen">
+      {/* HERO 섹션 */}
+      <div className="relative w-full h-screen">
         <Image
           src="/hero.jpg"
-          alt="hero"
+          alt="RAINSKISS AI Clothing Prompts"
           fill
-          className="object-cover object-top"
+          className="object-cover object-center"
           priority
         />
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 bg-black/40">
-          <h1 className="text-5xl font-extrabold text-white tracking-tight">
+        <div className="absolute inset-0 bg-black/60" />
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+          <h1 className="text-6xl md:text-8xl font-black text-white tracking-tight mb-4">
             RAINSKISS
           </h1>
-          <p className="mt-3 text-white/80 text-lg font-light">
-            The sound of rain kissing the earth,
-            <br />
-            the most beautiful music in the world.
+          <p className="text-xl md:text-2xl text-white/90 font-light mb-2 max-w-2xl">
+            AI-generated costume & character prompts
           </p>
+          <p className="text-lg text-white/70 mb-12">
+            crafted for Grok & Flow
+          </p>
+
+          {/* 검색창 - 히어로 중앙에 큼직하게 배치 */}
+          <div className="w-full max-w-xl mb-8">
+            <input
+              type="text"
+              placeholder="Search for prompts..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-6 py-4 text-lg rounded-2xl bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:border-transparent backdrop-blur-sm"
+              style={{ "--tw-ring-color": "#c10002" } as any}
+            />
+          </div>
         </div>
       </div>
 
-      {/* 본문 */}
-      <main className="px-6 py-16 max-w-5xl mx-auto">
-        {/* 타이틀 */}
-        <div className="text-center mb-12">
-          <h2 className="text-2xl sm:text-3xl font-semibold text-[#1d1d1f] tracking-tight">
-            rainskiss — <span style={{color: "#c10002"}}>My Playground</span>
-          </h2>
-          <p className="mt-3 text-sm text-[#6e6e73]">
-            Music · Dance · Beauty · History
-          </p>
-        </div>
-
-        {/* 3 구역 카드 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
-          {/* Cafe Rainskiss */}
-          <a
-            href="https://youtube.com/@rainskiss.m"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group flex flex-col gap-3 p-7 rounded-2xl border border-[#d2d2d7] bg-[#f5f5f7] hover:bg-[#eaeaef] transition"
-          >
-            <span className="text-2xl">☕</span>
-            <h3 className="text-base font-semibold text-[#1d1d1f]">
-              Cafe Rainskiss
-            </h3>
-            <p className="text-sm text-[#6e6e73] leading-relaxed">
-              BGM &amp; OST — music for quiet moments, handcrafted at 14 LUFS.
-            </p>
-            <span className="mt-auto text-xs text-[#6e6e73] group-hover:text-[#1d1d1f] transition">
-              YouTube ↗
-            </span>
-          </a>
-
-          {/* Club Rainskiss */}
-          <a
-            href="https://deviantart.com/rainskiss-x"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group flex flex-col gap-3 p-7 rounded-2xl border border-[#d2d2d7] bg-[#f5f5f7] hover:bg-[#eaeaef] transition"
-          >
-            <span className="text-2xl">🎧</span>
-            <h3 className="text-base font-semibold text-[#1d1d1f]">
-              Club Rainskiss
-            </h3>
-            <p className="text-sm text-[#6e6e73] leading-relaxed">
-              Dance music with choreography — where the beat never stops.
-            </p>
-            <span className="mt-auto text-xs text-[#6e6e73] group-hover:text-[#1d1d1f] transition">
-              DeviantArt ↗
-            </span>
-          </a>
-
-          {/* rainskiss-x */}
-          {/*<a
-            href="https://deviantart.com/rainskiss-x"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group flex flex-col gap-3 p-7 rounded-2xl border border-[#d2d2d7] bg-[#1d1d1f] hover:bg-[#2d2d2f] transition"
-          >*/}
-          {/*<span className="text-2xl">✦</span>
-            <h3 className="text-base font-semibold text-white">rainskiss-x</h3>
-            <p className="text-sm text-white/60 leading-relaxed">
-              Time-leap through history&apos;s most stunning places, guided by
-              the beauties who defined each era.
-            </p>
-            <span className="mt-auto text-xs text-white/40 group-hover:text-white/80 transition">
-              DeviantArt · 18+ ↗
-            </span>*/}
-          {/*</a>*/}
-        </div>
-
-        {/* Featured Product */}
-        <div className="mt-16 mb-12 text-center">
-          <h2 className="text-xl font-semibold text-[#1d1d1f] tracking-tight mb-2">
-            🔥 AI Clothing Prompt Store
-          </h2>
-          <p className="text-sm text-[#6e6e73] mb-8">
-            Professional AI prompts that actually work
-          </p>
-
-          <Link
-            href="/shop/white-halter-mini"
-            className="group inline-block bg-[#1d1d1f] rounded-2xl overflow-hidden hover:scale-105 transition-transform duration-300 max-w-sm mx-auto"
-          >
-            <div className="relative w-full h-64 bg-[#f5f5f7]">
-              <Image
-                src="/shop/white-halter-mini-01.jpg"
-                alt="White Halter Dress"
-                fill
-                className="object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-              <div className="absolute bottom-4 left-4 right-4">
-                <h3 className="text-lg font-bold text-white leading-tight">
-                  White Halter Dress
-                </h3>
-                <p className="text-xs text-white/80 mt-1">
-                  Flow Preview
-                </p>
-              </div>
-            </div>
-            <div className="p-4 text-left">
-              <p className="text-sm text-white/70 mb-2">
-                Pure yet sophisticated — standing in the light
-              </p>
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-white/50">✨ 100% working prompt</span>
-                <span
-                  className="text-sm font-bold px-3 py-1 rounded-full text-white"
-                  style={{backgroundColor: "#c10002"}}
-                >
-                  $15
-                </span>
-              </div>
-            </div>
-          </Link>
-
-          <div className="mt-6 text-center">
-            <p className="text-xs text-[#6e6e73] mb-2">
-              Free Flow previews available daily on
-            </p>
-            <a
+      {/* 카테고리 탭 */}
+      <section className="px-6 py-8 border-b border-white/10">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-wrap gap-3 justify-center">
+            <button
+              onClick={() => setSelectedCategory("all")}
+              className={`px-6 py-3 rounded-full text-sm font-medium transition ${
+                selectedCategory === "all"
+                  ? "bg-[#c10002] text-white"
+                  : "bg-white/10 text-white/70 hover:bg-white/20"
+              }`}
+            >
+              All Categories
+            </button>
+            {categories.map((category) => (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`px-6 py-3 rounded-full text-sm font-medium transition ${
+                  selectedCategory === category
+                    ? "bg-[#c10002] text-white"
+                    : "bg-white/10 text-white/70 hover:bg-white/20"
+                }`}
+              >
+                {category}
+              </button>
+            ))}
+            {/* R-rated 카테고리는 외부 링크 */}
+            <Link
               href="https://deviantart.com/rainskiss-x"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-[#6e6e73] hover:text-[#1d1d1f] transition underline"
+              className="px-6 py-3 rounded-full text-sm font-medium bg-white/10 text-white/70 hover:bg-white/20 transition relative"
             >
-              DeviantArt / rainskiss-x ↗
-            </a>
+              <span className="mr-2">Lingerie & Intimate</span>
+              <span className="text-xs bg-[#c10002] px-1 py-0.5 rounded text-white">18+</span>
+            </Link>
           </div>
         </div>
+      </section>
 
-        {/* 보조 링크 */}
-        <div className="flex flex-wrap gap-3 mt-8 justify-center">
-          <a
-            href="https://suno.com/invite/@rainskiss_o"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-5 py-2 rounded-full bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e8e8ed] text-sm font-medium transition"
-          >
-            ☀️ Suno
-          </a>
-          <Link
-            href="/shop"
-            className="px-5 py-2 rounded-full bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e8e8ed] text-sm font-medium transition"
-          >
-            🛒 Shop
-          </Link>
-          {/*<Link
-            href="/models"
-            className="px-5 py-2 rounded-full bg-[#1d1d1f] text-white hover:bg-[#3d3d3f] text-sm font-medium transition"
-          >
-            ✦ Models
-          </Link>*/}
-          <GemsButton />
+      {/* 검색 결과 / 기본 프롬프트 섹션 */}
+      <section className="px-6 py-16 max-w-6xl mx-auto">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight mb-4">
+            {searchQuery.trim() ? "Search Results" : "Featured Prompts"}
+          </h2>
+          <p className="text-white/60 text-lg mb-4">
+            Professional-grade prompts tested and verified
+          </p>
+          {(searchQuery.trim() || selectedCategory !== "all") && (
+            <p className="text-white/40 text-sm">
+              {displayProducts.length} prompts found
+              {selectedCategory !== "all" && ` in ${selectedCategory}`}
+            </p>
+          )}
         </div>
-      </main>
 
-      {/* Today's Life Song */}
-      <TodaysSong />
+        {/* 상품 그리드 */}
+        {displayProducts.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {displayProducts.map((product) => (
+              <Link
+                key={product.slug}
+                href={`/shop/${product.slug}`}
+                className="group bg-white/5 hover:bg-white/8 border border-white/10 rounded-2xl overflow-hidden transition duration-300"
+              >
+                <div className="relative aspect-[4/5]">
+                  <Image
+                    src={product.previewImage}
+                    alt={product.title.en}
+                    fill
+                    className="object-cover group-hover:scale-105 transition duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                  <div className="absolute bottom-6 left-6 right-6">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xs px-2 py-1 rounded-full bg-white/20 text-white/80">
+                        {product.category}
+                      </span>
+                    </div>
+                    <h3 className="text-xl font-bold text-white leading-tight mb-1">
+                      {product.title.en}
+                    </h3>
+                    <p className="text-white/80 text-sm mb-4">
+                      {product.tagline.en}
+                    </p>
+                  </div>
+                  <div className="absolute top-6 right-6">
+                    <span
+                      className="bg-[#c10002] text-white font-bold px-3 py-1 rounded-full text-sm"
+                    >
+                      {product.price}
+                    </span>
+                  </div>
+                </div>
+                <div className="p-6">
+                  <div className="flex items-center justify-between">
+                    <span className="text-white font-medium">Get Prompt</span>
+                    <span className="text-[#c10002] group-hover:translate-x-1 transition-transform">
+                      →
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-16">
+            <div className="text-white/20 mb-4">
+              <svg className="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-white/60 mb-2">No prompts found</h3>
+            <p className="text-white/40 text-sm">
+              Try adjusting your search or browse all categories
+            </p>
+          </div>
+        )}
 
-      {/* 푸터 */}
-      <footer className="py-6 text-xs text-[#6e6e73] text-center border-t border-[#d2d2d7]">
-        © 2025 rainskiss · All rights reserved ·{" "}
+        {/* 더 보기 링크 (기본 상태일 때만) */}
+        {!searchQuery.trim() && selectedCategory === "all" && (
+          <div className="text-center mt-12">
+            <Link
+              href="/shop"
+              className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-medium px-6 py-3 rounded-xl transition"
+            >
+              Browse All Prompts
+              <span>→</span>
+            </Link>
+          </div>
+        )}
+      </section>
+
+      {/* 이메일 수집 섹션 */}
+      <section className="bg-white/5 border-t border-white/10 px-6 py-20">
+        <div className="max-w-2xl mx-auto text-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight mb-3">
+            New drops, exclusive prompts
+          </h2>
+          <p className="text-white/60 mb-8">
+            Join the list and never miss a collection launch
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+            <input
+              type="email"
+              placeholder="Enter your email"
+              className="flex-1 px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[#c10002] focus:border-transparent"
+            />
+            <button
+              type="submit"
+              className="bg-[#c10002] hover:bg-[#a00002] text-white font-bold px-6 py-3 rounded-xl transition duration-300"
+            >
+              Subscribe
+            </button>
+          </div>
+
+          <p className="text-white/40 text-xs mt-4">
+            No spam, unsubscribe anytime. New collections weekly.
+          </p>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-white/10 px-6 py-8">
+        <div className="max-w-6xl mx-auto text-center">
+          <p className="text-white/40 text-sm">
+            © 2025 RAINSKISS · AI Clothing Prompts · All rights reserved
+          </p>
+        </div>
       </footer>
     </div>
   )

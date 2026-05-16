@@ -51,6 +51,7 @@ interface Props {
 export default function LookbookClient({ model }: Props) {
   const [fbData, setFbData] = useState<FirebaseModelData | null>(null)
   const [galleryEntries, setGalleryEntries] = useState<GalleryEntry[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   // Admin password state
   const [isAdmin, setIsAdmin] = useState(false)
@@ -73,18 +74,20 @@ export default function LookbookClient({ model }: Props) {
   const [isUploadingGalleryImage, setIsUploadingGalleryImage] = useState(false)
   const galleryFileInputRef = useRef<HTMLInputElement>(null)
 
+  // 두 Firebase 구독을 하나의 useEffect에서 동시에 시작 → waterfall 제거
   useEffect(() => {
-    const unsub = onModelData(model.slug, (data: FirebaseModelData | null) => {
+    setIsLoading(true)
+    const unsubModel = onModelData(model.slug, (data: FirebaseModelData | null) => {
       setFbData(data)
+      setIsLoading(false)
     })
-    return unsub
-  }, [model.slug])
-
-  useEffect(() => {
-    const unsub = onGalleryEntries(model.slug, (entries: unknown[]) => {
+    const unsubGallery = onGalleryEntries(model.slug, (entries: unknown[]) => {
       setGalleryEntries(entries as GalleryEntry[])
     })
-    return unsub
+    return () => {
+      unsubModel()
+      unsubGallery()
+    }
   }, [model.slug])
 
   // Merged model data
@@ -195,6 +198,35 @@ export default function LookbookClient({ model }: Props) {
     } finally {
       setRemovingId(null)
     }
+  }
+
+  // 로딩 스켈레톤 — Firebase 응답 전 빈 화면 flash 방지
+  if (isLoading) {
+    return (
+      <main className="min-h-screen bg-background text-foreground">
+        <nav className="border-b border-border px-5 py-3 flex items-center justify-between">
+          <div className="h-4 w-20 rounded bg-muted animate-pulse" />
+          <div className="h-4 w-4 rounded bg-muted animate-pulse" />
+        </nav>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 space-y-14">
+          <section className="flex flex-col sm:flex-row gap-6 sm:gap-10 items-start">
+            <div className="w-28 h-28 sm:w-36 sm:h-36 rounded bg-muted animate-pulse shrink-0" />
+            <div className="space-y-3 flex-1 pt-2">
+              <div className="h-8 w-48 rounded bg-muted animate-pulse" />
+              <div className="h-4 w-32 rounded bg-muted animate-pulse" />
+              <div className="h-4 w-full max-w-md rounded bg-muted animate-pulse" />
+              <div className="h-4 w-3/4 max-w-md rounded bg-muted animate-pulse" />
+            </div>
+          </section>
+          <div className="border-t border-border" />
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="aspect-[3/4] rounded bg-muted animate-pulse" />
+            ))}
+          </div>
+        </div>
+      </main>
+    )
   }
 
   return (
