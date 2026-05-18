@@ -259,7 +259,8 @@ function generateVisualPrompt(
     "Soul-Sync": `[Soul-Sync - Special] Masterpiece capturing ${query}, Da Vinci-style precision, transcendent moment, ${keywords.join(", ")}`
   }
 
-  return templates[templateType] || templates.Flow
+  // templateType(string)을 templates의 유효한 키 타입으로 캐스팅하여 인덱싱 에러 해결
+  return templates[templateType as keyof typeof templates] || templates.Flow
 }
 
 function extractMoodFromQuery(query: string): string {
