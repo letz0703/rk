@@ -372,7 +372,7 @@ export default function GemsPage() {
                   전략 엔진 가동 중...
                 </p>
               </div>
-            ) : onepunData?.error ? (
+            ) : onepunData && "error" in onepunData ? (
               <div className="text-center py-12">
                 <div className="text-4xl mb-4">⚠️</div>
                 <p className="text-red-400 text-lg">{onepunData.error}</p>
