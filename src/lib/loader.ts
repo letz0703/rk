@@ -235,7 +235,7 @@ ${legalBasis.length > 0 ? `**법적 근거**: ${legalBasis.join(', ')}` : ''}
 
     if (category === 'Culture') {
       // 댄스 동작 용어 추출
-      const danceTerms = [];
+      const danceTerms: string[] = [];
       const terms = ['Figure-8 Motion', 'Pivot Spin', 'Weight Rocking', 'Butterfly Pattern',
                     'Crouching Curtsy', 'Grand Battement', 'Shuffle Step', 'Serpentine'];
 
