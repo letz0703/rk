@@ -1,29 +1,69 @@
 "use client"
 
-import { ReactNode } from "react"
+import { createContext, useContext, useEffect, useState, ReactNode } from "react"
+import { auth } from "@/api/firebase"
+import {
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged,
+  User,
+} from "firebase/auth"
 
 type AuthContextValue = {
-  user: null
-  isLoading: false
-  isAdmin: false
+  user: User | null
+  isLoading: boolean
+  isAdmin: boolean
   login: () => Promise<any>
   logout: () => Promise<void>
 }
 
-const defaultValue: AuthContextValue = {
+const AuthContext = createContext<AuthContextValue>({
   user: null,
-  isLoading: false,
+  isLoading: true,
   isAdmin: false,
   login: async () => null,
-  logout: async () => {}
+  logout: async () => {},
+})
+
+const ADMIN_UID = process.env.NEXT_PUBLIC_ADMIN_UID ?? ""
+
+export function AuthContextProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<User | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setUser(u)
+      setIsLoading(false)
+    })
+    return () => unsub()
+  }, [])
+
+  async function login() {
+    const provider = new GoogleAuthProvider()
+    return signInWithPopup(auth, provider)
+  }
+
+  async function logout() {
+    await signOut(auth)
+  }
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        isLoading,
+        isAdmin: user?.uid === ADMIN_UID,
+        login,
+        logout,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  )
 }
 
-export function AuthContextProvider({children}: {children: ReactNode}) {
-  // 로그인 기능 완전 비활성화 - 바로 children 렌더링
-  return <>{children}</>
-}
-
-export function useAuthContext(): AuthContextValue {
-  // 로그인 기능 없이 기본값 반환
-  return defaultValue
+export function useAuthContext() {
+  return useContext(AuthContext)
 }

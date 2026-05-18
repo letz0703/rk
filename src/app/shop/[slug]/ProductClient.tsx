@@ -7,11 +7,22 @@ import {database} from "@/api/firebase"
 import {ref, onValue, push, remove} from "firebase/database"
 import type {ShopProduct} from "@/data/shop-products"
 import AdaptiveGallery from "@/app/components/AdaptiveGallery"
+import {useAuthContext} from "@/components/context/AuthContext"
+import {isWhitelisted} from "@/config/whitelist"
 
 type GalleryItem = {id: string; url: string}
 
 export default function ProductClient({product}: {product: ShopProduct}) {
-  const isAdmin = false // 로그인 기능 제거로 어드민 기능 비활성화
+  const {user, isAdmin, login, logout} = useAuthContext()
+  const canViewPrompt = isWhitelisted(user?.email)
+  const [promptOpen, setPromptOpen] = useState(false)
+  const [copied, setCopied] = useState<string | null>(null)
+
+  function copyToClipboard(text: string, key: string) {
+    navigator.clipboard.writeText(text)
+    setCopied(key)
+    setTimeout(() => setCopied(null), 2000)
+  }
 
   const [gallery, setGallery] = useState<GalleryItem[]>(
     product.gallery.map((url, i) => ({id: `static-${i}`, url}))
@@ -245,6 +256,86 @@ export default function ProductClient({product}: {product: ShopProduct}) {
                   </a>
                 </div>
               </div>
+
+              {/* 프롬프트 열람 — whitelist 전용 */}
+              <div className="border-t border-white/10 pt-5">
+                {!user ? (
+                  <button
+                    onClick={login}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-white/50 hover:text-white/80 text-sm transition"
+                  >
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
+                    </svg>
+                    Sign in to view prompt
+                  </button>
+                ) : canViewPrompt ? (
+                  <div>
+                    <button
+                      onClick={() => setPromptOpen(p => !p)}
+                      className="w-full flex items-center justify-between py-2.5 px-4 rounded-xl border border-[#c10002]/40 bg-[#c10002]/10 hover:bg-[#c10002]/20 text-white text-sm font-medium transition"
+                    >
+                      <span>View Prompt</span>
+                      <span className="text-white/40 text-xs">{promptOpen ? "▲" : "▼"}</span>
+                    </button>
+
+                    {promptOpen && (
+                      <div className="mt-3 space-y-3">
+                        {/* Clothing Prompt */}
+                        <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <p className="text-[10px] font-semibold tracking-widest text-white/30 uppercase">Clothing Prompt</p>
+                            <button
+                              onClick={() => copyToClipboard(product.content.clothingPrompt, "clothing")}
+                              className="text-[10px] text-white/40 hover:text-white transition"
+                            >
+                              {copied === "clothing" ? "Copied ✓" : "Copy"}
+                            </button>
+                          </div>
+                          <p className="text-xs text-white/70 leading-relaxed font-mono">
+                            {product.content.clothingPrompt}
+                          </p>
+                        </div>
+
+                        {/* Model Prompt */}
+                        <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <p className="text-[10px] font-semibold tracking-widest text-white/30 uppercase">Model Prompt</p>
+                            <button
+                              onClick={() => copyToClipboard(product.content.modelPrompt, "model")}
+                              className="text-[10px] text-white/40 hover:text-white transition"
+                            >
+                              {copied === "model" ? "Copied ✓" : "Copy"}
+                            </button>
+                          </div>
+                          <p className="text-xs text-white/70 leading-relaxed font-mono">
+                            {product.content.modelPrompt}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between mt-2 px-1">
+                      <p className="text-[10px] text-white/20">
+                        {user.email}
+                      </p>
+                      <button onClick={logout} className="text-[10px] text-white/20 hover:text-white/50 transition">
+                        Sign out
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-2">
+                    <p className="text-xs text-white/30">
+                      {user.email} — not authorized
+                    </p>
+                    <button onClick={logout} className="text-[10px] text-white/20 hover:text-white/40 transition mt-1">
+                      Sign out
+                    </button>
+                  </div>
+                )}
+              </div>
+
             </div>
           </div>
         </div>

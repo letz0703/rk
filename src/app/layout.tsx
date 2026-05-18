@@ -2,6 +2,7 @@ import type {Metadata} from "next"
 import {Geist, Geist_Mono} from "next/font/google"
 import "./globals.css"
 import {cn} from "@/lib/utils"
+import {AuthContextProvider} from "@/components/context/AuthContext"
 
 // Inter 제거 — Geist가 --font-sans 역할 통합 (폰트 요청 3→2)
 const geistSans = Geist({
@@ -32,7 +33,9 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
           geistMono.variable
         )}
       >
-        {children}
+        <AuthContextProvider>
+          {children}
+        </AuthContextProvider>
       </body>
     </html>
   )
