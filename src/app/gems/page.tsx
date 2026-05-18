@@ -7,7 +7,7 @@ import {useState} from "react"
 interface OnepunAction {
   title: string
   description: string
-  reason?: string
+  reason?: strin
   consequence?: string
 }
 
@@ -490,7 +490,7 @@ export default function GemsPage() {
                         <button
                           onClick={() =>
                             copyToClipboard(
-                              onepunData.strategicInsights.join("\n"),
+                              onepunData.strategicInsights?.join("\n") ?? "",
                               "인사이트"
                             )
                           }
@@ -524,7 +524,7 @@ export default function GemsPage() {
                         <button
                           onClick={() =>
                             copyToClipboard(
-                              onepunData.nextDayPreview,
+                              onepunData.nextDayPreview ?? "",
                               "미리보기"
                             )
                           }
