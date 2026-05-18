@@ -1,20 +1,20 @@
 "use client"
 
-import { createContext, useContext, useEffect, useState, ReactNode } from "react"
-import { auth } from "@/api/firebase"
+import {createContext, useContext, useEffect, useState, ReactNode} from "react"
+import {auth} from "@/api/firebase"
 import {
   GoogleAuthProvider,
   signInWithPopup,
   signOut,
   onAuthStateChanged,
-  User,
+  User
 } from "firebase/auth"
 
 type AuthContextValue = {
   user: User | null
   isLoading: boolean
   isAdmin: boolean
-  login: () => Promise<any>
+  login: () => Promise<unknown>
   logout: () => Promise<void>
 }
 
@@ -23,17 +23,17 @@ const AuthContext = createContext<AuthContextValue>({
   isLoading: true,
   isAdmin: false,
   login: async () => null,
-  logout: async () => {},
+  logout: async () => {}
 })
 
 const ADMIN_UID = process.env.NEXT_PUBLIC_ADMIN_UID ?? ""
 
-export function AuthContextProvider({ children }: { children: ReactNode }) {
+export function AuthContextProvider({children}: {children: ReactNode}) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => {
+    const unsub = onAuthStateChanged(auth, u => {
       setUser(u)
       setIsLoading(false)
     })
@@ -56,7 +56,7 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
         isLoading,
         isAdmin: user?.uid === ADMIN_UID,
         login,
-        logout,
+        logout
       }}
     >
       {children}

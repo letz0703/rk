@@ -1,33 +1,45 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import {useState, useEffect, useMemo, Suspense} from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { useRouter, useSearchParams } from "next/navigation"
-import { shopProducts, type Category } from "@/data/shop-products"
+import {useRouter, useSearchParams} from "next/navigation"
+import {shopProducts, type Category} from "@/data/shop-products"
 
-const categories: Category[] = ["Historical", "Street & Modern", "Fantasy & Armour"]
+const categories: Category[] = [
+  "Historical",
+  "Street & Modern",
+  "Fantasy & Armour"
+]
 
-export default function Page() {
+function SearchContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "")
-  const [selectedCategory, setSelectedCategory] = useState<Category | "all">("all")
+  const [selectedCategory, setSelectedCategory] = useState<Category | "all">(
+    "all"
+  )
 
   useEffect(() => {
     const params = new URLSearchParams()
     if (searchQuery.trim()) params.set("q", searchQuery.trim())
     if (selectedCategory !== "all") params.set("category", selectedCategory)
     const qs = params.toString()
-    router.replace(qs ? `/?${qs}` : "/", { scroll: false })
+    router.replace(qs ? `/?${qs}` : "/", {scroll: false})
   }, [searchQuery, selectedCategory, router])
 
+  // URL 파라미터 변경 시 상태 동기화 (뒤로가기 등 대응)
   useEffect(() => {
     const q = searchParams.get("q")
     const category = searchParams.get("category") as Category | null
-    if (q) setSearchQuery(q)
-    if (category && categories.includes(category)) setSelectedCategory(category)
+    if (q !== null && q !== searchQuery) setSearchQuery(q)
+    if (
+      category &&
+      categories.includes(category) &&
+      category !== selectedCategory
+    )
+      setSelectedCategory(category)
   }, [searchParams])
 
   const filteredProducts = useMemo(() => {
@@ -52,26 +64,34 @@ export default function Page() {
 
   return (
     <div className="bg-[#0e0e0e] text-white min-h-screen flex flex-col">
-
       {/* 상단 검색 헤더 */}
       <header className="sticky top-0 z-50 bg-[#0e0e0e]/95 backdrop-blur border-b border-white/10">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center gap-6">
-          <Link href="/" className="shrink-0 text-xl font-black tracking-tight text-white">
+          <Link
+            href="/"
+            className="shrink-0 text-xl font-black tracking-tight text-white"
+          >
             RAINSKISS
           </Link>
           <div className="flex-1 relative">
             <svg
               className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40"
-              fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"
+              />
             </svg>
             <input
               type="text"
               placeholder="Search prompts..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={e => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-4 py-2.5 rounded-xl bg-white/10 border border-white/15 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[#c10002] focus:border-transparent text-sm"
             />
             {searchQuery && (
@@ -97,7 +117,7 @@ export default function Page() {
           >
             All
           </button>
-          {categories.map((cat) => (
+          {categories.map(cat => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
@@ -117,7 +137,9 @@ export default function Page() {
             className="px-4 py-1.5 rounded-full text-xs font-medium bg-white/10 text-white/60 hover:bg-white/20 transition flex items-center gap-1.5"
           >
             Lingerie & Intimate
-            <span className="text-[10px] bg-[#c10002] px-1 py-0.5 rounded text-white leading-none">18+</span>
+            <span className="text-[10px] bg-[#c10002] px-1 py-0.5 rounded text-white leading-none">
+              18+
+            </span>
           </Link>
         </div>
       </header>
@@ -126,19 +148,30 @@ export default function Page() {
       <main className="flex-1 max-w-4xl w-full mx-auto px-6 py-8">
         {!hasQuery ? (
           <div className="py-16 text-center">
-            <p className="text-white/20 text-sm">Search for costume, armour, fantasy, street style...</p>
+            <p className="text-white/20 text-sm">
+              Search for costume, armour, fantasy, street style...
+            </p>
           </div>
         ) : (
           <>
             <p className="text-white/40 text-sm mb-6">
-              {displayProducts.length} result{displayProducts.length !== 1 ? "s" : ""}
-              {searchQuery.trim() && <> for <span className="text-white/60">"{searchQuery.trim()}"</span></>}
+              {displayProducts.length} result
+              {displayProducts.length !== 1 ? "s" : ""}
+              {searchQuery.trim() && (
+                <>
+                  {" "}
+                  for{" "}
+                  <span className="text-white/60">
+                    &quot;{searchQuery.trim()}&quot;
+                  </span>
+                </>
+              )}
               {selectedCategory !== "all" && ` · ${selectedCategory}`}
             </p>
 
             {displayProducts.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {displayProducts.map((product) => (
+                {displayProducts.map(product => (
                   <Link
                     key={product.slug}
                     href={`/shop/${product.slug}`}
@@ -171,7 +204,9 @@ export default function Page() {
                     </div>
                     <div className="px-4 py-3 flex items-center justify-between">
                       <span className="text-white/70 text-sm">Get Prompt</span>
-                      <span className="text-[#c10002] group-hover:translate-x-1 transition-transform text-sm">→</span>
+                      <span className="text-[#c10002] group-hover:translate-x-1 transition-transform text-sm">
+                        →
+                      </span>
                     </div>
                   </Link>
                 ))}
@@ -190,20 +225,22 @@ export default function Page() {
       <section className="border-t border-white/10 mt-8">
         <div className="max-w-4xl mx-auto px-6 py-16">
           <div className="flex flex-col sm:flex-row gap-12 items-start">
-
             {/* 좌측 카피 */}
             <div className="flex-1">
               <p className="text-[#c10002] text-xs font-semibold tracking-[0.2em] uppercase mb-4">
                 Primal Renaissance · Power Dynamic
               </p>
               <h2 className="text-4xl font-black tracking-tight leading-none mb-5">
-                AI Costume<br />
-                <span className="text-white/30">&amp; Character</span><br />
+                AI Costume
+                <br />
+                <span className="text-white/30">&amp; Character</span>
+                <br />
                 Prompts
               </h2>
               <p className="text-white/40 text-sm max-w-sm leading-relaxed mb-8">
-                Precision-engineered prompts for historical armour, fantasy figures,
-                and street style — ready for Midjourney, Flux, and beyond.
+                Precision-engineered prompts for historical armour, fantasy
+                figures, and street style — ready for Midjourney, Flux, and
+                beyond.
               </p>
               <div className="flex flex-wrap gap-3">
                 <Link
@@ -225,9 +262,11 @@ export default function Page() {
 
             {/* 우측 피처드 그리드 */}
             <div className="w-full sm:w-64 shrink-0">
-              <p className="text-white/20 text-xs font-medium tracking-widest uppercase mb-3">Featured</p>
+              <p className="text-white/20 text-xs font-medium tracking-widest uppercase mb-3">
+                Featured
+              </p>
               <div className="grid grid-cols-2 gap-2">
-                {featuredProducts.map((product) => (
+                {featuredProducts.map(product => (
                   <Link
                     key={product.slug}
                     href={`/shop/${product.slug}`}
@@ -244,13 +283,14 @@ export default function Page() {
                       <p className="text-white text-[10px] font-semibold leading-tight line-clamp-1">
                         {product.title.en}
                       </p>
-                      <p className="text-[#c10002] text-[10px] font-bold">{product.price}</p>
+                      <p className="text-[#c10002] text-[10px] font-bold">
+                        {product.price}
+                      </p>
                     </div>
                   </Link>
                 ))}
               </div>
             </div>
-
           </div>
         </div>
       </section>
@@ -263,5 +303,19 @@ export default function Page() {
         </div>
       </footer>
     </div>
+  )
+}
+
+export default function Page() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#0e0e0e] flex items-center justify-center text-white/20 text-sm">
+          Loading Search Engine...
+        </div>
+      }
+    >
+      <SearchContent />
+    </Suspense>
   )
 }

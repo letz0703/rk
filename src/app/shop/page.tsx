@@ -1,15 +1,23 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import {useState, useEffect, useMemo} from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { useRouter, useSearchParams } from "next/navigation"
-import { shopProducts, type Category, type ShopProduct } from "@/data/shop-products"
+import {useRouter, useSearchParams} from "next/navigation"
+import {
+  shopProducts,
+  type Category,
+  type ShopProduct
+} from "@/data/shop-products"
 
-const categories: Category[] = ["Historical", "Street & Modern", "Fantasy & Armour"]
+const categories: Category[] = [
+  "Historical",
+  "Street & Modern",
+  "Fantasy & Armour"
+]
 const sortOptions = [
-  { value: "newest", label: "최신순" },
-  { value: "popular", label: "인기순" }
+  {value: "newest", label: "최신순"},
+  {value: "popular", label: "인기순"}
 ] as const
 
 type SortOption = "newest" | "popular"
@@ -19,7 +27,9 @@ export default function ShopPage() {
   const searchParams = useSearchParams()
 
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "")
-  const [selectedCategory, setSelectedCategory] = useState<Category | "all">("all")
+  const [selectedCategory, setSelectedCategory] = useState<Category | "all">(
+    "all"
+  )
   const [sortBy, setSortBy] = useState<SortOption>("newest")
 
   // URL 파라미터 동기화
@@ -37,7 +47,7 @@ export default function ShopPage() {
 
     const queryString = params.toString()
     const newUrl = queryString ? `/shop?${queryString}` : "/shop"
-    router.replace(newUrl, { scroll: false })
+    router.replace(newUrl, {scroll: false})
   }, [searchQuery, selectedCategory, sortBy, router])
 
   // 초기 URL 파라미터 읽기
@@ -59,14 +69,17 @@ export default function ShopPage() {
     if (searchQuery.trim()) {
       const searchTerms = searchQuery.toLowerCase().trim().split(/\s+/)
       filtered = filtered.filter(product => {
-        const searchableText = `${product.title.en} ${product.description.en}`.toLowerCase()
+        const searchableText =
+          `${product.title.en} ${product.description.en}`.toLowerCase()
         return searchTerms.some(term => searchableText.includes(term))
       })
     }
 
     // 카테고리 필터링
     if (selectedCategory !== "all") {
-      filtered = filtered.filter(product => product.category === selectedCategory)
+      filtered = filtered.filter(
+        product => product.category === selectedCategory
+      )
     }
 
     // 정렬
@@ -91,11 +104,11 @@ export default function ShopPage() {
             AI Clothing Prompt Store
           </p>
           <h1 className="text-4xl sm:text-5xl font-extrabold text-white mb-4">
-            RAINSKISS{" "}
-            <span style={{ color: "#c10002" }}>COLLECTION</span>
+            RAINSKISS <span style={{color: "#c10002"}}>COLLECTION</span>
           </h1>
           <p className="text-white/60 text-sm max-w-lg mx-auto leading-relaxed mb-8">
-            Professional-grade prompts for Grok & Flow. Each prompt is tested and verified for consistent results.
+            Professional-grade prompts for Grok & Flow. Each prompt is tested
+            and verified for consistent results.
           </p>
         </div>
 
@@ -106,9 +119,10 @@ export default function ShopPage() {
               type="text"
               placeholder="Search prompts..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={e => setSearchQuery(e.target.value)}
               className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:border-transparent"
-              style={{ "--tw-ring-color": "#c10002" } as any}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              style={{"--tw-ring-color": "#c10002"} as any}
             />
           </div>
         </div>
@@ -127,7 +141,7 @@ export default function ShopPage() {
             >
               All Categories
             </button>
-            {categories.map((category) => (
+            {categories.map(category => (
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
@@ -144,7 +158,7 @@ export default function ShopPage() {
 
           {/* 정렬 */}
           <div className="flex gap-2">
-            {sortOptions.map((option) => (
+            {sortOptions.map(option => (
               <button
                 key={option.value}
                 onClick={() => setSortBy(option.value)}
@@ -170,7 +184,7 @@ export default function ShopPage() {
         {/* 상품 그리드 */}
         {filteredAndSortedProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            {filteredAndSortedProducts.map((product) => (
+            {filteredAndSortedProducts.map(product => (
               <Link
                 key={product.slug}
                 href={`/shop/${product.slug}`}
@@ -205,7 +219,7 @@ export default function ShopPage() {
                   <span className="text-white/40 text-sm">Get Prompt</span>
                   <span
                     className="text-sm font-bold px-3 py-1 rounded-full text-white"
-                    style={{ backgroundColor: "#c10002" }}
+                    style={{backgroundColor: "#c10002"}}
                   >
                     {product.price}
                   </span>
@@ -216,13 +230,24 @@ export default function ShopPage() {
         ) : (
           <div className="text-center py-16">
             <div className="text-white/20 mb-4">
-              <svg className="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+              <svg
+                className="w-16 h-16 mx-auto"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                  clipRule="evenodd"
+                />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-white/60 mb-2">No prompts found</h3>
+            <h3 className="text-lg font-semibold text-white/60 mb-2">
+              No prompts found
+            </h3>
             <p className="text-white/40 text-sm">
-              Try adjusting your search or filters to find what you're looking for.
+              Try adjusting your search or filters to find what you&apos;re
+              looking for.
             </p>
           </div>
         )}
