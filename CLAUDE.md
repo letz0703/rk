@@ -63,6 +63,50 @@ Key routes:
 - `tailwind.config.ts` — custom color variables and theme
 - `components.json` — shadcn/ui config (new-york style, RSC enabled)
 
+## Session Continuity
+
+**IMPORTANT**: At the start of any new conversation or after `/clear`, immediately read `kiss.md` to understand the current project state and any ongoing work handoffs between AI collaborators (제갈공명/다빈치/이순신).
+
+## AI-to-AI Collaboration Protocol
+
+When complex questions requiring research arise:
+
+1. **Claude's Role (제갈공명)**: Decision-maker and executor
+
+   - Read latest kiss.md for context
+   - Delegate research tasks to Gemini
+   - Execute final decisions based on Gemini's reports
+
+2. **Gemini's Role (다빈치/이순신)**: Research and analysis
+
+   - Scan Google Drive documents
+   - Analyze Obsidian vault content
+   - Review kiss*.md history
+   - Write structured reports to kiss.md
+
+3. **kiss.md Format**: Research reports should follow this structure:
+
+   ```markdown
+   ## 📋 [Date] Gemini Research Report
+   
+   ### 🎯 Query
+   [Original user question]
+   
+   ### 📊 Sources Analyzed
+   - Google Drive: [files found]
+   - Obsidian: [relevant notes] 
+   - Previous context: [kiss*.md summary]
+   
+   ### 🔍 Key Findings
+   [Bullet points of discoveries]
+   
+   ### 💡 Recommendations for Claude
+   [Specific actionable recommendations]
+   
+   ### 🔄 Next Steps
+   [Proposed next actions]
+   ```
+
 ## Skill routing
 
 When the user's request matches an available skill, invoke it via the Skill tool. When in doubt, invoke the skill.

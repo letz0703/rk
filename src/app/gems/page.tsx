@@ -3,6 +3,25 @@
 import Link from "next/link"
 import {useState} from "react"
 
+// onepun API 응답 데이터 타입 정의
+interface OnepunAction {
+  title: string
+  description: string
+  reason?: string
+  consequence?: string
+}
+
+interface OnepunDataSuccess {
+  date: string
+  dailyActions: {
+    mustDo: OnepunAction
+    shouldDo: OnepunAction
+    mustNotSkip: OnepunAction
+  }
+  strategicInsights?: string[]
+  nextDayPreview?: string
+}
+
 const gems = [
   {
     href: "https://gemini.google.com/gem/45fa10ca8b41",
@@ -90,7 +109,9 @@ export default function GemsPage() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState(false)
   const [onepunModalOpen, setOnepunModalOpen] = useState(false)
-  const [onepunData, setOnepunData] = useState(null)
+  const [onepunData, setOnepunData] = useState<
+    OnepunDataSuccess | {error: string} | null
+  >(null)
   const [onepunLoading, setOnepunLoading] = useState(false)
   const [copiedText, setCopiedText] = useState("")
 
@@ -115,30 +136,30 @@ export default function GemsPage() {
     setOnepunModalOpen(true)
 
     try {
-      const response = await fetch('/api/onepun', {
-        method: 'POST',
+      const response = await fetch("/api/onepun", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json"
         }
       })
 
-      const data = await response.json()
+      const data: OnepunDataSuccess = await response.json()
       setOnepunData(data)
     } catch (error) {
-      console.error('Onepun API 호출 실패:', error)
-      setOnepunData({ error: 'API 호출에 실패했습니다.' })
+      console.error("Onepun API 호출 실패:", error)
+      setOnepunData({error: "API 호출에 실패했습니다."})
     } finally {
       setOnepunLoading(false)
     }
   }
 
-  async function copyToClipboard(text, label) {
+  async function copyToClipboard(text: string, label: string) {
     try {
       await navigator.clipboard.writeText(text)
       setCopiedText(label)
       setTimeout(() => setCopiedText(""), 2000)
     } catch (err) {
-      console.error('복사 실패:', err)
+      console.error("복사 실패:", err)
     }
   }
 
@@ -288,20 +309,27 @@ export default function GemsPage() {
         >
           {/* Abstract Figure-8 Motion Background */}
           <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-1/4 left-1/4 w-32 h-32 rounded-full bg-gradient-to-br from-amber-500/10 to-red-500/10 animate-pulse"
-                 style={{animationDelay: '0s', animationDuration: '3s'}}></div>
-            <div className="absolute top-1/2 right-1/3 w-24 h-24 rounded-full bg-gradient-to-br from-blue-500/10 to-amber-500/10 animate-pulse"
-                 style={{animationDelay: '1s', animationDuration: '4s'}}></div>
-            <div className="absolute bottom-1/3 left-1/2 w-28 h-28 rounded-full bg-gradient-to-br from-red-500/10 to-blue-500/10 animate-pulse"
-                 style={{animationDelay: '2s', animationDuration: '5s'}}></div>
+            <div
+              className="absolute top-1/4 left-1/4 w-32 h-32 rounded-full bg-gradient-to-br from-amber-500/10 to-red-500/10 animate-pulse"
+              style={{animationDelay: "0s", animationDuration: "3s"}}
+            ></div>
+            <div
+              className="absolute top-1/2 right-1/3 w-24 h-24 rounded-full bg-gradient-to-br from-blue-500/10 to-amber-500/10 animate-pulse"
+              style={{animationDelay: "1s", animationDuration: "4s"}}
+            ></div>
+            <div
+              className="absolute bottom-1/3 left-1/2 w-28 h-28 rounded-full bg-gradient-to-br from-red-500/10 to-blue-500/10 animate-pulse"
+              style={{animationDelay: "2s", animationDuration: "5s"}}
+            ></div>
           </div>
 
           <div
             className="bg-gradient-to-br from-[#1a1a1a] via-[#141414] to-[#0f0f0f] border border-white/20 rounded-3xl p-8 w-full max-w-4xl max-h-[85vh] overflow-y-auto space-y-8 shadow-2xl relative"
             onClick={e => e.stopPropagation()}
             style={{
-              backgroundImage: 'radial-gradient(circle at 20% 20%, rgba(255,255,255,0.03) 1px, transparent 1px)',
-              backgroundSize: '30px 30px'
+              backgroundImage:
+                "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.03) 1px, transparent 1px)",
+              backgroundSize: "30px 30px"
             }}
           >
             {/* Chiaroscuro Header */}
@@ -315,7 +343,9 @@ export default function GemsPage() {
                       Onepun 전략 대시보드
                     </span>
                   </h1>
-                  <p className="text-gray-400 text-sm mt-1">AI 트렌드 분석 기반 즉시 실행 플랜</p>
+                  <p className="text-gray-400 text-sm mt-1">
+                    AI 트렌드 분석 기반 즉시 실행 플랜
+                  </p>
                 </div>
                 <button
                   onClick={() => setOnepunModalOpen(false)}
@@ -330,10 +360,17 @@ export default function GemsPage() {
               <div className="flex flex-col items-center justify-center py-16">
                 <div className="relative">
                   <div className="w-16 h-16 border-4 border-amber-500/20 rounded-full animate-spin"></div>
-                  <div className="absolute inset-0 w-16 h-16 border-4 border-transparent border-t-amber-500 rounded-full animate-spin" style={{animationDelay: '0.5s'}}></div>
-                  <div className="absolute inset-2 text-2xl animate-pulse">⚡</div>
+                  <div
+                    className="absolute inset-0 w-16 h-16 border-4 border-transparent border-t-amber-500 rounded-full animate-spin"
+                    style={{animationDelay: "0.5s"}}
+                  ></div>
+                  <div className="absolute inset-2 text-2xl animate-pulse">
+                    ⚡
+                  </div>
                 </div>
-                <p className="text-gray-400 mt-4 animate-pulse">전략 엔진 가동 중...</p>
+                <p className="text-gray-400 mt-4 animate-pulse">
+                  전략 엔진 가동 중...
+                </p>
               </div>
             ) : onepunData?.error ? (
               <div className="text-center py-12">
@@ -360,14 +397,23 @@ export default function GemsPage() {
                           🔥 CRITICAL - {onepunData.dailyActions?.mustDo?.title}
                         </h3>
                         <button
-                          onClick={() => copyToClipboard(onepunData.dailyActions?.mustDo?.description, "필수")}
+                          onClick={() =>
+                            copyToClipboard(
+                              onepunData.dailyActions?.mustDo?.description,
+                              "필수"
+                            )
+                          }
                           className="bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded-full text-xs font-medium transition-all duration-200 hover:scale-105 shadow-lg"
                         >
                           {copiedText === "필수" ? "✓ 복사됨" : "📋 복사"}
                         </button>
                       </div>
-                      <p className="text-gray-200 mb-3 leading-relaxed">{onepunData.dailyActions?.mustDo?.description}</p>
-                      <p className="text-red-300 text-sm italic">💎 {onepunData.dailyActions?.mustDo?.reason}</p>
+                      <p className="text-gray-200 mb-3 leading-relaxed">
+                        {onepunData.dailyActions?.mustDo?.description}
+                      </p>
+                      <p className="text-red-300 text-sm italic">
+                        💎 {onepunData.dailyActions?.mustDo?.reason}
+                      </p>
                     </div>
                   </div>
 
@@ -377,17 +423,27 @@ export default function GemsPage() {
                     <div className="relative">
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="text-amber-400 font-bold text-lg flex items-center gap-2">
-                          💡 RECOMMENDED - {onepunData.dailyActions?.shouldDo?.title}
+                          💡 RECOMMENDED -{" "}
+                          {onepunData.dailyActions?.shouldDo?.title}
                         </h3>
                         <button
-                          onClick={() => copyToClipboard(onepunData.dailyActions?.shouldDo?.description, "권장")}
+                          onClick={() =>
+                            copyToClipboard(
+                              onepunData.dailyActions?.shouldDo?.description,
+                              "권장"
+                            )
+                          }
                           className="bg-amber-500 hover:bg-amber-400 text-white px-4 py-2 rounded-full text-xs font-medium transition-all duration-200 hover:scale-105 shadow-lg"
                         >
                           {copiedText === "권장" ? "✓ 복사됨" : "📋 복사"}
                         </button>
                       </div>
-                      <p className="text-gray-200 mb-3 leading-relaxed">{onepunData.dailyActions?.shouldDo?.description}</p>
-                      <p className="text-amber-300 text-sm italic">⭐ {onepunData.dailyActions?.shouldDo?.reason}</p>
+                      <p className="text-gray-200 mb-3 leading-relaxed">
+                        {onepunData.dailyActions?.shouldDo?.description}
+                      </p>
+                      <p className="text-amber-300 text-sm italic">
+                        ⭐ {onepunData.dailyActions?.shouldDo?.reason}
+                      </p>
                     </div>
                   </div>
 
@@ -397,17 +453,27 @@ export default function GemsPage() {
                     <div className="relative">
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="text-blue-400 font-bold text-lg flex items-center gap-2">
-                          🛡️ DEFENSIVE - {onepunData.dailyActions?.mustNotSkip?.title}
+                          🛡️ DEFENSIVE -{" "}
+                          {onepunData.dailyActions?.mustNotSkip?.title}
                         </h3>
                         <button
-                          onClick={() => copyToClipboard(onepunData.dailyActions?.mustNotSkip?.description, "방어")}
+                          onClick={() =>
+                            copyToClipboard(
+                              onepunData.dailyActions?.mustNotSkip?.description,
+                              "방어"
+                            )
+                          }
                           className="bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded-full text-xs font-medium transition-all duration-200 hover:scale-105 shadow-lg"
                         >
                           {copiedText === "방어" ? "✓ 복사됨" : "📋 복사"}
                         </button>
                       </div>
-                      <p className="text-gray-200 mb-3 leading-relaxed">{onepunData.dailyActions?.mustNotSkip?.description}</p>
-                      <p className="text-blue-300 text-sm italic">⚠️ {onepunData.dailyActions?.mustNotSkip?.consequence}</p>
+                      <p className="text-gray-200 mb-3 leading-relaxed">
+                        {onepunData.dailyActions?.mustNotSkip?.description}
+                      </p>
+                      <p className="text-blue-300 text-sm italic">
+                        ⚠️ {onepunData.dailyActions?.mustNotSkip?.consequence}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -422,18 +488,28 @@ export default function GemsPage() {
                           🎯 Strategic Insights
                         </h3>
                         <button
-                          onClick={() => copyToClipboard(onepunData.strategicInsights.join('\n'), "인사이트")}
+                          onClick={() =>
+                            copyToClipboard(
+                              onepunData.strategicInsights.join("\n"),
+                              "인사이트"
+                            )
+                          }
                           className="bg-gray-600 hover:bg-gray-500 text-white px-3 py-1 rounded-full text-xs transition-all duration-200"
                         >
                           {copiedText === "인사이트" ? "✓" : "📋"}
                         </button>
                       </div>
                       <div className="space-y-3">
-                        {onepunData.strategicInsights.slice(0, 3).map((insight, index) => (
-                          <p key={index} className="text-gray-300 text-sm leading-relaxed border-l-2 border-gray-600/50 pl-3">
-                            {insight}
-                          </p>
-                        ))}
+                        {onepunData.strategicInsights
+                          .slice(0, 3)
+                          .map((insight, index) => (
+                            <p
+                              key={index}
+                              className="text-gray-300 text-sm leading-relaxed border-l-2 border-gray-600/50 pl-3"
+                            >
+                              {insight}
+                            </p>
+                          ))}
                       </div>
                     </div>
                   )}
@@ -446,13 +522,20 @@ export default function GemsPage() {
                           📅 Tomorrow Preview
                         </h3>
                         <button
-                          onClick={() => copyToClipboard(onepunData.nextDayPreview, "미리보기")}
+                          onClick={() =>
+                            copyToClipboard(
+                              onepunData.nextDayPreview,
+                              "미리보기"
+                            )
+                          }
                           className="bg-red-600 hover:bg-red-500 text-white px-3 py-1 rounded-full text-xs transition-all duration-200"
                         >
                           {copiedText === "미리보기" ? "✓" : "📋"}
                         </button>
                       </div>
-                      <p className="text-gray-200 text-sm leading-relaxed">{onepunData.nextDayPreview}</p>
+                      <p className="text-gray-200 text-sm leading-relaxed">
+                        {onepunData.nextDayPreview}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -472,15 +555,17 @@ ${onepunData.dailyActions?.shouldDo?.description}
 ${onepunData.dailyActions?.mustNotSkip?.description}
 
 🎯 INSIGHTS:
-${onepunData.strategicInsights?.join('\n') || ''}
+${onepunData.strategicInsights?.join("\n") || ""}
 
-📅 TOMORROW: ${onepunData.nextDayPreview || ''}
+📅 TOMORROW: ${onepunData.nextDayPreview || ""}
                       `.trim()
                       copyToClipboard(allContent, "전체")
                     }}
                     className="bg-gradient-to-r from-[#100002] via-red-600 to-[#100002] hover:from-red-600 hover:to-red-700 text-white px-8 py-3 rounded-full font-bold text-lg transition-all duration-300 hover:scale-105 shadow-2xl"
                   >
-                    {copiedText === "전체" ? "✅ 전체 복사 완료!" : "📋 전체 전략 복사"}
+                    {copiedText === "전체"
+                      ? "✅ 전체 복사 완료!"
+                      : "📋 전체 전략 복사"}
                   </button>
                 </div>
               </>

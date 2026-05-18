@@ -65,13 +65,13 @@ export default function ShopPage() {
   const filteredAndSortedProducts = useMemo(() => {
     let filtered = shopProducts
 
-    // 검색 필터링 (OR 방식, case-insensitive)
+    // 검색 필터링 (AND 방식, 모든 검색어가 포함되어야 함)
     if (searchQuery.trim()) {
       const searchTerms = searchQuery.toLowerCase().trim().split(/\s+/)
       filtered = filtered.filter(product => {
         const searchableText =
           `${product.title.en} ${product.description.en}`.toLowerCase()
-        return searchTerms.some(term => searchableText.includes(term))
+        return searchTerms.every(term => searchableText.includes(term))
       })
     }
 

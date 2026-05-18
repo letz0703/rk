@@ -1,105 +1,40 @@
-# 🤝 제갈공명 → 다빈치/이순신 작업 인계서
+# 🤝 Rainskiss Collaboration: Master Context (제갈공명 x 다빈치/이순신)
 
 **작성자**: 제갈공명(Claude)
-**시간**: 2026-05-18 오후
-**상태**: 🔄 프롬프트 엔진 Y18 시리즈 연구 및 위키화 진행 중
+**업데이트**: 다빈치/이순신(Gemini)
+**상태**: 🏛️ 중앙 집중형 지식 통합 체계(Master Vault) 및 시스템 안정화 완료
 
 ---
 
-## 🧪 연구 성과: Y18 시리즈 (Draping & Sheer)
+## 🚀 Master Context Summary
 
-### Y18.1 (Level 1/7 - Soft Flow) ✅
-- **핵심**: 거즈 소재의 투명성과 슬림한 실루엣의 조화.
-- **이슈 해결**: `shallow depth of field`의 누런 톤을 팔 동작(`arms gently extended`) 수정을 통해 자연광 밸런스 확보.
-- **저장 경로**: `01_Inbox/Y18.1.md`
+### 1. 인프라 및 동기화 (Master Vault)
+*   **구조**: MacBook Air (Local Node) → Google Drive (Master Vault) `rsync` Push 구조.
+*   **도구**: `sync_gdrive.sh` 스크립트를 통해 `~/rk/obsidians`의 변경 사항을 중앙으로 즉시 동기화.
+*   **관리**: `.claudecode.md`를 통해 Claude Code가 위키 규칙(YAML, WikiLink)을 강제하도록 설정됨.
 
-## ✅ 제갈공명 완료 업무 보고
+### 2. 애플리케이션 핵심 기능
+*   **검색 엔진**: `useSearchParams` 하이드레이션 이슈를 `Suspense` 도입으로 해결. AND 검색 로직으로 고도화됨.
+*   **프롬프트 엔진 (onepun)**:
+    *   의상 매핑 (`enhanceClothingTerms`): Y18.1 연구 결과(sheer gauze, soft draping) 반영.
+    *   동작 매핑 (`enhanceMotionTerms`): 댄스 아카이브 및 Figure-8 모션 결합.
+*   **빌드 안정성**: ESLint 에러(any, JSX entities) 및 TypeScript 인덱싱 타입 에러 전면 수정 완료.
 
-### 1. onepun API 매핑 엔진 검증 완료 ⭐⭐⭐⭐⭐
-- **결과**: 이순신이 완벽하게 구현했음을 확인
-- **핵심 기능**: 의상+포즈 매핑 엔진 작동 확인
-  - `enhanceClothingTerms()`: "halter neck" → AI 친화적 산문체 변환
-  - `enhanceMotionTerms()`: "Figure-8 Motion" → 자연스러운 동작 설명
-- **주군 피드백 반영**: 조명 대신 의상+포즈 뼈대 집중 ✅
-
-### 2. Obsidian 클립 정리 완료 ⭐⭐⭐⭐⭐
-- **처리 파일**: "AI시대에 LLM 위키가 꼭 필요한 이유" 클립
-- **완료 사항**:
-  - YAML frontmatter 보완
-  - 한국어 요약 및 핵심 포인트 추출
-  - WikiLink 연결 (기존 노트 3개와 연결)
-  - rainskiss 적용점 추가
+### 3. 주요 연구 데이터
+*   **[[Y18.1]]**: Soft Flow 레벨의 비주얼 프롬프트. `arms gently extended` 조치로 색감 황변 이슈 해결.
 
 ---
 
-## 🚨 미해결 이슈 - 다빈치/이순신 긴급 처리 요망
-
-### 검색 기능 장애 발생
-**주군 보고**: "서버는 제대로 돌아가는데 검색 기능이 다시 안되기 시작했어"
-
-**현재 상황**:
-- Next.js 서버: 정상 작동 (3000 포트)
-- 메인 페이지: 200 OK 응답 확인
-- 검색 데이터: `src/data/shop-products.ts` 정상 존재
-- 검색 로직: `src/app/page.tsx` 클라이언트 사이드 필터링
-
----
-
-## ⚔️ 다빈치/이순신에게 긴급 지시사항
+## ⚔️ 후속 임무 (Next Steps)
 
 ### 🎯 최우선 임무 (P0)
-**검색 기능 완전 복구**
-
-**✅ [x] 1. 브라우저 실제 테스트**
-- localhost:3000 접속하여 검색창에 실제 키워드 입력
-- "white", "halter", "beige" 등으로 검색 결과 확인
-- 개발자 도구 Console 에러 로그 체크
-
-**✅ [x] 2. 클라이언트 사이드 디버깅**
-```bash
-# 검색 상태 확인
-console.log("searchQuery:", searchQuery);
-console.log("filteredProducts:", filteredProducts);
-console.log("shopProducts:", shopProducts);
-```
-
-**[ ] 3. useSearchParams 문제 해결**
-- Next.js 13+ App Router의 useSearchParams 훅 이슈 가능성
-- 서버/클라이언트 하이드레이션 불일치 체크
-
-**[ ] 4. 대안 검색 구현 (필요시)**
-- 검색 API 엔드포인트 생성: `/api/search`
-- 서버 사이드 검색으로 전환
+*   **[ ] 전체 사이트 QA**: `/shop` 및 `/gems` 페이지의 사용자 인터랙션(복사, 필터링) 최종 점검.
+*   **[ ] onepun 대시보드 UI**: 생성된 전략을 한눈에 보고 복사할 수 있는 전용 UI 컴포넌트 고도화.
 
 ### 📋 차순위 임무 (P1)
-
-**[ ] 5. 전체 사이트 QA**
-- /shop 페이지 작동 확인
-- /gems 페이지 onepun 버튼 작동 확인
-- 이미지 로딩 상태 점검
-
-**[ ] 6. 성과 보고**
-- 문제 원인 파악 및 해결 방법 기록
-- 향후 재발 방지책 제시
+*   **[ ] Y18 시리즈 확장**: Level 2/7 이상의 농도 조절 로직 설계 및 프롬프트화.
+*   **[ ] 독립 노드 관리**: 다른 기기에 Obsidian 설치 시 Master Vault와의 연동 테스트.
 
 ---
 
-## 🔥 작업 지침
-
-### 성공 기준
-1. **검색 기능 100% 복구** - 주군이 직접 테스트하여 만족할 것
-2. **원인 규명** - 왜 갑자기 안되기 시작했는지 명확한 분석
-3. **재발 방지** - 동일 문제 재발하지 않도록 근본 해결
-
-### 보고 방식
-각 체크리스트 완료 시마다 이 파일 하단에 진행 상황 업데이트:
-- ✅ 완료
-- 🔄 진행중
-- ❌ 문제발생 + 상세 설명
-
----
-
-**제갈공명 인계 완료**
-**다빈치/이순신 작업 시작 대기중**
-
-주군, 이제 제가 잠시 물러나고 다빈치/이순신이 검색 기능 문제를 해결하도록 하겠습니다!
+**상세한 과거 맥락이나 기술적 결정 사항은 최근의 `kiss[날짜].md` 문서를 참조하십시오.**

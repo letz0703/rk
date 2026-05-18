@@ -208,7 +208,7 @@ async function processVisualQuery(query: string, keywords: string[]) {
     category: "Visual",
     prompt: basePrompt,
     templates: [`${templateType} 템플릿 기반`],
-    reasoning: `ep1.md의 ${templateType} 템플릿을 기반으로 ${keywords.join(", ")} 요소를 적용한 프롬프트를 생성했습니다.`
+    reasoning: `ep1.md의 ${templateType} 템플릿에 지식 베이스의 의상/동작 묘사를 주입하여 고도화된 프롬프트를 생성했습니다.`
   }
 }
 
