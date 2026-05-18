@@ -170,10 +170,12 @@ export default function TraveloguePage() {
             <div className="absolute inset-0 -z-10 bg-slate-900">
               <div key={imageKey} className="absolute inset-0 transition-opacity duration-1000">
                 {customImages[imageKey] ? (
-                  <img 
-                    src={customImages[imageKey]} 
+                  <Image
+                    src={customImages[imageKey]}
                     alt={`Scene ${index} ${timeMode}`}
-                    className="w-full h-full object-cover opacity-60 animate-in fade-in duration-1000"
+                    fill
+                    unoptimized
+                    className="object-cover opacity-60 animate-in fade-in duration-1000"
                   />
                 ) : (
                   <div className="absolute inset-0 opacity-30">

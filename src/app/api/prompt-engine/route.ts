@@ -24,7 +24,7 @@ interface PromptEngineResponse {
 export async function POST(req: NextRequest) {
   try {
     const body: PromptEngineRequest = await req.json()
-    const {query, category, intent, context} = body
+    const {query, category, intent, intensity} = body
 
     if (!query) {
       return NextResponse.json<PromptEngineResponse>(
@@ -40,12 +40,7 @@ export async function POST(req: NextRequest) {
     const parsedIntent = parseUserIntent(query, intent)
 
     // 카테고리별 처리
-    const result = await processQuery(
-      query,
-      parsedIntent,
-      category,
-      body.intensity
-    )
+    const result = await processQuery(query, parsedIntent, category, intensity)
 
     return NextResponse.json<PromptEngineResponse>({
       success: true,
@@ -76,6 +71,12 @@ function parseUserIntent(
   keywords: string[]
 } {
   const lowerQuery = query.toLowerCase()
+
+  // 명시적 의도(explicitIntent)가 있을 경우 우선 처리
+  if (explicitIntent === "legal_response")
+    return {category: "Admin", type: "legal_response", keywords: []}
+  if (explicitIntent === "creative_prompt")
+    return {category: "Visual", type: "creative_prompt", keywords: []}
 
   // Admin 의도 감지
   if (
@@ -195,9 +196,6 @@ async function processVisualQuery(
   keywords: string[],
   intensity: number
 ) {
-  // ep1.md 기반 Flow/Grok/Soul-Sync 템플릿 매핑
-  const knowledge = await markdownLoader.loadByCategory("Visual")
-
   // Flow/Grok/Soul-Sync 패턴 감지
   let templateType = "Flow" // 기본값
   if (query.toLowerCase().includes("grok") || intensity >= 6) {
@@ -264,6 +262,43 @@ function extractKeywords(text: string, relevantWords: string[]): string[] {
   )
 }
 
+function enhanceClothingTerms(keywords: string[], intensity: number): string[] {
+  const clothingMap: Record<string, string> = {
+    halter:
+      "elegant sheer gauze fabric, crisp white halter neckline, asymmetrical draping",
+    ribbed: "soft ribbed texture, form-fitting body-contouring silhouette",
+    gauze: "delicate sheer gauze fabric with intricate folds",
+    mini: "high-fashion mini skirt length, sleek and graceful figure"
+  }
+
+  return keywords.map(kw => {
+    const base = clothingMap[kw.toLowerCase()] || kw
+    if (intensity >= 6)
+      return `${base}, ultra-thin transparent material, provocative silhouette, high-fashion artistic nudity undertone`
+    if (intensity >= 3)
+      return `${base}, form-fitting sheer texture, detailed fabric folds`
+    return base
+  })
+}
+
+function enhanceMotionTerms(keywords: string[], intensity: number): string[] {
+  const motionMap: Record<string, string> = {
+    "figure-8":
+      "seamless fluid motion, continuous figure-eight trajectory, hypnotic looping movement",
+    spin: "dynamic pivot spin, fabric naturally spreading through space",
+    relax:
+      "clean elegant pose lying relaxed on wooden platform, legs lightly apart"
+  }
+
+  return keywords.map(kw => {
+    const base = motionMap[kw.toLowerCase()] || kw
+    if (intensity >= 6)
+      return `${base}, bold and daring posture, intimate eye contact, evocative movement`
+    if (intensity >= 3) return `${base}, elegant posture, confident expression`
+    return base
+  })
+}
+
 function generateVisualPrompt(
   query: string,
   templateType: string,
@@ -302,6 +337,7 @@ export async function GET(req: NextRequest) {
   const url = new URL(req.url)
   const query = url.searchParams.get("q")
   const category = url.searchParams.get("category")
+  const intensity = parseInt(url.searchParams.get("intensity") || "1")
 
   if (!query) {
     return NextResponse.json<PromptEngineResponse>(
@@ -316,7 +352,7 @@ export async function GET(req: NextRequest) {
   return POST(
     new Request(req.url, {
       method: "POST",
-      body: JSON.stringify({query, category}),
+      body: JSON.stringify({query, category, intensity}),
       headers: {"Content-Type": "application/json"}
     }) as NextRequest
   )
