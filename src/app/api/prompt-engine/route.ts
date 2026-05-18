@@ -6,6 +6,7 @@ interface PromptEngineRequest {
   category?: "Admin" | "Visual" | "Audio" | "Culture"
   intent?: string
   context?: Record<string, unknown>
+  intensity?: number // 1-7 level
 }
 
 interface PromptEngineResponse {
@@ -39,7 +40,12 @@ export async function POST(req: NextRequest) {
     const parsedIntent = parseUserIntent(query, intent)
 
     // 카테고리별 처리
-    const result = await processQuery(query, parsedIntent, category)
+    const result = await processQuery(
+      query,
+      parsedIntent,
+      category,
+      body.intensity
+    )
 
     return NextResponse.json<PromptEngineResponse>({
       success: true,
@@ -134,17 +140,18 @@ function parseUserIntent(
 async function processQuery(
   query: string,
   intent: ReturnType<typeof parseUserIntent>,
-  explicitCategory?: string
+  explicitCategory?: string,
+  intensity: number = 1
 ) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const category = (explicitCategory as any) || intent.category
+  const category =
+    (explicitCategory as PromptEngineRequest["category"]) || intent.category
 
   switch (intent.type) {
     case "legal_response":
       return await processLegalQuery(query, intent.keywords)
 
     case "creative_prompt":
-      return await processVisualQuery(query, intent.keywords)
+      return await processVisualQuery(query, intent.keywords, intensity)
 
     case "audio_guide":
       return await processAudioQuery(query, intent.keywords)
@@ -183,17 +190,20 @@ async function processLegalQuery(query: string, keywords: string[]) {
   }
 }
 
-async function processVisualQuery(query: string, keywords: string[]) {
+async function processVisualQuery(
+  query: string,
+  keywords: string[],
+  intensity: number
+) {
   // ep1.md 기반 Flow/Grok/Soul-Sync 템플릿 매핑
   const knowledge = await markdownLoader.loadByCategory("Visual")
 
   // Flow/Grok/Soul-Sync 패턴 감지
   let templateType = "Flow" // 기본값
-  if (
-    query.toLowerCase().includes("grok") ||
-    query.toLowerCase().includes("hard")
-  ) {
+  if (query.toLowerCase().includes("grok") || intensity >= 6) {
     templateType = "Grok"
+  } else if (intensity >= 2 && intensity < 6) {
+    templateType = "Flow-Enhanced"
   } else if (
     query.toLowerCase().includes("soul-sync") ||
     query.toLowerCase().includes("special")
@@ -201,14 +211,20 @@ async function processVisualQuery(query: string, keywords: string[]) {
     templateType = "Soul-Sync"
   }
 
+  // 키워드 강화 (의상 및 포즈) - Gemini가 정밀 분석한 강화 키워드 사용
+  const enhancedKeywords = [
+    ...enhanceClothingTerms(keywords, intensity),
+    ...enhanceMotionTerms(keywords, intensity)
+  ]
+
   // ep1.md 템플릿 기반 프롬프트 생성
-  const basePrompt = generateVisualPrompt(query, templateType, keywords)
+  const basePrompt = generateVisualPrompt(query, templateType, enhancedKeywords)
 
   return {
     category: "Visual",
     prompt: basePrompt,
     templates: [`${templateType} 템플릿 기반`],
-    reasoning: `ep1.md의 ${templateType} 템플릿에 지식 베이스의 의상/동작 묘사를 주입하여 고도화된 프롬프트를 생성했습니다.`
+    reasoning: `ep1.md의 ${templateType} 템플릿에 주군의 연구 데이터([[Y18.1]]) 및 강도 레벨 ${intensity}/7을 적용했습니다.`
   }
 }
 
@@ -255,6 +271,7 @@ function generateVisualPrompt(
 ): string {
   const templates = {
     Flow: `[Flow - Soft] ${query}, soft cinematic lighting, dreamy atmosphere, elegant composition, 8K resolution, ${keywords.join(", ")}`,
+    "Flow-Enhanced": `[Flow - Level 2] ${query}, professional fashion photography, dynamic composition, detailed textures, soft rim lighting, ${keywords.join(", ")}`,
     Grok: `[Grok - Hard] Extreme close-up, ${query}, dramatic lighting, intense shadows, high contrast, detailed textures, ${keywords.join(", ")}`,
     "Soul-Sync": `[Soul-Sync - Special] Masterpiece capturing ${query}, Da Vinci-style precision, transcendent moment, ${keywords.join(", ")}`
   }

@@ -121,8 +121,7 @@ export default function ShopPage() {
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:border-transparent"
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              style={{"--tw-ring-color": "#c10002"} as any}
+              style={{"--tw-ring-color": "#c10002"} as React.CSSProperties}
             />
           </div>
         </div>

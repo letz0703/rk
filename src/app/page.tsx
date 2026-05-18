@@ -48,7 +48,7 @@ function SearchContent() {
       const terms = searchQuery.toLowerCase().trim().split(/\s+/)
       filtered = filtered.filter(p => {
         const text = `${p.title.en} ${p.description.en}`.toLowerCase()
-        return terms.some(t => text.includes(t))
+        return terms.every(t => text.includes(t))
       })
     }
     if (selectedCategory !== "all") {

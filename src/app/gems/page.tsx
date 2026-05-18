@@ -109,6 +109,7 @@ export default function GemsPage() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState(false)
   const [onepunModalOpen, setOnepunModalOpen] = useState(false)
+  const [intensity, setIntensity] = useState(1)
   const [onepunData, setOnepunData] = useState<
     OnepunDataSuccess | {error: string} | null
   >(null)
@@ -140,10 +141,11 @@ export default function GemsPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
-        }
+        },
+        body: JSON.stringify({intensity})
       })
 
-      const data: OnepunDataSuccess = await response.json()
+      const data = await response.json()
       setOnepunData(data)
     } catch (error) {
       console.error("Onepun API 호출 실패:", error)
@@ -181,6 +183,28 @@ export default function GemsPage() {
         <div className="space-y-1">
           <h1 className="text-2xl font-bold tracking-tight">✦ Gems</h1>
           <p className="text-sm text-gray-400">Rainskiss 전용 AI 도구 모음</p>
+        </div>
+
+        {/* Intensity Selector - 상단 배치로 접근성 강화 */}
+        <div className="flex items-center justify-center gap-6 bg-[#141414] border border-white/10 p-4 rounded-2xl">
+          <span className="text-xs font-bold text-white/40 uppercase tracking-widest">
+            Strategy Intensity
+          </span>
+          <div className="flex items-center gap-4">
+            <input
+              type="range"
+              min="1"
+              max="7"
+              value={intensity}
+              onChange={e => setIntensity(parseInt(e.target.value))}
+              className="w-32 sm:w-48 accent-[#c10002] cursor-pointer"
+            />
+            <span
+              className={`text-sm font-black min-w-[3rem] text-center ${intensity >= 6 ? "text-red-500 animate-pulse" : "text-amber-400"}`}
+            >
+              Lv.{intensity}
+            </span>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
