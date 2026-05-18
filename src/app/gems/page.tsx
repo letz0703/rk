@@ -7,7 +7,7 @@ import {useState} from "react"
 interface OnepunAction {
   title: string
   description: string
-  reason?: strin
+  reason?: string
   consequence?: string
 }
 
