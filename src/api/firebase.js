@@ -13,7 +13,6 @@ import {
   getDatabase,
   ref,
   set,
-  get,
   push,
   remove,
   update,

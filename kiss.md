@@ -19,6 +19,9 @@
 *   **프롬프트 엔진 (onepun)**:
     *   의상/동작 매핑 함수 구현 완료 (`route.ts`). 주군의 Y18.1 연구 데이터(sheer gauze 등)를 실시간 프롬프트에 주입.
 *   **빌드 안정성**: ESLint 에러(any, JSX entities) 및 TypeScript 인덱싱 타입 에러 전면 수정 완료.
+*   **고급 질감/포즈 엔진**: `obsidian leather` 및 `high-speed pivot` 매핑 데이터 주입 완료 (Lv.6 전용).
+*   **노벨피아 데이터 통합**: 구글 드라이브의 노벨피아 파일들이 `obsidian/02_Notes/Story`로 이동되어 `onepun` 엔진에서 활용 준비 완료.
+*   **Look Analyzer 페이지 구축**: `/look` 경로에 이미지/프롬프트 분석 전용 UI 구현 및 Grok 7단계 엔진 연동 완료.
 
 ### 🤖 Gemini MCP & Heavy Context Strategy (New)
 *   **역할 분담**:
@@ -41,7 +44,8 @@
 ### 📋 차순위 임무 (P1)
 *   **[ ] Y18 시리즈 확장**: Level 2/7 이상의 농도 조절 로직 설계 및 프롬프트화.
 *   **[ ] 독립 노드 관리**: 다른 기기에 Obsidian 설치 시 Master Vault와의 연동 테스트.
-*   **[ ] Netlify 배포 확인**: 수정된 타입 안정성 로직이 Netlify 빌드를 통과하는지 모니터링.
+*   **[ ] Look Analyzer QA**: 다양한 Pinterest URL 및 텍스트 프롬프트에 대한 분석 정확도 점검.
+*   **[✅] Netlify 배포 확인**: 빌드 차단 요소(Unused vars, Missing functions) 전면 수정 완료.
 
 ---
 

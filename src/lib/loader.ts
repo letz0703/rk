@@ -3,7 +3,7 @@ import path from "path"
 
 interface KnowledgeBase {
   id: string
-  category: "Admin" | "Visual" | "Audio" | "Culture"
+  category: "Admin" | "Visual" | "Audio" | "Culture" | "Story"
   content: string
   metadata: {
     tags: string[]
@@ -51,6 +51,26 @@ class MarkdownLoader {
   ): Promise<KnowledgeBase[]> {
     const allKnowledge = await this.loadAllKnowledge()
     return allKnowledge.filter(kb => kb.category === category)
+  }
+
+  /**
+   * 키워드와 매칭되는 지식 조각들을 통합하여 반환
+   */
+  async findKnowledgeByKeywords(keywords: string[]): Promise<string[]> {
+    const allKnowledge = await this.loadAllKnowledge()
+    const matches: string[] = []
+
+    keywords.forEach(kw => {
+      const found = allKnowledge.filter(
+        kb =>
+          kb.metadata.tags.some(
+            tag => tag.toLowerCase() === kw.toLowerCase()
+          ) || kb.id.toLowerCase().includes(kw.toLowerCase())
+      )
+      found.forEach(f => matches.push(...f.metadata.templates))
+    })
+
+    return Array.from(new Set(matches))
   }
 
   /**
@@ -239,6 +259,25 @@ ${legalBasis.length > 0 ? `**법적 근거**: ${legalBasis.join(", ")}` : ""}
       content.includes("cabaret")
     ) {
       return "Culture"
+    }
+
+    // Story 카테고리 - 시리즈 서사, 트렌드 분석, 페티시, 시나리오
+    if (
+      content.includes("시리즈") ||
+      content.includes("Story") ||
+      content.includes("Scenario") ||
+      content.includes("NTR") ||
+      content.includes("BDSM") ||
+      content.includes("Wedding") ||
+      content.includes("Africa") ||
+      content.includes("Scandal") ||
+      content.includes("Novelpia") ||
+      content.includes("트렌드") ||
+      fileName.includes("trend") ||
+      fileName.includes("story") ||
+      fileName.includes("novelpia")
+    ) {
+      return "Story"
     }
 
     return null
