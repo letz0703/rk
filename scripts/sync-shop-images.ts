@@ -93,7 +93,7 @@ function updateShopProductsFile(targetSlug?: string, quietMode = false) {
     } else {
       // 기존 자동 생성 헤더 교체
       content = content.replace(
-        /\/\/ 🤖 자동 생성됨:.*?\n\n/s,
+        /\/\/ 🤖 자동 생성됨:[\s\S]*?\n\n/,
         header
       )
     }

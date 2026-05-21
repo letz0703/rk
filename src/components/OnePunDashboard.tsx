@@ -113,7 +113,7 @@ export default function OnePunDashboard() {
             {dailyActions.mustNotSkip.title}
           </h3>
           <p className="text-gray-400 text-sm mb-4 leading-relaxed italic">
-            "{dailyActions.mustNotSkip.description}"
+            &ldquo;{dailyActions.mustNotSkip.description}&rdquo;
           </p>
           <div className="text-[10px] text-red-500 font-mono uppercase tracking-widest">
             Consequence: {dailyActions.mustNotSkip.consequence}
