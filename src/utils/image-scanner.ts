@@ -18,13 +18,14 @@ export function scanProductImages(slug: string): string[] {
   const imageSet = new Set<string>() // 중복 제거를 위한 Set 사용
 
   try {
-    // 1. 직접 파일 스캔 (slug-01.jpg, slug-02.jpg 등)
+    // 1. 직접 파일 스캔 (정확한 slug 매치 + 숫자 패턴만)
     const files = readdirSync(shopDir)
     const directFiles = files
       .filter(file => {
         const isImage = IMAGE_EXTENSIONS.some(ext => file.toLowerCase().endsWith(ext))
-        const matchesSlug = file.toLowerCase().startsWith(slug.toLowerCase())
-        return isImage && matchesSlug
+        // 더 엄격한 매칭: slug-숫자.확장자 또는 slug_숫자.확장자 패턴만
+        const strictPattern = new RegExp(`^${slug.toLowerCase()}[-_]?\\d*\\.(${IMAGE_EXTENSIONS.join('|').replace(/\./g, '')})$`, 'i')
+        return isImage && strictPattern.test(file)
       })
       .sort() // 알파벳순 정렬로 일관성 유지
 
@@ -32,7 +33,7 @@ export function scanProductImages(slug: string): string[] {
       imageSet.add(`/shop/${file}`)
     })
 
-    // 2. 하위 디렉토리 스캔 (slug 이름의 폴더가 있는 경우)
+    // 2. 하위 디렉토리 스캔 (정확한 slug 이름의 폴더만)
     const slugDir = join(shopDir, slug)
     if (existsSync(slugDir)) {
       const subFiles = readdirSync(slugDir)
@@ -42,32 +43,6 @@ export function scanProductImages(slug: string): string[] {
       subFiles.forEach(file => {
         imageSet.add(`/shop/${slug}/${file}`)
       })
-    }
-
-    // 3. 유사 폴더명 스캔 (busan-marine-elegance-1618 같은 경우)
-    // 단, 직접 파일이 없을 때만 실행
-    if (imageSet.size === 0) {
-      const dirs = readdirSync(shopDir, { withFileTypes: true })
-      const relatedDirs = dirs
-        .filter(dirent => dirent.isDirectory())
-        .filter(dirent =>
-          dirent.name.toLowerCase().includes(slug.toLowerCase()) ||
-          slug.toLowerCase().includes(dirent.name.toLowerCase())
-        )
-        .map(dirent => dirent.name)
-
-      for (const dirName of relatedDirs) {
-        const relatedDir = join(shopDir, dirName)
-        if (existsSync(relatedDir)) {
-          const relatedFiles = readdirSync(relatedDir)
-            .filter(file => IMAGE_EXTENSIONS.some(ext => file.toLowerCase().endsWith(ext)))
-            .sort()
-
-          relatedFiles.forEach(file => {
-            imageSet.add(`/shop/${dirName}/${file}`)
-          })
-        }
-      }
     }
 
   } catch (error) {

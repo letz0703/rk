@@ -1,6 +1,39 @@
 import {NextRequest, NextResponse} from "next/server"
 import {markdownLoader} from "@/lib/loader"
 
+/**
+ * Admin/행정 노이즈 필터링 블랙리스트
+ */
+const ADMIN_BLACKLIST = [
+  "빌라 관리",
+  "건물 운영",
+  "수리",
+  "민원",
+  "부동산 임대",
+  "통장 인계",
+  "삼영그린빌라",
+  "세금",
+  "신고",
+  "계약서",
+  "법무",
+  "회계",
+  "행정처리",
+  "서류작업",
+  "누수",
+  "곰팡이",
+  "동의서"
+]
+
+/**
+ * 부정적 맥락 필터링 함수
+ */
+function isCleanContent(content: string): boolean {
+  const lowerContent = content.toLowerCase()
+  return !ADMIN_BLACKLIST.some(keyword =>
+    lowerContent.includes(keyword.toLowerCase())
+  )
+}
+
 interface OnePunResponse {
   date: string
   dailyActions: {
@@ -42,10 +75,8 @@ function enhanceClothingTerms(rawTerm: string): string {
       "high-gloss latex material, intricate leather restraints, metallic buckle accents, dominant silhouette",
     "wedding gown":
       "pristine white silk gauze, torn lace details, disheveled bridal aesthetic, high-fashion scandal mood",
-    "ethnic contrast":
-      "striking skin tone contrast, interplay of deep ebony and porcelain textures, cinematic lighting on diverse skin",
     "webnovel cinematic":
-      "high-end cinematic webnovel cover art style, realistic skin and fabric textures, sharp focus, dramatic atmosphere"
+      "high-end cinematic webnovel cover art style, realistic skin and fabric textures, sharp focus, consistent character trope"
   }
   return (
     clothingMap[rawTerm.toLowerCase()] ||
@@ -104,7 +135,7 @@ async function generateDailyActions(): Promise<OnePunResponse["dailyActions"]> {
   const enhancedTheme = enhanceClothingTerms(selectedSeries.theme)
   const enhancedMotion = enhanceMotionTerms(selectedMotion)
 
-  return {
+  const actions = {
     mustDo: {
       title: `[Series Evolution] ${selectedSeries.title}: ${selectedSeries.target}`,
       description: `"${enhancedTheme}" 테마와 "${enhancedMotion}" 포즈를 결합한 3개 이상의 숏폼 시퀀스 제작. 트렌드 키워드 'NTR' 및 'Power Dynamic' 반영.`,
@@ -127,6 +158,22 @@ async function generateDailyActions(): Promise<OnePunResponse["dailyActions"]> {
       urgency: "high"
     }
   }
+
+  // Admin 필터링 적용: 제목이나 설명에 블랙리스트 포함 시 기본 창작 가이드로 대체
+  if (
+    !isCleanContent(actions.shouldDo.title) ||
+    !isCleanContent(actions.shouldDo.description)
+  ) {
+    actions.shouldDo = {
+      title: "[Creative Focus] 의상 질감 디테일 심화 연구",
+      description:
+        "Sheer Gauze와 Silk 소재의 레이어링이 주는 시각적 텐션 분석 및 프롬프트화",
+      reason: "행정적 노이즈를 배제하고 순수 창작의 뼈대에 집중하기 위함",
+      benefit: "비주얼 자산의 독보적 퀄리티 유지"
+    }
+  }
+
+  return actions
 }
 
 export async function POST(req: NextRequest) {
