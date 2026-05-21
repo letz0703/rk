@@ -2,6 +2,7 @@
 
 import {useState, useEffect, ChangeEvent, DragEvent} from "react"
 import Image from "next/image"
+import { addNewProduct } from "@/api/firebase"
 
 interface AnalysisSector {
   title: string
@@ -20,6 +21,7 @@ interface DetailedAnalysis {
   cameraAngle: AnalysisSector
   dslrModel: AnalysisSector
   accessories: AnalysisSector
+  mathematicalRatios: AnalysisSector // π/φ 수학적 비율 분석
   finalPrompts: {
     eng: string
     kor: string
@@ -77,14 +79,24 @@ const MOCK_ANALYSIS: DetailedAnalysis = {
     description: "목선을 따라 흐르는 얇은 골드 체인과 진주 이어링.",
     alternatives: ["Black lace choker", "Statement emerald rings", "Minimalist silver anklet"]
   },
+  mathematicalRatios: {
+    title: "수학적 비율 (π/φ Mathematical Ratios)",
+    description: "스커트 길이가 전체 신장의 φ(1.618) 비율로 설정되어 황금비 미학을 구현. 포즈의 곡선이 π 궤적을 따라 흐르며 자연스러운 회전 동작 효과 연출. 케플러 삼각형 비율(1:√φ:φ)이 전체 구도에 적용되어 수학적 완벽함을 달성.",
+    alternatives: [
+      "Golden ratio φ (1.618) applied to hemline-to-waist proportion",
+      "Circular motion dynamics following π trajectory for natural flow",
+      "Kepler triangle balance (1:√φ:φ) in overall composition",
+      "Pentagon geometry (36°/18° angles) in pose positioning"
+    ]
+  },
   finalPrompts: [
     {
-      eng: "Masterpiece, ultra-detailed fashion photography, full body shot from head to toe, a model wearing a translucent black silk off-shoulder blouse and high-waisted satin pencil skirt, deep V-neck, intricate lace details, arching back pose, luxury penthouse background, golden rim lighting, cinematic shadows, shot on Canon EOS R5, 85mm f/1.2L, hyper-realistic skin texture, 8k resolution --ar 9:16",
-      kor: "걸작, 초고밀도 패션 사진, 머리 끝부터 발끝까지 나오는 전신 샷, 반투명 블랙 실크 오프숄더 블라우스와 하이웨이스트 새틴 펜슬 스커트를 입은 모델, 깊은 V넥, 복잡한 레이스 디테일, 뒤로 젖힌 자세, 럭셔리 펜트하우스 배경, 황금빛 림 라이팅, 영화적 그림자, Canon EOS R5로 촬영, 85mm f/1.2L, 하이퍼 리얼리스틱 피부 질감, 8k 해상도"
+      eng: "Mathematical beauty φ (1.618) proportions, masterpiece fashion photography, full body shot from head to toe, model wearing translucent black silk off-shoulder blouse and high-waisted satin pencil skirt at golden ratio hemline, deep V-neck, intricate lace details, pose following π circular flow dynamics, luxury penthouse background, golden rim lighting positioned at φ division point, cinematic shadows, shot on Canon EOS R5, 85mm f/1.2L, divine proportion aesthetic, hyper-realistic skin texture, 8k resolution --ar 4:5",
+      kor: "수학적 아름다움 φ(1.618) 비율, 걸작 패션 사진, 머리 끝부터 발끝까지 전신 샷, 황금비 스커트 길이의 반투명 블랙 실크 오프숄더 블라우스와 하이웨이스트 새틴 펜슬 스커트를 입은 모델, 깊은 V넥, 복잡한 레이스 디테일, π 원형 흐름 역학을 따르는 자세, 럭셔리 펜트하우스 배경, φ 분할점에 위치한 황금빛 림 라이팅, 영화적 그림자, Canon EOS R5로 촬영, 85mm f/1.2L, 신성한 비율 미학, 하이퍼 리얼리스틱 피부 질감, 8k 해상도"
     },
     {
-      eng: "Full body editorial portrait, head to toe visible, provocative pose standing against minimalist concrete wall, sheer lace bodysuit combined with high-denier stockings, dramatic chiaroscuro lighting, voluminous atmosphere, moisture on skin, high-fashion aesthetic, Sony A7R V, 35mm f/1.4 GM, sharp focus, vibrant contrast, cinematic look --v 6.0",
-      kor: "전신 에디토리얼 포트레이트, 머리부터 발끝까지 노출, 미니멀한 콘크리트 벽에 기댄 도발적인 자세, 비치는 레이스 바디수트와 스타킹의 조합, 드라마틱한 키아로스쿠로 조명, 부피감 있는 대기 표현, 피부 위 수분감, 하이패션 미학, Sony A7R V, 35mm f/1.4 GM, 선명한 초점, 강렬한 대비, 영화적 연출"
+      eng: "The 1.618 Collection - divine proportion aesthetic, full body editorial portrait, head to toe visible, kepler triangle proportions (1:√φ:φ) in composition, model positioned at golden ratio division, sheer lace bodysuit combined with high-denier stockings, perfect mathematical balance, circular motion dynamics following π trajectory, dramatic chiaroscuro lighting with φ-ratio color distribution, sacred geometry styling, Sony A7R V, 35mm f/1.4 GM, mathematically precise fashion design, vibrant contrast, celestial mathematical elegance --v 6.0",
+      kor: "The 1.618 컬렉션 - 신성한 비율 미학, 전신 에디토리얼 포트레이트, 머리부터 발끝까지 노출, 구도에서 케플러 삼각형 비율(1:√φ:φ), 황금비 분할점에 위치한 모델, 비치는 레이스 바디수트와 스타킹 조합, 완벽한 수학적 균형, π 궤적을 따르는 원형 운동 역학, φ-비율 색상 배치의 드라마틱한 키아로스쿠로 조명, 신성한 기하학적 스타일링, Sony A7R V, 35mm f/1.4 GM, 수학적으로 정밀한 패션 디자인, 강렬한 대비, 천체의 수학적 우아함"
     }
   ]
 };
@@ -96,6 +108,7 @@ export default function LookPage() {
   const [isGenerating, setIsGenerating] = useState(false)
   const [analysis, setAnalysis] = useState<DetailedAnalysis | null>(null)
   const [isDragging, setIsDragging] = useState(false)
+  const [isCreatingProduct, setIsCreatingProduct] = useState(false)
   const [results, setResults] = useState<Array<{
     level: number
     focus: string
@@ -166,6 +179,59 @@ export default function LookPage() {
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
     alert("프롬프트가 복사되었습니다.")
+  }
+
+  const createProductFromAnalysis = async () => {
+    if (!analysis) return
+
+    setIsCreatingProduct(true)
+
+    try {
+      const timestamp = new Date().toISOString().slice(0, 10)
+      const productData = {
+        id: `pi-${Date.now()}`,
+        title: `The 1.618 Collection - ${timestamp}`,
+        category: "Mathematical Fashion",
+        subcategory: "π/φ Series",
+        price: 29.9, // 기본가격 × φ ≈ 30
+        premiumPrice: 48.34, // 기본가격 × φ²
+        description: analysis.mathematicalRatios.description,
+        tags: [
+          "golden ratio", "pi mathematics", "divine proportion",
+          "kepler triangle", "mathematical beauty", "φ 1.618",
+          "sacred geometry", "perfect balance"
+        ],
+        prompts: {
+          english: analysis.finalPrompts[0].eng,
+          korean: analysis.finalPrompts[0].kor,
+          alternative: analysis.finalPrompts[1]?.eng || ""
+        },
+        mathematicalSpecs: {
+          goldenRatio: "φ (1.618) applied to hemline proportions",
+          piDynamics: "π circular flow in pose composition",
+          keplerTriangle: "1:√φ:φ geometric balance",
+          pentagonAngles: "36°/18° positioning for natural harmony"
+        },
+        technicalSpecs: {
+          camera: analysis.dslrModel.description,
+          lighting: analysis.lightTexture.description,
+          settings: analysis.dslrSettings.description,
+          angle: analysis.cameraAngle.description
+        },
+        createdAt: new Date().toISOString(),
+        featured: true,
+        status: "active"
+      }
+
+      await addNewProduct(productData)
+      alert(`🔥 상품이 생성되었습니다!\n\n"${productData.title}"\n\n/shop 페이지에서 확인하실 수 있습니다.`)
+
+    } catch (error) {
+      console.error("상품 생성 오류:", error)
+      alert("상품 생성 중 오류가 발생했습니다.")
+    } finally {
+      setIsCreatingProduct(false)
+    }
   }
 
   return (
@@ -377,10 +443,17 @@ export default function LookPage() {
             {/* Image Analysis Section */}
             {!isGenerating && analysis && (
               <div className="bg-zinc-950 border border-zinc-800 p-10 space-y-12">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center justify-between">
                   <span className="text-lg text-white uppercase tracking-[0.5em] font-black">
                     [상세 분석 보고서]
                   </span>
+                  <button
+                    onClick={createProductFromAnalysis}
+                    disabled={isCreatingProduct}
+                    className="bg-gradient-to-r from-yellow-500 to-orange-500 text-black px-8 py-4 text-sm font-black uppercase tracking-[0.3em] hover:from-yellow-400 hover:to-orange-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-2xl active:scale-[0.95]"
+                  >
+                    {isCreatingProduct ? "상품 생성 중..." : "🔥 바로 상품 생성"}
+                  </button>
                 </div>
                 <div className="grid gap-8 text-sm leading-relaxed text-zinc-400">
                   {Object.entries(analysis).map(([key, value]) => {

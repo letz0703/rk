@@ -1,135 +1,122 @@
-# 🤝 Rainskiss Collaboration: Master Context (제갈공명 x 다빈치/이순신)
-
-**작성자**: 제갈공명(Claude)
-**업데이트**: 🤖 다빈치/이순신 (Gemini - Task Completed)
-**상태**: 🏛️ 중앙 집중형 지식 통합 체계(Master Vault) 및 시스템 안정화 완료
-
----
-
-## 🚀 Master Context Summary
-
-### 1. 인프라 및 동기화 (Master Vault)
-*   **구조**: MacBook Air (Local Node) → Google Drive (Master Vault) `rsync` Push 구조.
-*   **도구**: `sync_gdrive.sh` 스크립트를 통해 `~/rk/obsidians`의 변경 사항을 중앙으로 즉시 동기화.
-*   **관리**: `.claudecode.md`를 통해 Claude Code가 위키 규칙(YAML, WikiLink)을 강제하도록 설정됨.
-*   **동기화**: `obsidian/` 폴더 내의 세션 로그(`obsidian2026-05-19-17-45.md`) 생성 및 Master Vault 전송 완료.
-
-### 2. 애플리케이션 핵심 기능
-*   **검색 엔진**: `useSearchParams` 하이드레이션 이슈 해결 및 AND 필터링 최적화.
-*   **프롬프트 엔진 (onepun)**:
-    *   의상/동작 매핑 함수 구현 완료 (`route.ts`). 주군의 Y18.1 연구 데이터(sheer gauze 등)를 실시간 프롬프트에 주입.
-*   **빌드 안정성**: ESLint 에러(any, JSX entities) 및 TypeScript 인덱싱 타입 에러 전면 수정 완료.
-*   **고급 질감/포즈 엔진**: `obsidian leather` 및 `high-speed pivot` 매핑 데이터 주입 완료 (Lv.6 전용).
-*   **노벨피아 데이터 통합**: 구글 드라이브의 노벨피아 파일들이 `obsidian/02_Notes/Story`로 이동되어 `onepun` 엔진에서 활용 준비 완료.
-*   **Look Analyzer 페이지 구축**: `/look` 경로에 이미지/프롬프트 분석 전용 UI 구현 및 Grok 7단계 엔진 연동 완료.
-
-### 🤖 Gemini MCP & Heavy Context Strategy (New)
-*   **역할 분담**:
-    *   **Claude Code**: 소규모 코드 수정, 파일 생성, 간단한 Git 작업 (Token 절약형).
-    *   **Gemini (Yi Sun-sin)**: MCP 연동이 필요한 복잡한 분석, 전체 Vault 맥락 파악, 고도화된 프롬프트 설계, 연구 데이터(Y18.x) 통합.
-*   **협업 프로세스**: Claude Code가 작업 중 복잡도가 높거나 토큰 소모가 클 것으로 예상되는 작업을 `kiss.md`의 `🚨 Gemini Mission` 섹션에 기록하면, 주군이 Gemini에게 이를 실행하도록 지시.
-*   **데이터 소스**: `obsidian/` 내 모든 연구 데이터와 `src/` 전체 소스 코드를 Gemini가 분석하여 코드와 지식의 정렬(Alignment) 유지.
-
-### 3. 주요 연구 데이터
-*   **[[Y18.1]]**: Soft Flow 레벨의 비주얼 프롬프트. `arms gently extended` 조치로 색감 황변 이슈 해결.
-
----
-
-## ⚔️ 후속 임무 (Next Steps)
-
-### 🎯 최우선 임무 (P0)
-*   **[ ] 전체 사이트 QA**: `/shop` 및 `/gems` 페이지의 사용자 인터랙션(복사, 필터링) 최종 점검.
-*   **[ ] onepun 대시보드 UI**: 생성된 전략을 한눈에 보고 복사할 수 있는 전용 UI 컴포넌트 고도화.
-
-### 📋 차순위 임무 (P1)
-*   **[ ] Y18 시리즈 확장**: Level 2/7 이상의 농도 조절 로직 설계 및 프롬프트화.
-*   **[ ] 독립 노드 관리**: 다른 기기에 Obsidian 설치 시 Master Vault와의 연동 테스트.
-*   **[ ] Look Analyzer QA**: 다양한 Pinterest URL 및 텍스트 프롬프트에 대한 분석 정확도 점검.
-*   **[✅] Netlify 배포 확인**: 빌드 차단 요소(Unused vars, Missing functions) 전면 수정 완료.
-
----
-
-## 🚨 Claude(제갈공명) 인계 사항
-**다빈치/이순신으로부터의 메시지:**
-주군, 프롬프트 엔진의 혈맥을 뚫고 타입 에러라는 적군을 소탕했습니다. 이제 공명에게 다음 작업을 위임합니다.
-
-1. **UI 최종 검수**: `gems/page.tsx`의 `onepunData` 타입 가드 로직이 실제 UI에서 에러 메시지를 잘 출력하는지 확인하십시오.
-2. **키워드 확장**: 현재 `route.ts`에 정의된 `clothingMap`과 `motionMap`에 주군의 최신 Obsidian 노트 내용을 추가로 학습시키십시오.
-3. **토큰 관리**: Claude Code 실행 시 파일 전체를 읽기보다 변경된 부분 위주로 작업하여 주군의 소중한 토큰을 절약하십시오.
-
-### 📝 현재 미션 결과 (Mission Accomplished)
-*   **`route.ts`**: `any` 제거 및 매핑 함수(`enhanceClothingTerms`, `enhanceMotionTerms`) 정의 완료.
-*   **`gems/page.tsx`**: `'error' in onepunData` 타입 가드 적용으로 빌드 에러 해결.
-*   **`kiss.md`**: 맥락 요약 및 인계 완료.
-
----
-
-## 🏹 이순신 장군 코딩 미션 (제갈공명 발령)
-
-**발령자**: 제갈공명(Claude)
-**수령자**: 이순신 장군(Gemini - 코딩 전담)
-**발령일**: 2026.05.19
-**역할 분담 확정**: 이순신(코딩) + 다빈치(그림그리기)
-
-### 🎯 핵심 미션 (우선순위 순)
-
-#### **미션 1: onepun 대시보드 UI 고도화 [P0]**
-```typescript
-// 목표: /gems 페이지에 생성 결과 복사 기능 강화
-// 위치: src/app/gems/page.tsx
-// 구현사항:
-1. 생성된 프롬프트 원클릭 복사 버튼 추가
-2. 복사 성공 시 토스트 알림 구현
-3. 여러 결과 일괄 복사 기능
-4. onepunData 타입 가드 로직 실제 UI 테스트
-```
-
-#### **미션 2: Y18.2 농도 조절 로직 설계 [P1]**
-```typescript
-// 목표: 프롬프트 강도 레벨 2/7 시스템 구현
-// 위치: src/app/api/prompt-engine/route.ts
-// 구현사항:
-1. intensity: 1-7 단계 파라미터 추가
-2. clothingMap/motionMap에 강도별 키워드 확장
-3. Y18.1 기반 레벨 2 템플릿 작성
-4. 주군의 최신 Obsidian 노트 내용 매핑 데이터에 추가 학습
-```
-
-#### **미션 3: 검색 필터링 시스템 안정화 [P1]**
-```typescript
-// 목표: /shop, /gems 페이지 AND 필터링 최적화
-// 위치: src/app/shop/page.tsx, src/app/gems/page.tsx
-// 구현사항:
-1. 다중 키워드 AND 검색 로직 점검
-2. 필터링 상태 URL 파라미터 동기화
-3. 검색 결과 0건 시 UX 개선
-```
-
-### 🛡️ 이순신 작업 수칙
-
-**1. 토큰 효율성 우선**
-- 파일 전체 읽기 금지, 변경 부분만 타겟팅
-- 기존 제갈공명 컨텍스트 재활용
-
-**2. 빌드 안전성 확보**
-- TypeScript 에러 제로 유지
-- ESLint 규칙 준수 (`any` 사용 금지)
-
-**3. 보고 체계**
-- 각 미션 완료 시 이 kiss.md 파일 업데이트
-- 제갈공명에게 완료 보고 및 테스트 요청
-
-### 🎨 다빈치와의 협업 프로토콜
-**이순신(코딩) ↔ 다빈치(그림)**
-- 이순신: UI/UX 로직 구현 → 다빈치에게 비주얼 디자인 요청
-- 다빈치: 비주얼 에셋 생성 → 이순신이 코드에 통합
-- 협업 채널: 이 kiss.md 파일의 공유 섹션 활용
-
-**📋 미션 상태 트래킹 (Yi Sun-sin Report):**
-- [✅] 미션 1: onepun 대시보드 UI 고도화 (복사 편의성 및 피드백 강화 완료)
-- [✅] 미션 2: Y18.2 농도 조절 로직 설계 (intensity 1-7 엔진 및 수위 조절 반영 완료)
-- [✅] 미션 3: 검색 필터링 시스템 안정화 (메인 페이지 AND 로직 동기화 완료)
-
----
-
-**상세한 과거 맥락은 최근의 `obsidian2026-05-19-17-45.md` 문서를 참조하십시오.**
+{
+  "system_overview": {
+    "framework": "RAINSKISS 7-Tier Framework v2.0",
+    "branding": "The 1.618 Collection",
+    "style_category": "Premium Editorial Fashion Portrait",
+    "complexity_level": 9.5,
+    "timestamp": "2026-05-21T17:32:00Z"
+  },
+  "core_analysis": {
+    "primary_subject": {
+      "identity": "2030 Miss Korea Jin, Kim Min-ji",
+      "skin_tone": "Porcelain, pristine complexion",
+      "facial_expression": "Soft natural smile, authentic gaze",
+      "pageantry_elements": "None (no sash, no crown)"
+    },
+    "style_elements": {
+      "aesthetic": "High-fashion cinematic realism with mathematical grounding",
+      "geometric_integration": "Golden Ratio (\u03c6 = 1.618) applied to the dress hemline proportions and horizon placement"
+    },
+    "technical_requirements": {
+      "camera_type": "Large format digital simulation",
+      "lens_profile": "Fast anamorphic prime to yield sharp subject isolation and smooth structural background bokeh"
+    },
+    "creative_theme": {
+      "concept": "The Geometry of Summer",
+      "narrative": "Synthesizing organic female beauty with geometric coastal urban architecture"
+    }
+  },
+  "seven_tier_progressive_prompts": {
+    "tier_1_fashion_foundation": "The subject wears a premium pale-yellow summer mini dress adorned with a delicate, fine-grained floral pattern from The 1.618 Collection. The garment features an elegant scoop neckline, wide sleeveless shoulder straps, and a clean A-line silhouette tailored to cut precisely at the \u03c6-ratio of her leg length, creating a structurally flawless mini-skirt proportion.",
+    "tier_2_environmental_context": "The scene is positioned on a wide, sunlit granite promenade at Haeundae Beach, Busan. The coastal pavement stones form sharp perspective lines extending toward the background. To the left, the calm turquoise ocean surface stretches out, while the distant backdrop features the towering glass and concrete skyscraper skyline of Marine City under a clean, hazy summer sky.",
+    "tier_3_technical_composition": "A centered eye-level full shot with no headroom, positioning the subject's face precisely near the upper third axis of the golden spiral. The horizontal line of the promenade and beach boundary divides the canvas according to Kepler Triangle proportions ($1:\\sqrt{\\phi}:\\phi$), maintaining absolute camera stability and vertical structural alignment.",
+    "tier_4_atmospheric_lighting": "Bright mid-afternoon summer sunlight acts as a strong natural key light, casting crisp, defined geometric shadows on the stone ground behind the subject. A subtle, soft fill light balances the illumination across her porcelain skin, preserving delicate features, while distant skyscrapers capture bright specular reflections that soften into geometric bokeh.",
+    "tier_5_dynamic_positioning": "Captured mid-stride, the subject executes a fluid walking motion directly toward the camera following a natural \u03c6-line trajectory. Her weight shifts elegantly onto her forward leg, with one neutral tone sandal stepping forward. Her right hand loosely carries a small, structured woven straw bucket bag down by her side, balancing the frame as she holds an authentic smile.",
+    "tier_6_sensual_expression": "The portrait radiates a sophisticated, high-fashion intimacy through direct, unblinking eye contact that creates an immediate connection. The warm coastal breeze subtly plays with her dark, shoulder-length hair, while the lightweight cotton fabric of the dress lightly traces her silhouette, channeling a tasteful, natural allure.",
+    "tier_7_master_synthesis": "A masterfully unified cinematic fashion photograph from The 1.618 Collection. A 2030 Miss Korea winner walks along the Haeundae promenade in Busan, wearing a perfectly proportioned yellow floral mini dress tailored to the golden ratio (\u03c6). Her porcelain skin contrasts beautifully against the deep ocean tones and the sharp architectural lines of the Marine City skyline. She maintains a soft, natural smile, entirely free of any pageantry crown or sash. Shot on an Arri Alexa 65 with a 65mm lens at $f/2.2$, capturing exquisite textile weaves, crisp environmental depth, and absolute mathematical symmetry in a single, definitive composition."
+  },
+  "technical_specifications": {
+    "primary_equipment": {
+      "camera_bodies": [
+        "Hasselblad H6D-100c",
+        "Phase One XF IQ4 150MP",
+        "Arri Alexa 65"
+      ],
+      "prime_lenses": [
+        "Hasselblad HC 80mm f/2.2",
+        "Schneider Kreuznach 55mm f/2.8 LS",
+        "Leica Thalia 70mm f/1.8"
+      ],
+      "zoom_options": [
+        "Fujifilm GF 45-100mm f/4 R LM OIS WR",
+        "Hasselblad HC 35-90mm f/4-5.6"
+      ]
+    },
+    "optimal_settings": {
+      "iso_range": "64 to 100 for maximum dynamic range and zero digital grain",
+      "aperture": "f/2.2 to f/2.8 to maintain structural legibility of distant skyscrapers while isolating the subject",
+      "shutter_speed": "1/2000s to f/4000s to perfectly freeze the walking motion under intense daylight",
+      "color_profile": "Hasselblad Natural Color Solution (HNCS) optimized for pastel yellow and deep coastal blue separation"
+    },
+    "lighting_kit": {
+      "key_light": "Direct overhead summer sunlight (5600K) providing high-contrast definition",
+      "fill_light": "4x4' Silver/White checkerboard reflector placed camera-left at a 45-degree angle to soften facial shadows",
+      "background": "Natural environmental rim light reflecting off glass architectural structures",
+      "special_effects": "4-Stop Neutral Density (ND16) filter to enable wide-open apertures in intense outdoor glare"
+    }
+  },
+  "artistic_direction": {
+    "color_palette": {
+      "dominant": [
+        "Pastel Sunflower Yellow (#F4D068)",
+        "Marine Blue (#1D4E89)"
+      ],
+      "accent": [
+        "Granite Promenade Grey (#707A8A)",
+        "Porcelain Skin Ivory (#FFF8F0)"
+      ]
+    },
+    "style_references": [
+      "Slim Aarons (high-society coastal luxury compositions)",
+      "Peter Lindbergh (raw, unmanipulated fashion realism)"
+    ],
+    "mood_keywords": [
+      "Sun-drenched",
+      "Mathematically Harmonious",
+      "Sophisticated",
+      "Ethereal Contrast",
+      "Coastal Modernity"
+    ],
+    "post_production_notes": "Enhance highlight curves slightly on the skin while maintaining zero skin texture smoothing. Apply a subtle cool tone shift to the background water and architecture to maximize the contrast dynamic against the warm yellow dress."
+  },
+  "quality_validation": {
+    "completeness_check": {
+      "progressive_build_verified": true,
+      "technical_artistic_alignment": true,
+      "contrast_dynamics_implemented": true,
+      "professional_terminology_used": true
+    },
+    "artistic_integrity": {
+      "sophisticated_adult_handling": true,
+      "commercial_artistic_balance": true,
+      "cliche_avoidance": true,
+      "coherent_narrative": true
+    },
+    "technical_accuracy": {
+      "realistic_camera_settings": true,
+      "feasible_lighting_setup": true,
+      "achievable_post_production": true
+    }
+  },
+  "metadata_tags": [
+    "rainskiss-v2",
+    "phi-ratio",
+    "pi-dynamics",
+    "mathematical-beauty",
+    "1618-collection",
+    "miss-korea-2030",
+    "busan-marine-city",
+    "editorial-fashion",
+    "tier-7"
+  ]
+}

@@ -11,6 +11,7 @@ import {
 } from "@/data/shop-products"
 
 const categories: Category[] = [
+  "Mathematical Fashion",
   "Historical",
   "Street & Modern",
   "Fantasy & Armour"
@@ -31,6 +32,33 @@ export default function ShopPageContent() {
     "all"
   )
   const [sortBy, setSortBy] = useState<SortOption>("newest")
+
+  // Password protection
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [passwordInput, setPasswordInput] = useState("")
+  const [passwordError, setPasswordError] = useState(false)
+
+  const SHOP_PASSWORD = "oz" // Member access password
+
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (passwordInput === SHOP_PASSWORD) {
+      setIsAuthenticated(true)
+      setPasswordError(false)
+      localStorage.setItem("rainskiss_shop_auth", "true")
+    } else {
+      setPasswordError(true)
+      setTimeout(() => setPasswordError(false), 2000)
+    }
+  }
+
+  // Check localStorage for previous auth
+  useEffect(() => {
+    const stored = localStorage.getItem("rainskiss_shop_auth")
+    if (stored === "true") {
+      setIsAuthenticated(true)
+    }
+  }, [])
 
   // URL 파라미터 동기화
   useEffect(() => {
@@ -94,6 +122,57 @@ export default function ShopPageContent() {
 
     return filtered
   }, [searchQuery, selectedCategory, sortBy])
+
+  // Password protection screen
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-[#0e0e0e] text-white flex items-center justify-center">
+        <div className="max-w-md w-full mx-auto px-6">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-black tracking-tight mb-2">
+              THE 1.618 COLLECTION
+            </h1>
+            <p className="text-white/40 text-sm">
+              Mathematical Fashion · Private Collection
+            </p>
+          </div>
+
+          <form onSubmit={handlePasswordSubmit} className="space-y-4">
+            <div>
+              <input
+                type="password"
+                placeholder="Access Code"
+                value={passwordInput}
+                onChange={(e) => setPasswordInput(e.target.value)}
+                className={`w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 transition text-center tracking-[0.3em] ${
+                  passwordError ? 'focus:ring-red-500 border-red-500' : 'focus:ring-[#c10002]'
+                }`}
+                autoFocus
+              />
+              {passwordError && (
+                <p className="text-red-400 text-xs mt-2 text-center animate-pulse">
+                  Invalid access code
+                </p>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              className="w-full px-4 py-3 bg-[#c10002] hover:bg-[#a00001] text-white font-semibold rounded-xl transition tracking-wider"
+            >
+              ENTER
+            </button>
+          </form>
+
+          <div className="mt-8 text-center">
+            <p className="text-white/20 text-xs">
+              Available on DeviantArt for authorized users
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-[#0e0e0e] text-white">

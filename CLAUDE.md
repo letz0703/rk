@@ -65,7 +65,7 @@ Key routes:
 
 ## Session Continuity
 
-**IMPORTANT**: At the start of any new conversation or after `/clear`, immediately read `kiss.md` to understand the current project state and any ongoing work handoffs between AI collaborators (제갈공명/다빈치/이순신).
+**IMPORTANT**: At the start of any new conversation or after `/clear`, **triggered by the `higem` command**, immediately read `kiss.md` as the absolute first priority to understand the current project state and any ongoing work handoffs between AI collaborators (제갈공명/다빈치/이순신).
 
 ## AI-to-AI Collaboration Protocol
 
@@ -88,21 +88,21 @@ When complex questions requiring research arise:
 
    ```markdown
    ## 📋 [Date] Gemini Research Report
-   
+
    ### 🎯 Query
    [Original user question]
-   
+
    ### 📊 Sources Analyzed
    - Google Drive: [files found]
-   - Obsidian: [relevant notes] 
+   - Obsidian: [relevant notes]
    - Previous context: [kiss*.md summary]
-   
+
    ### 🔍 Key Findings
    [Bullet points of discoveries]
-   
+
    ### 💡 Recommendations for Claude
    [Specific actionable recommendations]
-   
+
    ### 🔄 Next Steps
    [Proposed next actions]
    ```

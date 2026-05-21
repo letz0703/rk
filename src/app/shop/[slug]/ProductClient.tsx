@@ -7,16 +7,42 @@ import {database} from "@/api/firebase"
 import {ref, onValue, push, remove} from "firebase/database"
 import type {ShopProduct} from "@/data/shop-products"
 import AdaptiveGallery from "@/app/components/AdaptiveGallery"
-import {useAuthContext} from "@/components/context/AuthContext"
-import {isWhitelisted} from "@/config/whitelist"
+// Removed auth imports
 
 type GalleryItem = {id: string; url: string}
 
 export default function ProductClient({product}: {product: ShopProduct}) {
-  const {user, isAdmin, login, logout} = useAuthContext()
-  const canViewPrompt = isWhitelisted(user?.email)
+  // Removed auth - everyone can access all features now
+  const isAdmin = true // Always allow admin features
   const [promptOpen, setPromptOpen] = useState(false)
   const [copied, setCopied] = useState<string | null>(null)
+
+  // Prompt password protection
+  const [promptAuthenticated, setPromptAuthenticated] = useState(false)
+  const [promptPasswordInput, setPromptPasswordInput] = useState("")
+  const [promptPasswordError, setPromptPasswordError] = useState(false)
+
+  const PROMPT_PASSWORD = "phi" // Simple phi password for prompts
+
+  const handlePromptPasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (promptPasswordInput === PROMPT_PASSWORD) {
+      setPromptAuthenticated(true)
+      setPromptPasswordError(false)
+      sessionStorage.setItem(`rainskiss_prompt_auth_${product.slug}`, "true")
+    } else {
+      setPromptPasswordError(true)
+      setTimeout(() => setPromptPasswordError(false), 2000)
+    }
+  }
+
+  // Check sessionStorage for previous prompt auth
+  useEffect(() => {
+    const stored = sessionStorage.getItem(`rainskiss_prompt_auth_${product.slug}`)
+    if (stored === "true") {
+      setPromptAuthenticated(true)
+    }
+  }, [product.slug])
 
   function copyToClipboard(text: string, key: string) {
     navigator.clipboard.writeText(text)
@@ -66,6 +92,14 @@ export default function ProductClient({product}: {product: ShopProduct}) {
     setSelected(0)
   }
 
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files
+    if (files && files.length > 0) {
+      uploadFiles(files)
+      e.target.value = '' // Reset input
+    }
+  }
+
   function onDragOver(e: React.DragEvent) {
     e.preventDefault()
     setDragging(true)
@@ -97,9 +131,9 @@ export default function ProductClient({product}: {product: ShopProduct}) {
             {/* 메인 이미지 + 드래그드롭 영역 */}
             <div
               ref={dropRef}
-              onDragOver={isAdmin ? onDragOver : undefined}
-              onDragLeave={isAdmin ? onDragLeave : undefined}
-              onDrop={isAdmin ? onDrop : undefined}
+              onDragOver={onDragOver}
+              onDragLeave={onDragLeave}
+              onDrop={onDrop}
               className={`relative w-full aspect-[3/4] rounded-2xl overflow-hidden bg-white/5 transition ${
                 dragging ? "ring-2 ring-[#c10002] ring-offset-2 ring-offset-[#0e0e0e]" : ""
               }`}
@@ -126,17 +160,29 @@ export default function ProductClient({product}: {product: ShopProduct}) {
                 </div>
               )}
 
-              {/* 어드민 힌트 */}
-              {isAdmin && !dragging && !uploading && (
-                <div className="absolute top-3 right-3 z-10">
+              {/* 파일 업로드 */}
+              {!dragging && !uploading && (
+                <div className="absolute top-3 right-3 z-10 flex flex-col gap-2">
                   <span className="text-[10px] bg-white/10 text-white/50 px-2 py-1 rounded-full">
                     drag to add
                   </span>
+                  <label className="cursor-pointer">
+                    <span className="text-[10px] bg-[#c10002] text-white px-2 py-1 rounded-full hover:bg-[#a00001] transition">
+                      choose files
+                    </span>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                    />
+                  </label>
                 </div>
               )}
 
-              {/* 삭제 버튼 (어드민) */}
-              {isAdmin && currentImage && !gallery[selected]?.id.startsWith("static-") && (
+              {/* 삭제 버튼 */}
+              {currentImage && !gallery[selected]?.id.startsWith("static-") && (
                 <button
                   onClick={() => deleteImage(gallery[selected])}
                   className="absolute bottom-3 right-3 z-10 text-xs bg-black/60 text-white/60 hover:text-red-400 px-2 py-1 rounded-full transition"
@@ -257,25 +303,53 @@ export default function ProductClient({product}: {product: ShopProduct}) {
                 </div>
               </div>
 
-              {/* 프롬프트 열람 — whitelist 전용 */}
+              {/* 프롬프트 열람 — 암호 보호 */}
               <div className="border-t border-white/10 pt-5">
-                {!user ? (
-                  <button
-                    onClick={login}
-                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-white/50 hover:text-white/80 text-sm transition"
-                  >
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
-                    </svg>
-                    Sign in to view prompt
-                  </button>
-                ) : canViewPrompt ? (
+                {!promptAuthenticated ? (
+                  <div className="space-y-3">
+                    <button
+                      onClick={() => setPromptOpen(true)}
+                      className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-white/50 hover:text-white/80 text-sm transition"
+                    >
+                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 1L9 4h6l-3-3zm0 22l3-3H9l3 3zm9-9l-3-3v6l3-3zM3 12l3 3V9l-3 3z"/>
+                      </svg>
+                      View Mathematical Prompts
+                    </button>
+
+                    {promptOpen && (
+                      <form onSubmit={handlePromptPasswordSubmit} className="space-y-3">
+                        <input
+                          type="password"
+                          placeholder="Prompt Access Code"
+                          value={promptPasswordInput}
+                          onChange={(e) => setPromptPasswordInput(e.target.value)}
+                          className={`w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-1 transition text-sm text-center ${
+                            promptPasswordError ? 'focus:ring-red-500 border-red-500' : 'focus:ring-[#c10002]'
+                          }`}
+                          autoFocus
+                        />
+                        {promptPasswordError && (
+                          <p className="text-red-400 text-xs text-center animate-pulse">
+                            Invalid prompt access code
+                          </p>
+                        )}
+                        <button
+                          type="submit"
+                          className="w-full px-3 py-2 bg-[#c10002] hover:bg-[#a00001] text-white text-sm font-medium rounded-lg transition"
+                        >
+                          UNLOCK PROMPTS
+                        </button>
+                      </form>
+                    )}
+                  </div>
+                ) : (
                   <div>
                     <button
                       onClick={() => setPromptOpen(p => !p)}
                       className="w-full flex items-center justify-between py-2.5 px-4 rounded-xl border border-[#c10002]/40 bg-[#c10002]/10 hover:bg-[#c10002]/20 text-white text-sm font-medium transition"
                     >
-                      <span>View Prompt</span>
+                      <span>Mathematical Prompts φ</span>
                       <span className="text-white/40 text-xs">{promptOpen ? "▲" : "▼"}</span>
                     </button>
 
@@ -284,7 +358,7 @@ export default function ProductClient({product}: {product: ShopProduct}) {
                         {/* Clothing Prompt */}
                         <div className="bg-white/5 border border-white/10 rounded-xl p-4">
                           <div className="flex items-center justify-between mb-2">
-                            <p className="text-[10px] font-semibold tracking-widest text-white/30 uppercase">Clothing Prompt</p>
+                            <p className="text-[10px] font-semibold tracking-widest text-white/30 uppercase">φ Clothing Prompt</p>
                             <button
                               onClick={() => copyToClipboard(product.content.clothingPrompt, "clothing")}
                               className="text-[10px] text-white/40 hover:text-white transition"
@@ -300,7 +374,7 @@ export default function ProductClient({product}: {product: ShopProduct}) {
                         {/* Model Prompt */}
                         <div className="bg-white/5 border border-white/10 rounded-xl p-4">
                           <div className="flex items-center justify-between mb-2">
-                            <p className="text-[10px] font-semibold tracking-widest text-white/30 uppercase">Model Prompt</p>
+                            <p className="text-[10px] font-semibold tracking-widest text-white/30 uppercase">π Model Prompt</p>
                             <button
                               onClick={() => copyToClipboard(product.content.modelPrompt, "model")}
                               className="text-[10px] text-white/40 hover:text-white transition"
@@ -312,26 +386,41 @@ export default function ProductClient({product}: {product: ShopProduct}) {
                             {product.content.modelPrompt}
                           </p>
                         </div>
+
+                        {/* 7-Tier Prompts */}
+                        <div className="bg-gradient-to-br from-[#c10002]/10 to-[#c10002]/5 border border-[#c10002]/20 rounded-xl p-4">
+                          <p className="text-[10px] font-semibold tracking-widest text-[#c10002] uppercase mb-3">7-Tier Mathematical Series</p>
+                          <div className="space-y-2 text-xs">
+                            {Object.entries(product.tieredPrompts).slice(0, 7).map(([key, prompt]) => (
+                              <div key={key} className="flex items-center justify-between">
+                                <span className="text-white/60 text-[10px] uppercase tracking-wide">{key.replace('level', 'T').replace('_', ' ')}</span>
+                                <button
+                                  onClick={() => copyToClipboard(prompt, key)}
+                                  className="text-[10px] text-[#c10002]/60 hover:text-[#c10002] transition"
+                                >
+                                  {copied === key ? "✓" : "Copy"}
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     )}
 
-                    <div className="flex items-center justify-between mt-2 px-1">
+                    <div className="flex items-center justify-between mt-3 px-1">
                       <p className="text-[10px] text-white/20">
-                        {user.email}
+                        Authenticated · φ Access
                       </p>
-                      <button onClick={logout} className="text-[10px] text-white/20 hover:text-white/50 transition">
-                        Sign out
+                      <button
+                        onClick={() => {
+                          setPromptAuthenticated(false)
+                          sessionStorage.removeItem(`rainskiss_prompt_auth_${product.slug}`)
+                        }}
+                        className="text-[10px] text-white/20 hover:text-white/50 transition"
+                      >
+                        Lock prompts
                       </button>
                     </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-2">
-                    <p className="text-xs text-white/30">
-                      {user.email} — not authorized
-                    </p>
-                    <button onClick={logout} className="text-[10px] text-white/20 hover:text-white/40 transition mt-1">
-                      Sign out
-                    </button>
                   </div>
                 )}
               </div>
