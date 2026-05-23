@@ -1,10 +1,10 @@
 # CLAUDE.md
 
-File provides guidance to Claude Code (claude.ai/code) when working with code in repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
 
-**rainskiss** is Next.js multimedia content platform for music, AI-powered creative tools, pose references. Integrates Firebase (auth, database, storage), Anthropic Claude API, Google Gemini.
+**rainskiss** is a Next.js multimedia content platform for music, AI-powered creative tools, and pose references. It integrates Firebase (auth, database, storage), Anthropic Claude API, and Google Gemini.
 
 ## Commands
 
@@ -15,7 +15,7 @@ bun start      # Start production server
 bun lint       # Run ESLint (next lint)
 ```
 
-No test suite configured. Use `ts-node` to run one-off TypeScript scripts (e.g., `src/api/` uploaders).
+No test suite is configured. Use `ts-node` to run one-off TypeScript scripts (e.g., `src/api/` uploaders).
 
 ## Environment Variables
 
@@ -41,18 +41,18 @@ Key routes:
 
 ### Auth Flow
 
-`AuthContextProvider` wraps root layout, provides Google OAuth state via Firebase. Consume with `useAuthContext()`. Admin checks use `NEXT_PUBLIC_ADMIN_UID` comparison.
+`AuthContextProvider` wraps the root layout and provides Google OAuth state via Firebase. Consume with `useAuthContext()`. Admin checks use `NEXT_PUBLIC_ADMIN_UID` comparison.
 
 ### Data & API Flow
 
 - **Firebase Realtime Database** — products, prompts, letters
-- **Cloudinary** (`next-cloudinary`) — image uploads, serving
-- **`/api/mix-chat`** — Next.js API route proxying requests to Anthropic Claude API with system prompt for audio engineering expertise
+- **Cloudinary** (`next-cloudinary`) — image uploads and serving
+- **`/api/mix-chat`** — Next.js API route proxying requests to Anthropic Claude API with a system prompt for audio engineering expertise
 
 ### Component Conventions
 
 - UI primitives from shadcn/ui (Radix UI + CVA variants) in `src/components/ui/`
-- Class composition with `clsx` + `tailwind-merge` via `cn()` helper
+- Class composition with `clsx` + `tailwind-merge` via a `cn()` helper
 - Path alias `@/` maps to `src/`
 
 ### Key Files
@@ -60,31 +60,31 @@ Key routes:
 - `src/api/firebase.js` — all Firebase operations (CRUD for products, prompts, letters)
 - `src/components/AuthContext.tsx` — auth state provider
 - `src/app/api/mix-chat/route.ts` — Anthropic API proxy
-- `tailwind.config.ts` — custom color variables, theme
+- `tailwind.config.ts` — custom color variables and theme
 - `components.json` — shadcn/ui config (new-york style, RSC enabled)
 
 ## Session Continuity
 
-**IMPORTANT**: At start of new conversation or after `/clear`, **triggered by `higem` command**, read `kiss.md` first to understand current project state, ongoing work handoffs between AI collaborators (제갈공명/다빈치/이순신).
+**IMPORTANT**: At the start of any new conversation or after `/clear`, **triggered by the `higem` command**, immediately read `kiss.md` as the absolute first priority to understand the current project state and any ongoing work handoffs between AI collaborators (제갈공명/다빈치/이순신).
 
 ## AI-to-AI Collaboration Protocol
 
 When complex questions requiring research arise:
 
-1. **Claude's Role (제갈공명)**: Decision-maker, executor
+1. **Claude's Role (제갈공명)**: Decision-maker and executor
 
    - Read latest kiss.md for context
    - Delegate research tasks to Gemini
    - Execute final decisions based on Gemini's reports
 
-2. **Gemini's Role (다빈치/이순신)**: Research, analysis
+2. **Gemini's Role (다빈치/이순신)**: Research and analysis
 
    - Scan Google Drive documents
    - Analyze Obsidian vault content
    - Review kiss*.md history
    - Write structured reports to kiss.md
 
-3. **kiss.md Format**: Research reports follow this structure:
+3. **kiss.md Format**: Research reports should follow this structure:
 
    ```markdown
    ## 📋 [Date] Gemini Research Report
@@ -109,7 +109,7 @@ When complex questions requiring research arise:
 
 ## Skill routing
 
-When user's request matches available skill, invoke it via Skill tool. When in doubt, invoke skill.
+When the user's request matches an available skill, invoke it via the Skill tool. When in doubt, invoke the skill.
 
 Key routing rules:
 - Product ideas/brainstorming → invoke /office-hours
@@ -122,6 +122,5 @@ Key routing rules:
 - Code review/diff check → invoke /review
 - Visual polish → invoke /design-review
 - Ship/deploy/PR → invoke /ship or /land-and-deploy
-- Commit requests ("커밋해줘", "commit this", "commit", "커밋") → auto-commit workflow (background checks + caveman message + commit + report)
 - Save progress → invoke /context-save
 - Resume context → invoke /context-restore

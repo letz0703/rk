@@ -18,9 +18,18 @@ echo "📥 Main Target: $MAIN_VAULT_PATH"
 mkdir -p "$MAIN_VAULT_PATH"
 
 # --delete 옵션을 유지하여 로컬에서 정리된 상태를 메인에 그대로 반영 (통합 전략)
-rsync -avz --delete \
+# Google Drive 스트리밍 지연 대응: 타임아웃 및 재시도 설정
+rsync -avz --delete --timeout=30 --contimeout=10 \
     --exclude ".obsidian/workspace*" \
     --exclude ".obsidian/cache*" \
+    --exclude ".DS_Store" \
     "$VAULT_PATH/" "$MAIN_VAULT_PATH/"
+
+if [ $? -ne 0 ]; then
+    echo "⚠️  일부 파일 전송 실패 (Google Drive 동기화 지연). 재시도 권장."
+    echo "🔄 수동 재실행: ./sync_gdrive.sh"
+else
+    echo "✅ 완벽 동기화 완료!"
+fi
 
 echo "✅ 메인 Vault로 전달 완료! 구글 드라이브를 통해 통합 저장됩니다."

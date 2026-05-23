@@ -109,6 +109,7 @@ export default function LookPage() {
   const [analysis, setAnalysis] = useState<DetailedAnalysis | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [isCreatingProduct, setIsCreatingProduct] = useState(false)
+  const [isGenerating7Stage, setIsGenerating7Stage] = useState(false)
   const [results, setResults] = useState<Array<{
     level: number
     focus: string
@@ -231,6 +232,84 @@ export default function LookPage() {
       alert("상품 생성 중 오류가 발생했습니다.")
     } finally {
       setIsCreatingProduct(false)
+    }
+  }
+
+  const generate7StageCollection = async () => {
+    if (!analysis) return
+
+    setIsGenerating7Stage(true)
+
+    try {
+      // rainskiss 스킬 7단계 모드로 패키지 생성
+      const stagePrompts = [
+        { level: 1, intensity: "단정함", price: 29.9 },
+        { level: 2, intensity: "우아함", price: 35.2 },
+        { level: 3, intensity: "매혹적", price: 42.1 },
+        { level: 4, intensity: "관능적", price: 50.8 },
+        { level: 5, intensity: "도발적", price: 61.6 },
+        { level: 6, intensity: "농염한", price: 74.9 },
+        { level: 7, intensity: "극상 관능미", price: 91.0 }
+      ]
+
+      const timestamp = new Date().toISOString().slice(0, 10)
+      const successCount = { total: 0 }
+
+      for (const stage of stagePrompts) {
+        const stageProduct = {
+          id: `stage${stage.level}-${Date.now()}-${stage.level}`,
+          title: `The 1.618 Collection - Stage ${stage.level}: ${stage.intensity}`,
+          category: "Mathematical Fashion",
+          subcategory: "7-Stage Series",
+          price: stage.price,
+          premiumPrice: stage.price * 1.618,
+          description: `${analysis.mathematicalRatios.description} [단계 ${stage.level}: ${stage.intensity}]`,
+          tags: [
+            "7-stage progression", `stage-${stage.level}`, stage.intensity,
+            "golden ratio", "pi mathematics", "divine proportion",
+            "progressive intensity", "mathematical beauty", "φ 1.618"
+          ],
+          prompts: {
+            english: `${analysis.finalPrompts[0].eng.replace(/masterpiece/g, `masterpiece stage ${stage.level} ${stage.intensity}`)}`,
+            korean: analysis.finalPrompts[0].kor,
+            alternative: analysis.finalPrompts[1]?.eng || ""
+          },
+          stageInfo: {
+            level: stage.level,
+            intensity: stage.intensity,
+            progression: `${stage.level}/7 stages complete`
+          },
+          mathematicalSpecs: {
+            goldenRatio: "φ (1.618) applied to hemline proportions",
+            piDynamics: "π circular flow in pose composition",
+            keplerTriangle: "1:√φ:φ geometric balance",
+            pentagonAngles: "36°/18° positioning for natural harmony"
+          },
+          technicalSpecs: {
+            camera: analysis.dslrModel.description,
+            lighting: analysis.lightTexture.description,
+            settings: analysis.dslrSettings.description,
+            angle: analysis.cameraAngle.description
+          },
+          createdAt: new Date().toISOString(),
+          featured: stage.level === 7, // 최고 단계만 featured
+          status: "active"
+        }
+
+        await addNewProduct(stageProduct)
+        successCount.total++
+
+        // 각 단계 생성 간 약간의 지연
+        await new Promise(resolve => setTimeout(resolve, 100))
+      }
+
+      alert(`🔥 7단계 컬렉션이 생성되었습니다!\n\n총 ${successCount.total}개 상품이 /shop에 등록되었습니다.\n\n단정함(1단계) → 극상 관능미(7단계)`)
+
+    } catch (error) {
+      console.error("7단계 컬렉션 생성 오류:", error)
+      alert("7단계 컬렉션 생성 중 오류가 발생했습니다.")
+    } finally {
+      setIsGenerating7Stage(false)
     }
   }
 
@@ -447,13 +526,22 @@ export default function LookPage() {
                   <span className="text-lg text-white uppercase tracking-[0.5em] font-black">
                     [상세 분석 보고서]
                   </span>
-                  <button
-                    onClick={createProductFromAnalysis}
-                    disabled={isCreatingProduct}
-                    className="bg-gradient-to-r from-yellow-500 to-orange-500 text-black px-8 py-4 text-sm font-black uppercase tracking-[0.3em] hover:from-yellow-400 hover:to-orange-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-2xl active:scale-[0.95]"
-                  >
-                    {isCreatingProduct ? "상품 생성 중..." : "🔥 바로 상품 생성"}
-                  </button>
+                  <div className="flex gap-4">
+                    <button
+                      onClick={createProductFromAnalysis}
+                      disabled={isCreatingProduct}
+                      className="bg-gradient-to-r from-yellow-500 to-orange-500 text-black px-8 py-4 text-sm font-black uppercase tracking-[0.3em] hover:from-yellow-400 hover:to-orange-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-2xl active:scale-[0.95]"
+                    >
+                      {isCreatingProduct ? "상품 생성 중..." : "🔥 바로 상품 생성"}
+                    </button>
+                    <button
+                      onClick={generate7StageCollection}
+                      disabled={isGenerating7Stage || isCreatingProduct}
+                      className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 text-sm font-black uppercase tracking-[0.3em] hover:from-purple-500 hover:to-pink-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-2xl active:scale-[0.95]"
+                    >
+                      {isGenerating7Stage ? "7단계 생성 중..." : "💎 7단계 컬렉션"}
+                    </button>
+                  </div>
                 </div>
                 <div className="grid gap-8 text-sm leading-relaxed text-zinc-400">
                   {Object.entries(analysis).map(([key, value]) => {

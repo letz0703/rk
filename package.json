@@ -11,7 +11,9 @@
     "start": "next start",
     "lint": "next lint",
     "sync-images": "bun scripts/sync-shop-images.ts",
-    "scan-images": "bun scripts/sync-shop-images.ts debug"
+    "scan-images": "bun scripts/sync-shop-images.ts debug",
+    "deploy": "bash scripts/deploy.sh",
+    "git-deploy": "bash scripts/git-deploy.sh"
   },
   "dependencies": {
     "@google/genai": "^1.21.0",
@@ -27,8 +29,6 @@
     "faiss-node": "^0.5.1",
     "firebase": "^10.12.4",
     "fuse.js": "^7.1.0",
-    "google-auth-library": "^10.6.2",
-    "google-spreadsheet": "^5.2.0",
     "langchain": "^1.3.0",
     "lucide-react": "^1.14.0",
     "next": "^15.5.5",

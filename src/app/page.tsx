@@ -25,21 +25,24 @@ export default function HomePage() {
             <p className="text-[#c10002] text-xs font-semibold tracking-[0.2em] uppercase mb-4">
               Mathematical Beauty · Divine Proportion
             </p>
-            <h1 className="text-6xl font-black tracking-tight leading-none mb-6">
+            <h1 className="text-6xl font-black tracking-tight leading-none mb-2">
               RAINSKISS
               <br />
               <span className="text-white/30">AI Fashion</span>
             </h1>
+            <p className="text-xs md:text-sm font-extralight uppercase tracking-[0.5em] text-white/40 mb-10">
+              LOOK & SOUND
+            </p>
           </div>
 
           {/* Links */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
+            {/*<Link
               href="/mix"
               className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold rounded-xl transition border border-white/20"
             >
               Mix Advisor
-            </Link>
+            </Link>*/}
           </div>
 
           {/* Hidden Shop Access */}
