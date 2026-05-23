@@ -185,11 +185,25 @@ export default function ShopPageContent() {
           </div>
         </div>
 
-        {/* 검색 결과 개수 */}
-        <div className="mb-6">
+        {/* 검색 결과 개수 & 상품 추가 */}
+        <div className="mb-6 flex justify-between items-center">
           <p className="text-white/40 text-sm">
             {filteredAndSortedProducts.length} prompts found
           </p>
+          {isAdmin && (
+            <button
+              onClick={() => {
+                const title = prompt("상품 제목을 입력하세요:")
+                if (title) {
+                  // TODO: 상품 추가 로직
+                  alert("상품 추가 기능은 준비 중입니다.")
+                }
+              }}
+              className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm rounded transition"
+            >
+              + 상품 추가
+            </button>
+          )}
         </div>
 
         {/* 상품 그리드 */}
@@ -301,35 +315,6 @@ export default function ShopPageContent() {
         </div>
       </div>
 
-      {/* 이메일 수집 섹션 */}
-      <section className="bg-white/5 border-t border-white/10 px-6 py-16">
-        <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight mb-3">
-            New drops, exclusive prompts
-          </h2>
-          <p className="text-white/60 mb-8">
-            Join the list and never miss a collection launch
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="flex-1 px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[#c10002] focus:border-transparent"
-            />
-            <button
-              type="submit"
-              className="bg-[#c10002] hover:bg-[#a00002] text-white font-bold px-6 py-3 rounded-xl transition duration-300"
-            >
-              Subscribe
-            </button>
-          </div>
-
-          <p className="text-white/40 text-xs mt-4">
-            No spam, unsubscribe anytime. New collections weekly.
-          </p>
-        </div>
-      </section>
     </div>
   )
 }

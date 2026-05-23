@@ -1,6 +1,6 @@
 import {NextRequest, NextResponse} from "next/server"
-import {writeFile, mkdir} from "fs/promises"
-import {join} from "path"
+import {storage} from "@/api/firebase"
+import {ref, uploadBytes, getDownloadURL} from "firebase/storage"
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,15 +16,16 @@ export async function POST(req: NextRequest) {
     }
 
     const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
+    const buffer = new Uint8Array(bytes)
     const ext = (file.name.split(".").pop() ?? "jpg").toLowerCase()
     const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
 
-    const dir = join(process.cwd(), "public", "shop", slug)
-    await mkdir(dir, {recursive: true})
-    await writeFile(join(dir, filename), buffer)
+    // Firebase Storage에 업로드
+    const storageRef = ref(storage, `shop/${slug}/${filename}`)
+    const snapshot = await uploadBytes(storageRef, buffer)
+    const downloadURL = await getDownloadURL(snapshot.ref)
 
-    return NextResponse.json({url: `/shop/${slug}/${filename}`})
+    return NextResponse.json({url: downloadURL})
   } catch (e) {
     console.error("[shop-upload]", e)
     return NextResponse.json({error: "upload failed"}, {status: 500})

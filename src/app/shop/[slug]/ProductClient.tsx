@@ -2,30 +2,34 @@
 
 import {useState, useEffect, useRef} from "react"
 import Image from "next/image"
-import Link from "next/link"
 import {database} from "@/api/firebase"
-import {ref, onValue, push, remove} from "firebase/database"
+import {ref, push, set, onValue, remove, get} from "firebase/database"
 import type {ShopProduct} from "@/data/shop-products"
-import AdaptiveGallery from "@/app/components/AdaptiveGallery"
 import {useAuthContext} from "@/components/context/AuthContext"
 
 type GalleryItem = {id: string; url: string}
 
 export default function ProductClient({product}: {product: ShopProduct}) {
-  const {user, isAdmin, login} = useAuthContext()
+  const {isAdmin, user} = useAuthContext()
 
-  // Debug info
-  console.log("Auth Debug:", { user: user?.email, isAdmin })
-  const [promptOpen, setPromptOpen] = useState(false)
+  // Hard prompt access restricted to specific admins
+  const isHardPromptAdmin = user?.email === 'rainskiss@gmail.com' || user?.email === 'icanmart@gmail.com'
+
+  // States
   const [copied, setCopied] = useState<string | null>(null)
-
-  // Prompt editing states
   const [editMode, setEditMode] = useState<{[key: string]: boolean}>({})
   const [editedPrompts, setEditedPrompts] = useState<{[key: string]: string}>({})
   const [saving, setSaving] = useState<string | null>(null)
+  const [blogNote, setBlogNote] = useState("")
+  const [editingBlog, setEditingBlog] = useState(false)
 
-  // Remove password protection - admin already checked by AuthGuard
-
+  // Gallery states
+  const [gallery, setGallery] = useState<GalleryItem[]>(
+    product.gallery.map((url, i) => ({id: `static-${i}`, url}))
+  )
+  const [dragging, setDragging] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const dropRef = useRef<HTMLDivElement>(null)
 
   function copyToClipboard(text: string, key: string) {
     navigator.clipboard.writeText(text)
@@ -43,412 +47,397 @@ export default function ProductClient({product}: {product: ShopProduct}) {
     delete newEditMode[key]
     setEditMode(newEditMode)
 
-    const newEditedPrompts = {...editedPrompts}
-    delete newEditedPrompts[key]
-    setEditedPrompts(newEditedPrompts)
+    // Don't clear editedPrompts on save - keep saved content for display
   }
 
   async function savePrompt(key: string) {
     if (!isAdmin) return
-
     setSaving(key)
     try {
-      await push(ref(database, `/shop/${product.slug}/prompts/${key}`), {
+      console.log("Saving prompt with user:", user?.email)
+      await set(ref(database, `/fashion-diary/${product.slug}/prompts/${key}`), {
         text: editedPrompts[key],
         timestamp: new Date().toISOString(),
         version: Date.now()
       })
-
-      // Exit edit mode
       cancelEdit(key)
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to save prompt:", error)
+      alert(`Save failed: ${error?.message || 'Unknown error'}`)
     } finally {
       setSaving(null)
     }
   }
 
-  const [gallery, setGallery] = useState<GalleryItem[]>(
-    product.gallery.map((url, i) => ({id: `static-${i}`, url}))
-  )
-  const [selected, setSelected] = useState(0)
-  const [dragging, setDragging] = useState(false)
-  const [uploading, setUploading] = useState(false)
-  const dropRef = useRef<HTMLDivElement>(null)
+  async function saveBlogNote() {
+    if (!isAdmin) return
+    try {
+      console.log("Saving blog note with user:", user?.email)
+      await set(ref(database, `/fashion-diary/${product.slug}/blog`), {
+        content: blogNote,
+        timestamp: new Date().toISOString()
+      })
+      setEditingBlog(false)
+    } catch (error: any) {
+      console.error("Failed to save blog note:", error)
+      alert(`Save failed: ${error?.message || 'Unknown error'}`)
+    }
+  }
 
-  // Firebase에서 갤러리 실시간 로드
+  // Load saved data from Firebase
   useEffect(() => {
-    const dbRef = ref(database, `/shop/${product.slug}/gallery`)
-    const unsub = onValue(dbRef, snap => {
-      if (!snap.exists()) return
-      const data = snap.val() as Record<string, {url: string}>
-      const items = Object.entries(data).map(([id, v]) => ({id, url: v.url}))
-      setGallery(items)
-    })
-    return () => unsub()
-  }, [product.slug])
+    if (!user?.email || !isAdmin) return
+
+    console.log("Loading data for admin user:", user.email, "UID:", user.uid)
+
+    // Load blog note
+    const blogRef = ref(database, `/fashion-diary/${product.slug}/blog`)
+    get(blogRef).then(snap => {
+      if (snap.exists()) {
+        const data = snap.val()
+        console.log("Loaded blog data:", data)
+        setBlogNote(data.content || "")
+      } else {
+        console.log("No blog data found")
+      }
+    }).catch((error: any) => console.error("Blog load error:", error))
+
+    // Load saved prompts
+    const promptsRef = ref(database, `/fashion-diary/${product.slug}/prompts`)
+    get(promptsRef).then(snap => {
+      if (snap.exists()) {
+        const data = snap.val()
+        console.log("Loaded prompts data:", data)
+        const prompts: {[key: string]: string} = {}
+        Object.entries(data).forEach(([key, value]: [string, any]) => {
+          prompts[key] = value.text || ""
+        })
+        setEditedPrompts(prompts)
+      } else {
+        console.log("No prompts data found")
+      }
+    }).catch((error: any) => console.error("Prompts load error:", error))
+  }, [product.slug, user?.email, isAdmin])
 
   async function uploadFiles(files: FileList | File[]) {
+    if (!isAdmin) return
     setUploading(true)
     for (const file of Array.from(files)) {
       if (!file.type.startsWith("image/")) continue
       const form = new FormData()
       form.append("file", file)
       form.append("slug", product.slug)
-      const res = await fetch("/api/shop-upload", {method: "POST", body: form})
-      if (res.ok) {
-        const {url} = await res.json()
-        await push(ref(database, `/shop/${product.slug}/gallery`), {url})
+      try {
+        const res = await fetch("/api/shop-upload", {method: "POST", body: form})
+        if (res.ok) {
+          const {url} = await res.json()
+          // Firebase Storage URL로 갤러리에 추가
+          await push(ref(database, `/fashion-diary/${product.slug}/gallery`), {url})
+        }
+      } catch (error) {
+        console.error("Upload failed:", error)
       }
     }
     setUploading(false)
   }
 
   async function deleteImage(item: GalleryItem) {
-    if (item.id.startsWith("static-")) return
-    await remove(ref(database, `/shop/${product.slug}/gallery/${item.id}`))
-    setSelected(0)
+    if (!isAdmin || item.id.startsWith("static-")) return
+    // Firebase 제거 대신 로컬 state에서만 제거
+    setGallery(prev => prev.filter(g => g.id !== item.id))
+  }
+
+  function handleDragOver(e: React.DragEvent) {
+    e.preventDefault()
+    setDragging(true)
+  }
+
+  function handleDragLeave(e: React.DragEvent) {
+    e.preventDefault()
+    setDragging(false)
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault()
+    setDragging(false)
+    const files = e.dataTransfer.files
+    if (files.length > 0) uploadFiles(files)
   }
 
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files
     if (files && files.length > 0) {
       uploadFiles(files)
-      e.target.value = '' // Reset input
+      e.target.value = ''
     }
   }
 
-  function onDragOver(e: React.DragEvent) {
-    e.preventDefault()
-    setDragging(true)
-  }
-  function onDragLeave() {
-    setDragging(false)
-  }
-  function onDrop(e: React.DragEvent) {
-    e.preventDefault()
-    setDragging(false)
-    if (e.dataTransfer.files.length) uploadFiles(e.dataTransfer.files)
-  }
-
-  const currentImage = gallery[selected]?.url ?? product.previewImage
-
   return (
-    <div className="min-h-screen bg-[#0e0e0e] text-white">
-      <div className="max-w-5xl mx-auto px-6 py-14">
-        <Link
-          href="/shop"
-          className="text-sm text-white/30 hover:text-white/60 transition mb-8 inline-block"
-        >
-          ← Back to Shop
-        </Link>
+    <div className="bg-[#0e0e0e] text-white min-h-screen">
+      <div className="max-w-4xl mx-auto px-6 py-8">
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-4">
-          {/* 갤러리 */}
-          <div className="flex flex-col gap-3">
-            {/* 메인 이미지 + 드래그드롭 영역 */}
-            <div
-              ref={dropRef}
-              onDragOver={onDragOver}
-              onDragLeave={onDragLeave}
-              onDrop={onDrop}
-              className={`relative w-full aspect-[3/4] rounded-2xl overflow-hidden bg-white/5 transition ${
-                dragging ? "ring-2 ring-[#c10002] ring-offset-2 ring-offset-[#0e0e0e]" : ""
-              }`}
-            >
-              <Image
-                src={currentImage}
-                alt={product.title.en}
-                fill
-                className="object-cover object-top transition duration-500"
-                priority
-              />
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-white mb-2">
+            {product.title.en}
+          </h1>
+          <p className="text-white/60 italic">
+            {product.tagline.en}
+          </p>
+        </div>
 
-              {/* 드래그 오버레이 */}
-              {dragging && (
-                <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10">
-                  <p className="text-white font-bold text-lg">Drop to upload</p>
-                </div>
-              )}
-
-              {/* 업로드 중 */}
-              {uploading && (
-                <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10">
-                  <p className="text-white text-sm animate-pulse">Uploading...</p>
-                </div>
-              )}
-
-              {/* 파일 업로드 */}
-              {!dragging && !uploading && (
-                <div className="absolute top-3 right-3 z-10 flex flex-col gap-2">
-                  <span className="text-[10px] bg-white/10 text-white/50 px-2 py-1 rounded-full">
-                    drag to add
-                  </span>
-                  <label className="cursor-pointer">
-                    <span className="text-[10px] bg-[#c10002] text-white px-2 py-1 rounded-full hover:bg-[#a00001] transition">
-                      choose files
-                    </span>
-                    <input
-                      type="file"
-                      multiple
-                      accept="image/*"
-                      onChange={handleFileSelect}
-                      className="hidden"
-                    />
-                  </label>
-                </div>
-              )}
-
-              {/* 삭제 버튼 */}
-              {currentImage && !gallery[selected]?.id.startsWith("static-") && (
+        {/* Personal Research Note (Blog Post Style) */}
+        {isAdmin && (
+          <div className="bg-white/5 border border-white/10 rounded-xl p-6 mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-white">연구 노트</h2>
+              {!editingBlog && (
                 <button
-                  onClick={() => deleteImage(gallery[selected])}
-                  className="absolute bottom-3 right-3 z-10 text-xs bg-black/60 text-white/60 hover:text-red-400 px-2 py-1 rounded-full transition"
+                  onClick={() => setEditingBlog(true)}
+                  className="text-sm text-blue-400 hover:text-blue-300 transition"
                 >
-                  Delete
+                  편집
                 </button>
               )}
+            </div>
 
-              <div className="absolute bottom-3 left-3">
-                <span className="text-[10px] font-bold tracking-widest text-white/30 uppercase">
-                  Flow Preview
-                </span>
+            {editingBlog ? (
+              <div className="space-y-3">
+                <textarea
+                  value={blogNote}
+                  onChange={(e) => setBlogNote(e.target.value)}
+                  placeholder="이 의상에 대한 연구 내용, 아이디어, 참고 링크 등을 자유롭게 작성하세요..."
+                  className="w-full h-32 px-3 py-2 bg-white/10 border border-white/20 rounded text-white placeholder-white/40 resize-none focus:outline-none focus:ring-1 focus:ring-blue-400"
+                />
+                <div className="flex gap-2">
+                  <button
+                    onClick={saveBlogNote}
+                    className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm rounded transition"
+                  >
+                    저장
+                  </button>
+                  <button
+                    onClick={() => setEditingBlog(false)}
+                    className="px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white text-sm rounded transition"
+                  >
+                    취소
+                  </button>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="text-white/70 whitespace-pre-wrap">
+                {blogNote || "연구 노트가 비어있습니다. 편집 버튼을 눌러 내용을 추가하세요."}
+              </div>
+            )}
+          </div>
+        )}
 
-            {/* 썸네일 */}
-            <div className="flex gap-2 flex-wrap">
-              {gallery.map((item, i) => (
-                <button
-                  key={item.id}
-                  onClick={() => setSelected(i)}
-                  className={`relative w-20 h-20 rounded-xl overflow-hidden border-2 transition flex-shrink-0 ${
-                    selected === i
-                      ? "border-[#c10002]"
-                      : "border-white/10 hover:border-white/30"
-                  }`}
-                >
-                  <Image
-                    src={item.url}
-                    alt=""
-                    fill
-                    className="object-cover object-top"
-                  />
-                </button>
-              ))}
-            </div>
+        {/* Image Gallery */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-semibold text-white">갤러리</h3>
+            {isAdmin && (
+              <label className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded cursor-pointer transition">
+                이미지 추가
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+              </label>
+            )}
           </div>
 
-          {/* 상품 정보 */}
-          <div className="flex flex-col gap-6">
-            <div>
-              <p className="text-[10px] font-semibold tracking-widest text-white/25 uppercase mb-3">
-                AI Clothing Prompt · Erotic Edition
-              </p>
-              <h1 className="text-3xl font-extrabold text-white leading-tight mb-2">
-                {product.title.en}
-              </h1>
-              <p className="text-white/40 text-sm italic mb-5">
-                {product.tagline.en}
-              </p>
-              <p className="text-white/60 text-sm leading-7">
-                {product.description.en}
-              </p>
-            </div>
-
-            {/* 코디 팁 */}
-            <div className="bg-white/5 border border-white/10 rounded-xl p-5">
-              <p className="text-xs font-semibold tracking-widest text-white/30 uppercase mb-3">
-                Styling Tips
-              </p>
-              <ul className="space-y-2">
-                {product.stylingTipsLang.en.map((tip, i) => (
-                  <li key={i} className="text-sm text-white/60 flex gap-2">
-                    <span className="text-[#c10002] mt-0.5 flex-shrink-0">›</span>
-                    {tip}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* 패키지 구성 */}
-            <div className="bg-white/5 border border-white/10 rounded-xl p-5">
-              <p className="text-xs font-semibold tracking-widest text-white/30 uppercase mb-3">
-                Package includes
-              </p>
-              <ul className="space-y-1.5">
-                {[
-                  "✦ Full Grok prompt (erotic version)",
-                  "✦ Flow & Grok image gallery",
-                  "✦ Styling & coordinator notes",
-                  "✦ NotebookLM fashion slides",
-                ].map((item, i) => (
-                  <li key={i} className="text-sm text-white/60">{item}</li>
-                ))}
-              </ul>
-            </div>
-
-            {/* 구매 */}
-            <div id="purchase">
-              <p className="text-4xl font-extrabold text-white mb-4">
-                {product.price}
-              </p>
-
-              <div className="space-y-3">
-                {/* DeviantArt 구매 버튼 */}
-                <a
-                  href={product.content.slideshowUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full bg-[#c10002] hover:bg-[#a00002] text-white font-bold py-4 px-6 rounded-2xl transition duration-300 text-center block"
-                >
-                  🛒 Buy Now on DeviantArt
-                </a>
-
-                {/* 무료 미리보기 안내 */}
-                <div className="text-center pt-2">
-                  <p className="text-xs text-white/40 mb-1">
-                    Free Flow previews available on
-                  </p>
-                  <a
-                    href="https://deviantart.com/rainskiss-x"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-white/60 hover:text-white transition underline"
+          <div
+            ref={dropRef}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            className={`grid grid-cols-2 gap-4 transition-colors ${
+              dragging && isAdmin ? 'bg-blue-500/10 border-2 border-dashed border-blue-500' : ''
+            } ${isAdmin ? 'p-4 rounded-lg' : ''}`}
+          >
+            {gallery.map((item, i) => (
+              <div key={item.id} className="relative aspect-[4/5] rounded-lg overflow-hidden group">
+                <Image
+                  src={item.url}
+                  alt={`${product.title.en} ${i + 1}`}
+                  fill
+                  className="object-cover"
+                />
+                {isAdmin && !item.id.startsWith('static-') && (
+                  <button
+                    onClick={() => deleteImage(item)}
+                    className="absolute top-2 right-2 w-6 h-6 bg-red-600 hover:bg-red-700 text-white rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition"
                   >
-                    DeviantArt / rainskiss-x ↗
-                  </a>
+                    ×
+                  </button>
+                )}
+              </div>
+            ))}
+
+            {isAdmin && gallery.length === 0 && (
+              <div className="col-span-2 border-2 border-dashed border-white/20 rounded-lg p-8 text-center text-white/40">
+                <p>이미지를 드래그 앤 드롭하거나 위의 버튼으로 추가하세요</p>
+              </div>
+            )}
+          </div>
+
+          {uploading && (
+            <div className="mt-2 text-center text-blue-400 text-sm">
+              업로드 중...
+            </div>
+          )}
+        </div>
+
+        {/* Prompt Research Section */}
+        {isAdmin && (
+          <div className="space-y-6">
+            <h3 className="text-xl font-semibold text-white">프롬프트 연구</h3>
+
+            {/* Soft Prompt */}
+            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="font-semibold text-green-400">SOFT Prompt</h4>
+                <div className="flex gap-2">
+                  {!editMode.soft && (
+                    <button
+                      onClick={() => startEdit("soft", product.content.clothingPrompt)}
+                      className="text-sm text-blue-400 hover:text-blue-300 transition"
+                    >
+                      편집
+                    </button>
+                  )}
+                  <button
+                    onClick={() => copyToClipboard(editedPrompts.soft || product.content.clothingPrompt, "soft")}
+                    className="text-sm text-white/40 hover:text-white transition"
+                  >
+                    {copied === "soft" ? "복사됨 ✓" : "복사"}
+                  </button>
                 </div>
               </div>
 
-              {/* 프롬프트 섹션 */}
-              <div className="border-t border-white/10 pt-5">
-                <button
-                  onClick={() => setPromptOpen(p => !p)}
-                  className="w-full flex items-center justify-between py-2.5 px-4 rounded-xl border border-[#c10002]/40 bg-[#c10002]/10 hover:bg-[#c10002]/20 text-white text-sm font-medium transition"
-                >
-                  <span>Prompts (Soft/Hard)</span>
-                  <span className="text-white/40 text-xs">{promptOpen ? "▲" : "▼"}</span>
-                </button>
-
-                {promptOpen && (
-                  <div className="mt-3 space-y-3">
-                    {/* Soft Prompt - Everyone can see */}
-                    <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <p className="text-[10px] font-semibold tracking-widest text-green-400 uppercase">SOFT Prompt (Public)</p>
-                        <div className="flex gap-2">
-                          {isAdmin && !editMode.soft && (
-                            <button
-                              onClick={() => startEdit("soft", product.content.clothingPrompt)}
-                              className="text-[10px] text-blue-400 hover:text-blue-300 transition"
-                            >
-                              Edit
-                            </button>
-                          )}
-                          <button
-                            onClick={() => copyToClipboard(editedPrompts.soft || product.content.clothingPrompt, "soft")}
-                            className="text-[10px] text-white/40 hover:text-white transition"
-                          >
-                            {copied === "soft" ? "Copied ✓" : "Copy"}
-                          </button>
-                        </div>
-                      </div>
-                      {editMode.soft ? (
-                        <div className="space-y-2">
-                          <textarea
-                            value={editedPrompts.soft || ""}
-                            onChange={(e) => setEditedPrompts({...editedPrompts, soft: e.target.value})}
-                            className="w-full h-32 px-2 py-1 bg-white/10 border border-white/20 rounded text-xs text-white font-mono resize-none focus:outline-none focus:ring-1 focus:ring-blue-400"
-                          />
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => savePrompt("soft")}
-                              disabled={saving === "soft"}
-                              className="px-3 py-1 bg-green-600 hover:bg-green-500 disabled:bg-green-800 text-white text-xs rounded transition"
-                            >
-                              {saving === "soft" ? "Saving..." : "Save"}
-                            </button>
-                            <button
-                              onClick={() => cancelEdit("soft")}
-                              className="px-3 py-1 bg-gray-600 hover:bg-gray-500 text-white text-xs rounded transition"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        <p className="text-xs text-white/70 leading-relaxed font-mono">
-                          {editedPrompts.soft || product.content.clothingPrompt}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Hard Prompt - Admin Only */}
-                    {isAdmin && (
-                      <div className="bg-gradient-to-br from-red-900/20 to-red-800/10 border border-red-600/30 rounded-xl p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <p className="text-[10px] font-semibold tracking-widest text-red-400 uppercase">HARD Prompt (Admin Only)</p>
-                          <div className="flex gap-2">
-                            {!editMode.hard && (
-                              <button
-                                onClick={() => startEdit("hard", Object.entries(product.tieredPrompts).slice(0, 7).map(([key, prompt]) => `${key}: ${prompt}`).join('\n\n'))}
-                                className="text-[10px] text-blue-400 hover:text-blue-300 transition"
-                              >
-                                Edit
-                              </button>
-                            )}
-                            <button
-                              onClick={() => copyToClipboard(editedPrompts.hard || Object.entries(product.tieredPrompts).slice(0, 7).map(([key, prompt]) => `${key}: ${prompt}`).join('\n\n'), "hard")}
-                              className="text-[10px] text-red-400/60 hover:text-red-400 transition"
-                            >
-                              {copied === "hard" ? "Copied ✓" : "Copy"}
-                            </button>
-                          </div>
-                        </div>
-                        {editMode.hard ? (
-                          <div className="space-y-2">
-                            <textarea
-                              value={editedPrompts.hard || ""}
-                              onChange={(e) => setEditedPrompts({...editedPrompts, hard: e.target.value})}
-                              className="w-full h-48 px-2 py-1 bg-white/10 border border-white/20 rounded text-xs text-white font-mono resize-none focus:outline-none focus:ring-1 focus:ring-blue-400"
-                              placeholder="level1_clothing: prompt text here&#10;&#10;level2_background: prompt text here&#10;..."
-                            />
-                            <div className="flex gap-2">
-                              <button
-                                onClick={() => savePrompt("hard")}
-                                disabled={saving === "hard"}
-                                className="px-3 py-1 bg-green-600 hover:bg-green-500 disabled:bg-green-800 text-white text-xs rounded transition"
-                              >
-                                {saving === "hard" ? "Saving..." : "Save"}
-                              </button>
-                              <button
-                                onClick={() => cancelEdit("hard")}
-                                className="px-3 py-1 bg-gray-600 hover:bg-gray-500 text-white text-xs rounded transition"
-                              >
-                                Cancel
-                              </button>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="text-xs text-white/70 leading-relaxed font-mono whitespace-pre-wrap">
-                            {editedPrompts.hard || Object.entries(product.tieredPrompts).slice(0, 7).map(([key, prompt]) => `${key}: ${prompt}`).join('\n\n')}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                      </div>
-                    )}
-
+              {editMode.soft ? (
+                <div className="space-y-3">
+                  <textarea
+                    value={editedPrompts.soft || ""}
+                    onChange={(e) => setEditedPrompts({...editedPrompts, soft: e.target.value})}
+                    className="w-full h-24 px-3 py-2 bg-white/10 border border-white/20 rounded text-white font-mono resize-none focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => savePrompt("soft")}
+                      disabled={saving === "soft"}
+                      className="px-3 py-1 bg-green-600 hover:bg-green-500 disabled:bg-green-800 text-white text-xs rounded transition"
+                    >
+                      {saving === "soft" ? "저장중..." : "저장"}
+                    </button>
+                    <button
+                      onClick={() => cancelEdit("soft")}
+                      className="px-3 py-1 bg-gray-600 hover:bg-gray-500 text-white text-xs rounded transition"
+                    >
+                      취소
+                    </button>
                   </div>
-                )
-              </div>
-
+                </div>
+              ) : (
+                <div className="text-sm text-white/70 font-mono leading-relaxed whitespace-pre-wrap">
+                  {editedPrompts.soft || product.content.clothingPrompt}
+                </div>
+              )}
             </div>
+
+            {/* Hard Prompt - Admin Only */}
+            {isHardPromptAdmin && (
+              <div className="bg-gradient-to-br from-red-900/20 to-red-800/10 border border-red-600/30 rounded-xl p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="font-semibold text-red-400">HARD Prompt</h4>
+                  <div className="flex gap-2">
+                    {!editMode.hard && (
+                      <button
+                        onClick={() => startEdit("hard", Object.entries(product.tieredPrompts).slice(0, 7).map(([key, prompt]) => `${key}: ${prompt}`).join('\n\n'))}
+                        className="text-sm text-blue-400 hover:text-blue-300 transition"
+                      >
+                        편집
+                      </button>
+                    )}
+                    <button
+                      onClick={() => copyToClipboard(editedPrompts.hard || Object.entries(product.tieredPrompts).slice(0, 7).map(([key, prompt]) => `${key}: ${prompt}`).join('\n\n'), "hard")}
+                      className="text-sm text-red-400/60 hover:text-red-400 transition"
+                    >
+                      {copied === "hard" ? "복사됨 ✓" : "복사"}
+                    </button>
+                  </div>
+                </div>
+
+                {editMode.hard ? (
+                  <div className="space-y-3">
+                    <textarea
+                      value={editedPrompts.hard || ""}
+                      onChange={(e) => setEditedPrompts({...editedPrompts, hard: e.target.value})}
+                      className="w-full h-32 px-3 py-2 bg-white/10 border border-white/20 rounded text-white font-mono resize-none focus:outline-none focus:ring-1 focus:ring-blue-400"
+                      placeholder="level1_clothing: prompt text here&#10;&#10;level2_background: prompt text here&#10;..."
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => savePrompt("hard")}
+                        disabled={saving === "hard"}
+                        className="px-3 py-1 bg-green-600 hover:bg-green-500 disabled:bg-green-800 text-white text-xs rounded transition"
+                      >
+                        {saving === "hard" ? "저장중..." : "저장"}
+                      </button>
+                      <button
+                        onClick={() => cancelEdit("hard")}
+                        className="px-3 py-1 bg-gray-600 hover:bg-gray-500 text-white text-xs rounded transition"
+                      >
+                        취소
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-sm text-white/70 font-mono leading-relaxed whitespace-pre-wrap">
+                    {editedPrompts.hard || Object.entries(product.tieredPrompts).slice(0, 7).map(([key, prompt]) => `${key}: ${prompt}`).join('\n\n')}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* External Links */}
+        <div className="mt-8 pt-6 border-t border-white/10">
+          <h3 className="text-lg font-semibold text-white mb-4">관련 링크</h3>
+          <div className="flex gap-3">
+            <a
+              href={product.content.slideshowUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 bg-[#c10002] hover:bg-[#a00002] text-white font-medium rounded-lg transition"
+            >
+              DeviantArt에서 보기
+            </a>
+            <button
+              onClick={() => copyToClipboard(window.location.href, "page-url")}
+              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white font-medium rounded-lg transition"
+            >
+              {copied === "page-url" ? "복사됨 ✓" : "페이지 링크 복사"}
+            </button>
           </div>
         </div>
+
+        {/* Back to Gallery */}
+        <div className="mt-8 text-center">
+          <a
+            href="/shop"
+            className="text-white/60 hover:text-white transition text-sm"
+          >
+            ← 갤러리로 돌아가기
+          </a>
+        </div>
+
       </div>
-      <AdaptiveGallery images={gallery.map((g) => g.url)} ctaHref="#purchase" />
     </div>
   )
 }
