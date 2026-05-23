@@ -4,6 +4,7 @@ import {useState, useEffect, useMemo} from "react"
 import Link from "next/link"
 import Image from "next/image"
 import {useRouter, useSearchParams} from "next/navigation"
+import {useAuthContext} from "@/components/context/AuthContext"
 import {
   shopProducts,
   type Category,
@@ -26,6 +27,7 @@ type SortOption = "newest" | "popular"
 export default function ShopPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const {isAdmin} = useAuthContext()
 
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "")
   const [selectedCategory, setSelectedCategory] = useState<Category | "all">(
@@ -33,32 +35,13 @@ export default function ShopPageContent() {
   )
   const [sortBy, setSortBy] = useState<SortOption>("newest")
 
-  // Password protection
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [passwordInput, setPasswordInput] = useState("")
-  const [passwordError, setPasswordError] = useState(false)
-
-  const SHOP_PASSWORD = "oz" // Member access password
-
-  const handlePasswordSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (passwordInput === SHOP_PASSWORD) {
-      setIsAuthenticated(true)
-      setPasswordError(false)
-      localStorage.setItem("rainskiss_shop_auth", "true")
-    } else {
-      setPasswordError(true)
-      setTimeout(() => setPasswordError(false), 2000)
+  // Delete product function
+  const deleteProduct = (slug: string) => {
+    if (confirm(`Delete product "${slug}"?`)) {
+      // TODO: Remove from Firebase and update local state
+      console.log("Delete product:", slug)
     }
   }
-
-  // Check localStorage for previous auth
-  useEffect(() => {
-    const stored = localStorage.getItem("rainskiss_shop_auth")
-    if (stored === "true") {
-      setIsAuthenticated(true)
-    }
-  }, [])
 
   // URL 파라미터 동기화
   useEffect(() => {
@@ -123,56 +106,6 @@ export default function ShopPageContent() {
     return filtered
   }, [searchQuery, selectedCategory, sortBy])
 
-  // Password protection screen
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-[#0e0e0e] text-white flex items-center justify-center">
-        <div className="max-w-md w-full mx-auto px-6">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-black tracking-tight mb-2">
-              THE 1.618 COLLECTION
-            </h1>
-            <p className="text-white/40 text-sm">
-              Mathematical Fashion · Private Collection
-            </p>
-          </div>
-
-          <form onSubmit={handlePasswordSubmit} className="space-y-4">
-            <div>
-              <input
-                type="password"
-                placeholder="Access Code"
-                value={passwordInput}
-                onChange={(e) => setPasswordInput(e.target.value)}
-                className={`w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 transition text-center tracking-[0.3em] ${
-                  passwordError ? 'focus:ring-red-500 border-red-500' : 'focus:ring-[#c10002]'
-                }`}
-                autoFocus
-              />
-              {passwordError && (
-                <p className="text-red-400 text-xs mt-2 text-center animate-pulse">
-                  Invalid access code
-                </p>
-              )}
-            </div>
-
-            <button
-              type="submit"
-              className="w-full px-4 py-3 bg-[#c10002] hover:bg-[#a00001] text-white font-semibold rounded-xl transition tracking-wider"
-            >
-              ENTER
-            </button>
-          </form>
-
-          <div className="mt-8 text-center">
-            <p className="text-white/20 text-xs">
-              Available on DeviantArt for authorized users
-            </p>
-          </div>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="min-h-screen bg-[#0e0e0e] text-white">
@@ -263,46 +196,60 @@ export default function ShopPageContent() {
         {filteredAndSortedProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {filteredAndSortedProducts.map(product => (
-              <Link
+              <div
                 key={product.slug}
-                href={`/shop/${product.slug}`}
-                className="group block bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-white/20 transition duration-300"
+                className="group bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-white/20 transition duration-300 relative"
               >
-                <div className="relative w-full aspect-[4/5] bg-white/5">
-                  <Image
-                    src={product.previewImage}
-                    alt={product.title.en}
-                    fill
-                    className="object-cover group-hover:scale-105 transition duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-4">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs px-2 py-1 rounded-full bg-white/20 text-white/70">
-                        {product.category}
-                      </span>
-                      <span className="text-xs text-white/40 uppercase tracking-wide">
-                        Flow Preview
-                      </span>
-                    </div>
-                    <h2 className="text-lg font-bold text-white leading-tight mb-1">
-                      {product.title.en}
-                    </h2>
-                    <p className="text-white/60 text-sm line-clamp-2">
-                      {product.tagline.en}
-                    </p>
-                  </div>
-                </div>
-                <div className="p-4 flex items-center justify-between">
-                  <span className="text-white/40 text-sm">Get Prompt</span>
-                  <span
-                    className="text-sm font-bold px-3 py-1 rounded-full text-white"
-                    style={{backgroundColor: "#c10002"}}
+                {/* Admin Delete Button */}
+                {isAdmin && (
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault()
+                      deleteProduct(product.slug)
+                    }}
+                    className="absolute top-2 right-2 z-10 w-6 h-6 bg-red-600 hover:bg-red-700 text-white rounded-full flex items-center justify-center text-xs transition opacity-0 group-hover:opacity-100"
                   >
-                    {product.price}
-                  </span>
-                </div>
-              </Link>
+                    ×
+                  </button>
+                )}
+
+                <Link href={`/shop/${product.slug}`} className="block">
+                  <div className="relative w-full aspect-[4/5] bg-white/5">
+                    <Image
+                      src={product.previewImage}
+                      alt={product.title.en}
+                      fill
+                      className="object-cover group-hover:scale-105 transition duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-4">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs px-2 py-1 rounded-full bg-white/20 text-white/70">
+                          {product.category}
+                        </span>
+                        <span className="text-xs text-white/40 uppercase tracking-wide">
+                          Flow Preview
+                        </span>
+                      </div>
+                      <h2 className="text-lg font-bold text-white leading-tight mb-1">
+                        {product.title.en}
+                      </h2>
+                      <p className="text-white/60 text-sm line-clamp-2">
+                        {product.tagline.en}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="p-4 flex items-center justify-between">
+                    <span className="text-white/40 text-sm">Get Prompt</span>
+                    <span
+                      className="text-sm font-bold px-3 py-1 rounded-full text-white"
+                      style={{backgroundColor: "#c10002"}}
+                    >
+                      {product.price}
+                    </span>
+                  </div>
+                </Link>
+              </div>
             ))}
           </div>
         ) : (

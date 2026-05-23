@@ -1,5 +1,5 @@
 import {notFound} from "next/navigation"
-import AgeGate from "@/components/AgeGate"
+import AuthGuard from "@/components/AuthGuard"
 import ProductClient from "./ProductClient"
 import {getProduct} from "@/data/shop-products"
 
@@ -13,8 +13,8 @@ export default async function ProductPage({
   if (!product) notFound()
 
   return (
-    <AgeGate>
+    <AuthGuard>
       <ProductClient product={product} />
-    </AgeGate>
+    </AuthGuard>
   )
 }

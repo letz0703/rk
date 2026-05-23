@@ -7,47 +7,65 @@ import {database} from "@/api/firebase"
 import {ref, onValue, push, remove} from "firebase/database"
 import type {ShopProduct} from "@/data/shop-products"
 import AdaptiveGallery from "@/app/components/AdaptiveGallery"
-// Removed auth imports
+import {useAuthContext} from "@/components/context/AuthContext"
 
 type GalleryItem = {id: string; url: string}
 
 export default function ProductClient({product}: {product: ShopProduct}) {
-  // Removed auth - everyone can access all features now
-  const isAdmin = true // Always allow admin features
+  const {user, isAdmin, login} = useAuthContext()
+
+  // Debug info
+  console.log("Auth Debug:", { user: user?.email, isAdmin })
   const [promptOpen, setPromptOpen] = useState(false)
   const [copied, setCopied] = useState<string | null>(null)
 
-  // Prompt password protection
-  const [promptAuthenticated, setPromptAuthenticated] = useState(false)
-  const [promptPasswordInput, setPromptPasswordInput] = useState("")
-  const [promptPasswordError, setPromptPasswordError] = useState(false)
+  // Prompt editing states
+  const [editMode, setEditMode] = useState<{[key: string]: boolean}>({})
+  const [editedPrompts, setEditedPrompts] = useState<{[key: string]: string}>({})
+  const [saving, setSaving] = useState<string | null>(null)
 
-  const PROMPT_PASSWORD = "phi" // Simple phi password for prompts
+  // Remove password protection - admin already checked by AuthGuard
 
-  const handlePromptPasswordSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (promptPasswordInput === PROMPT_PASSWORD) {
-      setPromptAuthenticated(true)
-      setPromptPasswordError(false)
-      sessionStorage.setItem(`rainskiss_prompt_auth_${product.slug}`, "true")
-    } else {
-      setPromptPasswordError(true)
-      setTimeout(() => setPromptPasswordError(false), 2000)
-    }
-  }
-
-  // Check sessionStorage for previous prompt auth
-  useEffect(() => {
-    const stored = sessionStorage.getItem(`rainskiss_prompt_auth_${product.slug}`)
-    if (stored === "true") {
-      setPromptAuthenticated(true)
-    }
-  }, [product.slug])
 
   function copyToClipboard(text: string, key: string) {
     navigator.clipboard.writeText(text)
     setCopied(key)
     setTimeout(() => setCopied(null), 2000)
+  }
+
+  function startEdit(key: string, currentText: string) {
+    setEditMode({...editMode, [key]: true})
+    setEditedPrompts({...editedPrompts, [key]: currentText})
+  }
+
+  function cancelEdit(key: string) {
+    const newEditMode = {...editMode}
+    delete newEditMode[key]
+    setEditMode(newEditMode)
+
+    const newEditedPrompts = {...editedPrompts}
+    delete newEditedPrompts[key]
+    setEditedPrompts(newEditedPrompts)
+  }
+
+  async function savePrompt(key: string) {
+    if (!isAdmin) return
+
+    setSaving(key)
+    try {
+      await push(ref(database, `/shop/${product.slug}/prompts/${key}`), {
+        text: editedPrompts[key],
+        timestamp: new Date().toISOString(),
+        version: Date.now()
+      })
+
+      // Exit edit mode
+      cancelEdit(key)
+    } catch (error) {
+      console.error("Failed to save prompt:", error)
+    } finally {
+      setSaving(null)
+    }
   }
 
   const [gallery, setGallery] = useState<GalleryItem[]>(
@@ -303,126 +321,127 @@ export default function ProductClient({product}: {product: ShopProduct}) {
                 </div>
               </div>
 
-              {/* 프롬프트 열람 — 암호 보호 */}
+              {/* 프롬프트 섹션 */}
               <div className="border-t border-white/10 pt-5">
-                {!promptAuthenticated ? (
-                  <div className="space-y-3">
-                    <button
-                      onClick={() => setPromptOpen(true)}
-                      className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-white/50 hover:text-white/80 text-sm transition"
-                    >
-                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 1L9 4h6l-3-3zm0 22l3-3H9l3 3zm9-9l-3-3v6l3-3zM3 12l3 3V9l-3 3z"/>
-                      </svg>
-                      View Mathematical Prompts
-                    </button>
+                <button
+                  onClick={() => setPromptOpen(p => !p)}
+                  className="w-full flex items-center justify-between py-2.5 px-4 rounded-xl border border-[#c10002]/40 bg-[#c10002]/10 hover:bg-[#c10002]/20 text-white text-sm font-medium transition"
+                >
+                  <span>Prompts (Soft/Hard)</span>
+                  <span className="text-white/40 text-xs">{promptOpen ? "▲" : "▼"}</span>
+                </button>
 
-                    {promptOpen && (
-                      <form onSubmit={handlePromptPasswordSubmit} className="space-y-3">
-                        <input
-                          type="password"
-                          placeholder="Prompt Access Code"
-                          value={promptPasswordInput}
-                          onChange={(e) => setPromptPasswordInput(e.target.value)}
-                          className={`w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-1 transition text-sm text-center ${
-                            promptPasswordError ? 'focus:ring-red-500 border-red-500' : 'focus:ring-[#c10002]'
-                          }`}
-                          autoFocus
-                        />
-                        {promptPasswordError && (
-                          <p className="text-red-400 text-xs text-center animate-pulse">
-                            Invalid prompt access code
-                          </p>
+                {promptOpen && (
+                  <div className="mt-3 space-y-3">
+                    {/* Soft Prompt - Everyone can see */}
+                    <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-[10px] font-semibold tracking-widest text-green-400 uppercase">SOFT Prompt (Public)</p>
+                        <div className="flex gap-2">
+                          {isAdmin && !editMode.soft && (
+                            <button
+                              onClick={() => startEdit("soft", product.content.clothingPrompt)}
+                              className="text-[10px] text-blue-400 hover:text-blue-300 transition"
+                            >
+                              Edit
+                            </button>
+                          )}
+                          <button
+                            onClick={() => copyToClipboard(editedPrompts.soft || product.content.clothingPrompt, "soft")}
+                            className="text-[10px] text-white/40 hover:text-white transition"
+                          >
+                            {copied === "soft" ? "Copied ✓" : "Copy"}
+                          </button>
+                        </div>
+                      </div>
+                      {editMode.soft ? (
+                        <div className="space-y-2">
+                          <textarea
+                            value={editedPrompts.soft || ""}
+                            onChange={(e) => setEditedPrompts({...editedPrompts, soft: e.target.value})}
+                            className="w-full h-32 px-2 py-1 bg-white/10 border border-white/20 rounded text-xs text-white font-mono resize-none focus:outline-none focus:ring-1 focus:ring-blue-400"
+                          />
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => savePrompt("soft")}
+                              disabled={saving === "soft"}
+                              className="px-3 py-1 bg-green-600 hover:bg-green-500 disabled:bg-green-800 text-white text-xs rounded transition"
+                            >
+                              {saving === "soft" ? "Saving..." : "Save"}
+                            </button>
+                            <button
+                              onClick={() => cancelEdit("soft")}
+                              className="px-3 py-1 bg-gray-600 hover:bg-gray-500 text-white text-xs rounded transition"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-xs text-white/70 leading-relaxed font-mono">
+                          {editedPrompts.soft || product.content.clothingPrompt}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Hard Prompt - Admin Only */}
+                    {isAdmin && (
+                      <div className="bg-gradient-to-br from-red-900/20 to-red-800/10 border border-red-600/30 rounded-xl p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-[10px] font-semibold tracking-widest text-red-400 uppercase">HARD Prompt (Admin Only)</p>
+                          <div className="flex gap-2">
+                            {!editMode.hard && (
+                              <button
+                                onClick={() => startEdit("hard", Object.entries(product.tieredPrompts).slice(0, 7).map(([key, prompt]) => `${key}: ${prompt}`).join('\n\n'))}
+                                className="text-[10px] text-blue-400 hover:text-blue-300 transition"
+                              >
+                                Edit
+                              </button>
+                            )}
+                            <button
+                              onClick={() => copyToClipboard(editedPrompts.hard || Object.entries(product.tieredPrompts).slice(0, 7).map(([key, prompt]) => `${key}: ${prompt}`).join('\n\n'), "hard")}
+                              className="text-[10px] text-red-400/60 hover:text-red-400 transition"
+                            >
+                              {copied === "hard" ? "Copied ✓" : "Copy"}
+                            </button>
+                          </div>
+                        </div>
+                        {editMode.hard ? (
+                          <div className="space-y-2">
+                            <textarea
+                              value={editedPrompts.hard || ""}
+                              onChange={(e) => setEditedPrompts({...editedPrompts, hard: e.target.value})}
+                              className="w-full h-48 px-2 py-1 bg-white/10 border border-white/20 rounded text-xs text-white font-mono resize-none focus:outline-none focus:ring-1 focus:ring-blue-400"
+                              placeholder="level1_clothing: prompt text here&#10;&#10;level2_background: prompt text here&#10;..."
+                            />
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => savePrompt("hard")}
+                                disabled={saving === "hard"}
+                                className="px-3 py-1 bg-green-600 hover:bg-green-500 disabled:bg-green-800 text-white text-xs rounded transition"
+                              >
+                                {saving === "hard" ? "Saving..." : "Save"}
+                              </button>
+                              <button
+                                onClick={() => cancelEdit("hard")}
+                                className="px-3 py-1 bg-gray-600 hover:bg-gray-500 text-white text-xs rounded transition"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="text-xs text-white/70 leading-relaxed font-mono whitespace-pre-wrap">
+                            {editedPrompts.hard || Object.entries(product.tieredPrompts).slice(0, 7).map(([key, prompt]) => `${key}: ${prompt}`).join('\n\n')}
+                          </div>
                         )}
-                        <button
-                          type="submit"
-                          className="w-full px-3 py-2 bg-[#c10002] hover:bg-[#a00001] text-white text-sm font-medium rounded-lg transition"
-                        >
-                          UNLOCK PROMPTS
-                        </button>
-                      </form>
+                      </div>
                     )}
-                  </div>
-                ) : (
-                  <div>
-                    <button
-                      onClick={() => setPromptOpen(p => !p)}
-                      className="w-full flex items-center justify-between py-2.5 px-4 rounded-xl border border-[#c10002]/40 bg-[#c10002]/10 hover:bg-[#c10002]/20 text-white text-sm font-medium transition"
-                    >
-                      <span>Mathematical Prompts φ</span>
-                      <span className="text-white/40 text-xs">{promptOpen ? "▲" : "▼"}</span>
-                    </button>
-
-                    {promptOpen && (
-                      <div className="mt-3 space-y-3">
-                        {/* Clothing Prompt */}
-                        <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                          <div className="flex items-center justify-between mb-2">
-                            <p className="text-[10px] font-semibold tracking-widest text-white/30 uppercase">φ Clothing Prompt</p>
-                            <button
-                              onClick={() => copyToClipboard(product.content.clothingPrompt, "clothing")}
-                              className="text-[10px] text-white/40 hover:text-white transition"
-                            >
-                              {copied === "clothing" ? "Copied ✓" : "Copy"}
-                            </button>
-                          </div>
-                          <p className="text-xs text-white/70 leading-relaxed font-mono">
-                            {product.content.clothingPrompt}
-                          </p>
-                        </div>
-
-                        {/* Model Prompt */}
-                        <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                          <div className="flex items-center justify-between mb-2">
-                            <p className="text-[10px] font-semibold tracking-widest text-white/30 uppercase">π Model Prompt</p>
-                            <button
-                              onClick={() => copyToClipboard(product.content.modelPrompt, "model")}
-                              className="text-[10px] text-white/40 hover:text-white transition"
-                            >
-                              {copied === "model" ? "Copied ✓" : "Copy"}
-                            </button>
-                          </div>
-                          <p className="text-xs text-white/70 leading-relaxed font-mono">
-                            {product.content.modelPrompt}
-                          </p>
-                        </div>
-
-                        {/* 7-Tier Prompts */}
-                        <div className="bg-gradient-to-br from-[#c10002]/10 to-[#c10002]/5 border border-[#c10002]/20 rounded-xl p-4">
-                          <p className="text-[10px] font-semibold tracking-widest text-[#c10002] uppercase mb-3">7-Tier Mathematical Series</p>
-                          <div className="space-y-2 text-xs">
-                            {Object.entries(product.tieredPrompts).slice(0, 7).map(([key, prompt]) => (
-                              <div key={key} className="flex items-center justify-between">
-                                <span className="text-white/60 text-[10px] uppercase tracking-wide">{key.replace('level', 'T').replace('_', ' ')}</span>
-                                <button
-                                  onClick={() => copyToClipboard(prompt, key)}
-                                  className="text-[10px] text-[#c10002]/60 hover:text-[#c10002] transition"
-                                >
-                                  {copied === key ? "✓" : "Copy"}
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
                       </div>
                     )}
 
-                    <div className="flex items-center justify-between mt-3 px-1">
-                      <p className="text-[10px] text-white/20">
-                        Authenticated · φ Access
-                      </p>
-                      <button
-                        onClick={() => {
-                          setPromptAuthenticated(false)
-                          sessionStorage.removeItem(`rainskiss_prompt_auth_${product.slug}`)
-                        }}
-                        className="text-[10px] text-white/20 hover:text-white/50 transition"
-                      >
-                        Lock prompts
-                      </button>
-                    </div>
                   </div>
-                )}
+                )
               </div>
 
             </div>

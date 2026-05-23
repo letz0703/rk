@@ -3,6 +3,7 @@
 import Link from "next/link"
 
 export default function HomePage() {
+
   return (
     <div className="bg-[#0e0e0e] text-white min-h-screen flex flex-col">
       {/* Header */}
@@ -18,19 +19,29 @@ export default function HomePage() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center">
-        <div className="max-w-2xl mx-auto px-6 text-center">
+      <main className="flex-1 flex items-center justify-center relative">
+        {/* Hero Background Image */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/hero-image.jpeg"
+            alt="RAINSKISS Hero"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black/30"></div>
+        </div>
+
+        <div className="max-w-2xl mx-auto px-6 text-center relative z-10">
           {/* Hero Section */}
           <div className="mb-12">
             <p className="text-[#c10002] text-xs font-semibold tracking-[0.2em] uppercase mb-4">
               Mathematical Beauty · Divine Proportion
             </p>
-            <h1 className="text-6xl font-black tracking-tight leading-none mb-2">
+            <h1 className="text-6xl font-black tracking-tight leading-none mb-2 drop-shadow-2xl">
               RAINSKISS
               <br />
-              <span className="text-white/30">AI Fashion</span>
+              <span className="text-white/60">AI Fashion</span>
             </h1>
-            <p className="text-xs md:text-sm font-extralight uppercase tracking-[0.5em] text-white/40 mb-10">
+            <p className="text-xs md:text-sm font-extralight uppercase tracking-[0.5em] text-white/80 mb-10 drop-shadow-lg">
               LOOK & SOUND
             </p>
           </div>

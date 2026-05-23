@@ -9,6 +9,133 @@ import {addNewProduct, getProductByTitle} from "../lib/firebase"
 const NOTES_DIR = path.join(process.cwd(), "obsidian/02_Notes")
 const PHI = 1.618
 
+// Style mapping based on stage intensity
+const STYLE_DESCRIPTORS = {
+  1: ["elegant", "refined", "classic"],
+  2: ["graceful", "sophisticated", "artistic"],
+  3: ["captivating", "alluring", "magnetic"],
+  4: ["sensual", "provocative", "intense"],
+  5: ["bold", "daring", "seductive"],
+  6: ["exotic", "dramatic", "fierce"],
+  7: ["extreme", "transcendent", "divine"]
+}
+
+// Extract meaningful keywords from prompt text
+function extractKeywords(prompt: string): string[] {
+  const keywords: string[] = []
+
+  // Style keywords
+  const styleTerms = [
+    "elegant",
+    "graceful",
+    "sophisticated",
+    "refined",
+    "classic",
+    "sensual",
+    "provocative",
+    "seductive",
+    "alluring",
+    "captivating",
+    "bold",
+    "daring",
+    "fierce",
+    "dramatic",
+    "exotic",
+    "intense",
+    "artistic",
+    "creative",
+    "beautiful",
+    "stunning",
+    "gorgeous",
+    "fashion",
+    "style",
+    "pose",
+    "portrait",
+    "model",
+    "photography"
+  ]
+
+  // Clothing/fashion keywords
+  const fashionTerms = [
+    "dress",
+    "outfit",
+    "clothing",
+    "fashion",
+    "style",
+    "wear",
+    "elegant",
+    "casual",
+    "formal",
+    "vintage",
+    "modern",
+    "chic"
+  ]
+
+  // Technical terms
+  const techTerms = [
+    "studio",
+    "lighting",
+    "camera",
+    "portrait",
+    "photo",
+    "shoot",
+    "professional",
+    "high-quality",
+    "detailed",
+    "composition"
+  ]
+
+  const allTerms = [...styleTerms, ...fashionTerms, ...techTerms]
+  const promptLower = prompt.toLowerCase()
+
+  for (const term of allTerms) {
+    if (promptLower.includes(term)) {
+      keywords.push(term)
+    }
+  }
+
+  return Array.from(new Set(keywords)) // Remove duplicates
+}
+
+function generateSmartTags(
+  prompt: string,
+  stage: number,
+  category?: string
+): string[] {
+  const tags: string[] = []
+
+  // Core collection tags
+  tags.push("The 1.618 Collection", "Automated-Upload")
+
+  // Style descriptors based on stage
+  if (STYLE_DESCRIPTORS[stage as keyof typeof STYLE_DESCRIPTORS]) {
+    tags.push(...STYLE_DESCRIPTORS[stage as keyof typeof STYLE_DESCRIPTORS])
+  }
+
+  // Content-based keywords
+  const keywords = extractKeywords(prompt)
+  tags.push(...keywords.slice(0, 5)) // Limit to top 5 keywords
+
+  // Category-based tags
+  if (category) {
+    tags.push(category.toLowerCase().replace(/\s+/g, "-"))
+  }
+
+  // Mathematical/phi-based tags
+  tags.push("golden-ratio", "mathematical-beauty", "phi-1618")
+
+  // Remove duplicates and return
+  return Array.from(new Set(tags))
+}
+
+interface PromptHistoryItem {
+  version: number
+  prompt: string
+  testResult: "good" | "bad" | "pending"
+  notes: string
+  createdAt: string
+}
+
 interface ProductData {
   title: string
   prompt: string
@@ -16,6 +143,15 @@ interface ProductData {
   price: number
   category: string
   tags: string[]
+  // QC workflow fields
+  status: "draft" | "testing" | "verified" | "live"
+  locked: boolean
+  promptHistory: PromptHistoryItem[]
+  currentPromptVersion: number
+  sampleGallery: string[]
+  qcNotes: string
+  qcStartedAt?: string
+  qcCompletedAt?: string
 }
 
 async function parseMarkdownFile(
@@ -40,13 +176,26 @@ async function parseMarkdownFile(
   // φ(1.618) 기반 가격 책정: 기본 10$ * φ^stage
   const price = Math.round(10 * Math.pow(PHI, stage))
 
+  // Generate smart tags based on content and style
+  const smartTags = generateSmartTags(
+    promptMatch[1].trim(),
+    stage,
+    categoryMatch?.[1]?.trim()
+  )
+
   return {
     title: fileName,
     prompt: promptMatch[1].trim(),
     stage,
     price,
     category: categoryMatch ? categoryMatch[1].trim() : "Mathematical Fashion",
-    tags: ["The 1.618 Collection", `Stage-${stage}`, "Automated-Upload"]
+    tags: smartTags,
+    status: "draft", // 초기 등록 시 초안 상태
+    locked: false,
+    promptHistory: [],
+    currentPromptVersion: 1,
+    sampleGallery: [],
+    qcNotes: ""
   }
 }
 

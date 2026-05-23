@@ -286,69 +286,6 @@ export const shopProducts: ShopProduct[] = [
     },
   },
   {
-    slug: "midnight-emerald-silk",
-    category: "Street & Modern",
-    title: {
-      ko: "미드나잇 에메랄드 실크 세트",
-      ja: "ミッドナイト エメラルド シルク セット",
-      en: "Midnight Emerald Silk Set",
-    },
-    tagline: {
-      ko: "심연의 녹색 — 부드러운 실크의 역동성",
-      ja: "深淵の緑 — 柔らかなシルクのダイナミ즘",
-      en: "Abyssal Green — The Dynamics of Soft Silk",
-    },
-    description: {
-      ko: "깊은 숲의 밤을 닮은 에메랄드 그린 컬러의 실크 새틴 세트입니다. 빛의 각도에 따라 유려하게 변하는 실크의 광택이 인물의 조형적 미학을 강조하며, 극단적인 명암 대비를 통해 고전 회화와 같은 깊이감을 선사합니다. 피부 위에 흐르는 액체 같은 질감이 특징입니다.",
-      ja: "深い森の夜を彷彿とさせるエメラルドグリーンのシルクサテンセットです。光の角度によって流麗に変化するシルクの光沢が人物の造形美を強調し、極端な明暗対比を通じて古典絵画のような奥行きを与えます。肌の上を流れる液体のような質感が特徴です。",
-      en: "A silk satin set in a deep emerald green reminiscent of a forest at midnight. The fluid luster of the silk emphasizes the sculptural aesthetics of the subject, providing a depth similar to classical paintings through extreme chiaroscuro contrast. Features a liquid-like texture flowing over the skin.",
-    },
-    stylingTips: [],
-    stylingTipsLang: {
-      ko: ["미세한 안개가 낀 어두운 배경에서 촬영하세요", "골드 주얼리로 에메랄드 톤의 고귀함을 강조하세요", "슬릿 사이로 드러나는 피부의 광택을 림 라이트로 포착하세요"],
-      ja: ["微かな霧が漂う暗い背景で撮影してください", "ゴールドのジュエリーでエメラルドトーンの気品を強調しましょう", "スリットから覗く肌の光沢をリムライトで捉えてください"],
-      en: ["Shoot against a dark, misty background for atmosphere", "Accentuate the emerald tones with gold jewelry for a regal look", "Capture the skin's glow through the side slit using sharp rim lighting"],
-    },
-    previewImage: "/shop/midnight-emerald-01.jpg",
-    price: "$15",
-    gallery: ["/shop/midnight-emerald-01.jpg", "/shop/midnight-emerald-02.jpg"],
-    tieredPrompts: {
-      level1_clothing: "Emerald green silk satin slip dress, thin adjustable straps, high side slit, minimalist luxury design.",
-      level2_background: "Moody luxury suite, dark velvet curtains, moonlit balcony, deep shadows, cinematic noir setting.",
-      level3_camera_angle: "Close-up portrait, 85mm f/1.2 lens, shallow depth of field, focus on the fabric's sheen and skin texture.",
-      level4_lighting: "Low-key lighting, golden rim light, soft diffuse highlights on silk, dramatic chiaroscuro.",
-      level5_pose: "Reclining pose on dark leather, one leg extended through the slit, graceful silhouette, intense gaze.",
-      level6_erotic_pose: "Seductive arch, fabric clinging to skin, subtle transparency under direct light, evocative shadows.",
-      level7_hard_complete: "Masterpiece: The absolute contrast between pale porcelain skin and deep emerald silk. 8k, hyper-realistic, liquid silk physics simulation.",
-      vaultPath: "02_Notes/Visual/midnight-emerald-silk"
-    },
-    cameraRecs: {
-      body: ["Sony α7R V", "Canon EOS R5"],
-      lenses: ["85mm f/1.2 L", "50mm f/1.2 GM"],
-      settings: {
-        iso: ["100-400", "100"],
-        aperture: ["f/1.2 - f/2.0", "f/1.4"],
-        shutter: ["1/160 - 1/500", "1/200"]
-      }
-    },
-    y18Vault: {
-      flow_master: "Emerald silk harmony in soft moonlight.",
-      grok_master: "High-contrast emerald noir with sharp detail.",
-      signature_master: "Imperial Vault: The Emerald Seduction."
-    },
-    content: {
-      clothingPrompt: "Emerald green silk satin slip, high side slit, liquid-like luster, deep green tones, high contrast.",
-      modelPrompt: "Porcelain skin model, ethereal presence, dramatic low-key lighting, professional high-fashion look.",
-      videoPrompts: {
-        editorial: "Cinematic silk movement, slow motion fabric drapes, dramatic lighting shifts.",
-        iphone: "Casual intimate handheld view, emerald silk details, natural skin texture.",
-        cinematic: "Fashion film aesthetic, dark moody tones, slow tracking shots of fabric physics."
-      },
-      slideshowUrl: "https://arc.net/e/C0DA2479-7A73-4666-B034-731BDC0F8400",
-      bonusImageUrl: "/shop/midnight-emerald-bonus.jpg",
-    },
-  },
-  {
     slug: "busan-marine-elegance-1618",
     category: "Mathematical Fashion",
     title: {

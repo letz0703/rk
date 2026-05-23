@@ -26,7 +26,10 @@ const AuthContext = createContext<AuthContextValue>({
   logout: async () => {}
 })
 
-const ADMIN_UID = process.env.NEXT_PUBLIC_ADMIN_UID ?? ""
+const ADMIN_EMAILS = [
+  "rainskiss@gmail.com",
+  ...(process.env.NEXT_PUBLIC_ADMIN_EMAIL || "").split(",").map(email => email.trim()).filter(Boolean)
+]
 
 export function AuthContextProvider({children}: {children: ReactNode}) {
   const [user, setUser] = useState<User | null>(null)
@@ -49,12 +52,21 @@ export function AuthContextProvider({children}: {children: ReactNode}) {
     await signOut(auth)
   }
 
+  const isAdmin = user?.email ? ADMIN_EMAILS.includes(user.email) : false
+
+  // Debug logging
+  console.log("AuthContext Debug:", {
+    userEmail: user?.email,
+    adminEmails: ADMIN_EMAILS,
+    isAdmin
+  })
+
   return (
     <AuthContext.Provider
       value={{
         user,
         isLoading,
-        isAdmin: user?.uid === ADMIN_UID,
+        isAdmin,
         login,
         logout
       }}
