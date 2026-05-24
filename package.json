@@ -5,13 +5,14 @@
     "node": ">=18.18 <23"
   },
   "scripts": {
-    "dev": "bun scripts/sync-shop-images.ts --quiet && next dev",
+    "dev": "bun run scan-inventory --quiet && bun scripts/sync-shop-images.ts --quiet && next dev",
     "dev-only": "next dev",
     "build": "bun run sync-images && next build",
     "start": "next start",
     "lint": "next lint",
     "sync-images": "bun scripts/sync-shop-images.ts",
     "scan-images": "bun scripts/sync-shop-images.ts debug",
+    "scan-inventory": "bun scripts/inventory-scanner.ts",
     "deploy": "bash scripts/deploy.sh",
     "git-deploy": "bash scripts/git-deploy.sh"
   },
