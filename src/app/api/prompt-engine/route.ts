@@ -6,20 +6,11 @@ interface PromptEngineRequest {
   category?: "Admin" | "Visual" | "Audio" | "Culture"
   intent?: string
   context?: Record<string, unknown>
-  intensity?: number // 1-7 level
+  intensity?: number // Flow/Grok mode indicator
   imageUrl?: string // Pinterest or direct image link
 }
 
-interface VisualStep {
-  level: number
-  promptEn: string
-  promptKo: string
-  magicKeywords: string[]
-  pose: string
-  cameraAngle: string
-  lensInfo: string
-  location: string
-}
+// Removed: VisualStep interface (7-step system deprecated)
 
 interface AnalysisData {
   pose: string
@@ -37,7 +28,7 @@ interface PromptEngineResponse {
     legalBasis?: string[]
     templates?: string[]
     reasoning: string
-    steps?: VisualStep[] // Grok 7-step sequence
+    // Flow/Grok 2-step system
     analysis?: AnalysisData // Image analysis block
   }
   error?: string
@@ -234,40 +225,27 @@ async function processVisualQuery(
   // 지식 베이스에서 동적 컨텍스트 로드 (Visual + Culture)
   const vaultContext = await markdownLoader.findKnowledgeByKeywords(keywords)
 
-  // 주군의 Grok 7단계 지침이 포함된 경우 시퀀스 생성 모드 진입
-  if (
-    query.includes("7단계") ||
-    query.toLowerCase().includes("ero fashion") ||
-    intensity >= 7
-  ) {
-    return await processVisual7StepQuery(
-      query,
-      keywords,
-      vaultContext,
-      imageUrl
-    )
-  }
+  // Flow/Grok 2단계 시스템
 
-  // 주군의 Grok 7단계 프로젝트 철학을 반영한 템플릿 결정 로직
+  // Flow/Grok 2단계 템플릿 결정 로직
   const getTemplateType = (q: string, lv: number, ctx: string[]): string => {
     const lowerQ = q.toLowerCase()
-    if (lv >= 7 || lowerQ.includes("soul-sync")) return "Soul-Sync"
     if (
-      lv >= 5 ||
       lowerQ.includes("grok") ||
+      lowerQ.includes("hard") ||
       ctx.some(c => c.includes("[Grok]"))
     )
       return "Grok"
-    if (lv >= 2) return "Flow-Enhanced"
     return "Flow"
   }
 
   const templateType = getTemplateType(query, intensity, vaultContext)
+  const isGrok = templateType === "Grok"
 
-  // 키워드 강화 (의상 및 포즈) - Gemini가 정밀 분석한 강화 키워드 사용
+  // 키워드 강화 (의상 및 포즈) - Flow/Grok 2단계 강화
   let enhancedKeywords = [
-    ...enhanceClothingTerms(keywords, intensity),
-    ...enhanceMotionTerms(keywords, intensity)
+    ...enhanceClothingTerms(keywords, isGrok),
+    ...enhanceMotionTerms(keywords, isGrok)
   ]
 
   // Obsidian Vault의 데이터가 있다면 최우선적으로 결합
@@ -282,79 +260,11 @@ async function processVisualQuery(
     category: "Visual",
     prompt: basePrompt,
     templates: [`${templateType} 템플릿 기반`],
-    reasoning: `Obsidian Master Vault의 실시간 지식(${vaultContext.length}건)과 강도 레벨 ${intensity}/7을 결합하여 최적화했습니다.`,
+    reasoning: `Obsidian Master Vault의 실시간 지식(${vaultContext.length}건)과 ${templateType} 템플릿을 결합하여 최적화했습니다.`,
     analysis: imageUrl ? generatePlaceholderAnalysis(imageUrl) : undefined
   }
 }
 
-async function processVisual7StepQuery(
-  query: string,
-  keywords: string[],
-  vaultContext: string[],
-  imageUrl?: string
-) {
-  const steps: VisualStep[] = []
-  const locations = [
-    "High-end minimalist studio",
-    "High-end minimalist studio",
-    "Modern luxury penthouse suite",
-    "Abandoned industrial warehouse with dramatic shadows",
-    "Exclusive moonlit poolside",
-    "Private velvet-lined boutique room",
-    "Ethereal obsidian-surfaced abstract space"
-  ]
-
-  const lenses = [
-    "85mm f/1.2 prime lens",
-    "50mm f/1.4 prime lens",
-    "35mm f/1.4 wide lens",
-    "35mm f/1.4 wide lens",
-    "24mm f/1.4 ultra-wide lens",
-    "50mm f/1.2 prime lens",
-    "Macro 100mm f/2.8 lens"
-  ]
-
-  for (let i = 1; i <= 7; i++) {
-    const intensity = i
-    const location = locations[i - 1]
-    const lens = lenses[i - 1]
-
-    const enhancedKeywords = [
-      ...enhanceClothingTerms(keywords, intensity),
-      ...enhanceMotionTerms(keywords, intensity)
-    ]
-
-    const templateType = i >= 6 ? "Grok" : i >= 2 ? "Flow-Enhanced" : "Flow"
-    const prompt = generateVisualPrompt(query, templateType, enhancedKeywords)
-
-    // 추가 매직 키워드 주입
-    const magic =
-      i === 1
-        ? ["fashion editorial photography", "high-end studio lighting"]
-        : ["cinematic focus", "hyper-detailed skin"]
-
-    steps.push({
-      level: i,
-      promptEn: prompt,
-      promptKo: `${i}단계: ${query}를 기반으로 한 ${templateType} 스타일의 비주얼 제안.`,
-      magicKeywords: magic,
-      pose: i >= 5 ? "Provocative and daring posture" : "Elegant fashion pose",
-      cameraAngle: i >= 4 ? "Low angle upward shot" : "Eye-level straight shot",
-      lensInfo: lens,
-      location: location
-    })
-  }
-
-  return {
-    category: "Visual",
-    steps,
-    analysis: imageUrl
-      ? generatePlaceholderAnalysis(imageUrl)
-      : generatePlaceholderAnalysis("text-based-context"),
-    reasoning:
-      "주군의 Grok 7단계 지침에 따라 최저 수위부터 단계별 수위 확장 및 비주얼 분석을 수행했습니다."
-  }
-}
 
 function generatePlaceholderAnalysis(source: string) {
   return {
@@ -410,7 +320,7 @@ function extractKeywords(text: string, relevantWords: string[]): string[] {
   )
 }
 
-function enhanceClothingTerms(keywords: string[], intensity: number): string[] {
+function enhanceClothingTerms(keywords: string[], isGrok: boolean): string[] {
   const clothingMap: Record<string, string> = {
     halter:
       "elegant sheer gauze fabric, crisp white halter neckline, asymmetrical draping",
@@ -423,18 +333,14 @@ function enhanceClothingTerms(keywords: string[], intensity: number): string[] {
     const lowerKw = kw.toLowerCase()
     const base = clothingMap[lowerKw] || kw
 
-    // 7단계 강도에 따른 점진적 묘사 강화
-    if (intensity >= 7)
-      return `${base}, transcendent fabric simulation, quantum-level detail, ethereal transparency`
-    if (intensity >= 5)
-      return `${base}, ultra-thin transparent material, provocative silhouette, artistic undertone`
-    if (intensity >= 3)
-      return `${base}, form-fitting sheer texture, intricate fabric folds`
-    return base
+    // Flow/Grok 2단계 강화
+    if (isGrok)
+      return `${base}, dramatic fabric texture, bold silhouette, high-contrast lighting`
+    return `${base}, soft elegant draping, natural flow`
   })
 }
 
-function enhanceMotionTerms(keywords: string[], intensity: number): string[] {
+function enhanceMotionTerms(keywords: string[], isGrok: boolean): string[] {
   const motionMap: Record<string, string> = {
     "figure-8":
       "seamless fluid motion, continuous figure-eight trajectory, hypnotic looping movement",
@@ -447,13 +353,10 @@ function enhanceMotionTerms(keywords: string[], intensity: number): string[] {
     const lowerKw = kw.toLowerCase()
     const base = motionMap[lowerKw] || kw
 
-    // 7단계 강도에 따른 점진적 동작 강화
-    if (intensity >= 7)
-      return `${base}, hyper-dynamic momentum, soul-piercing gaze, transcendent fluidity`
-    if (intensity >= 5)
-      return `${base}, bold and daring posture, intimate eye contact, evocative movement`
-    if (intensity >= 3) return `${base}, elegant posture, confident expression`
-    return base
+    // Flow/Grok 2단계 동작 강화
+    if (isGrok)
+      return `${base}, bold dynamic posture, intense eye contact, dramatic expression`
+    return `${base}, elegant graceful movement, natural expression`
   })
 }
 
@@ -464,12 +367,9 @@ function generateVisualPrompt(
 ): string {
   const templates = {
     Flow: `[Flow - Soft] ${query}, soft cinematic lighting, dreamy atmosphere, elegant composition, 8K resolution, ${keywords.join(", ")}`,
-    "Flow-Enhanced": `[Flow - Level 2] ${query}, professional fashion photography, dynamic composition, detailed textures, soft rim lighting, ${keywords.join(", ")}`,
-    Grok: `[Grok - Hard] Extreme close-up, ${query}, dramatic lighting, intense shadows, high contrast, detailed textures, ${keywords.join(", ")}`,
-    "Soul-Sync": `[Soul-Sync - Special] Masterpiece capturing ${query}, Da Vinci-style precision, transcendent moment, ${keywords.join(", ")}`
+    Grok: `[Grok - Hard] ${query}, dramatic lighting, intense shadows, high contrast, bold composition, detailed textures, ${keywords.join(", ")}`
   }
 
-  // templateType(string)을 templates의 유효한 키 타입으로 캐스팅하여 인덱싱 에러 해결
   return templates[templateType as keyof typeof templates] || templates.Flow
 }
 

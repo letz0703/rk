@@ -1,80 +1,51 @@
 "use client"
 
-import Link from "next/link"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 
 export default function HomePage() {
+  const [password, setPassword] = useState("")
+  const router = useRouter()
+
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (password === "oz") {
+      router.push("/oz")
+    } else if (password === "zo") {
+      router.push("/zo")
+    } else if (password === "ic") {
+      router.push("/ic")
+    } else {
+      alert("잘못된 암호입니다")
+      setPassword("")
+    }
+  }
 
   return (
-    <div className="bg-[#0e0e0e] text-white min-h-screen flex flex-col">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#0e0e0e]/95 backdrop-blur border-b border-white/10">
-        <div className="max-w-4xl mx-auto px-6 py-4">
-          <Link
-            href="/"
-            className="text-xl font-black tracking-tight text-white"
-          >
-            RAINSKISS
-          </Link>
+    <div className="bg-[#0e0e0e] text-white min-h-screen flex items-center justify-center">
+      <div className="max-w-md mx-auto px-6">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-black tracking-tight mb-2">RAINSKISS</h1>
+          <p className="text-white/60 text-sm">Private Access</p>
         </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center relative">
-        {/* Hero Background Image */}
-        <div className="absolute inset-0 z-0">
-          <img
-            src="/hero-image.jpeg"
-            alt="RAINSKISS Hero"
-            className="w-full h-full object-cover"
+        <form onSubmit={handlePasswordSubmit} className="space-y-4">
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter password"
+            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-[#c10002]"
+            autoFocus
           />
-          <div className="absolute inset-0 bg-black/30"></div>
-        </div>
-
-        <div className="max-w-2xl mx-auto px-6 text-center relative z-10">
-          {/* Hero Section */}
-          <div className="mb-12">
-            <p className="text-[#c10002] text-xs font-semibold tracking-[0.2em] uppercase mb-4">
-              Mathematical Beauty · Divine Proportion
-            </p>
-            <h1 className="text-6xl font-black tracking-tight leading-none mb-2 drop-shadow-2xl">
-              RAINSKISS
-              <br />
-              <span className="text-white/60">AI Fashion</span>
-            </h1>
-            <p className="text-xs md:text-sm font-extralight uppercase tracking-[0.5em] text-white/80 mb-10 drop-shadow-lg">
-              LOOK & SOUND
-            </p>
-          </div>
-
-          {/* Links */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            {/*<Link
-              href="/mix"
-              className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold rounded-xl transition border border-white/20"
-            >
-              Mix Advisor
-            </Link>*/}
-          </div>
-
-          {/* Hidden Shop Access */}
-          <div className="mt-16 pt-8 border-t border-white/10">
-            <p className="text-white/20 text-xs tracking-wider">
-              Special collections available for authorized users
-            </p>
-          </div>
-        </div>
-      </main>
-
-      {/* Footer */}
-      <footer className="border-t border-white/10">
-        <div className="max-w-4xl mx-auto px-6 py-8">
-          <div className="text-center">
-            <p className="text-white/30 text-sm">
-              © 2026 RAINSKISS · Mathematical Fashion Design
-            </p>
-          </div>
-        </div>
-      </footer>
+          <button
+            type="submit"
+            className="w-full px-4 py-3 bg-[#c10002] hover:bg-[#a00001] text-white rounded-lg transition-colors"
+          >
+            Enter
+          </button>
+        </form>
+      </div>
     </div>
   )
 }

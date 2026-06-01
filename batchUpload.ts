@@ -105,7 +105,18 @@ function generateSmartTags(
   const tags: string[] = []
 
   // Core collection tags
-  tags.push("The 1.618 Collection", "Automated-Upload")
+  tags.push("The 1.618 Collection")
+
+  // Flow vs Grok Mood Detection
+  const promptLower = prompt.toLowerCase()
+  const isFlow = promptLower.includes("flow") || stage <= 2
+  const isGrok = promptLower.includes("grok") || stage >= 5
+
+  if (isFlow) {
+    tags.push("flow-style", "ethereal-texture", "soft-diffusion")
+  } else if (isGrok) {
+    tags.push("grok-style", "high-definition", "intense-precision")
+  }
 
   // Style descriptors based on stage
   if (STYLE_DESCRIPTORS[stage as keyof typeof STYLE_DESCRIPTORS]) {
@@ -125,7 +136,7 @@ function generateSmartTags(
   tags.push("golden-ratio", "mathematical-beauty", "phi-1618")
 
   // Remove duplicates and return
-  return Array.from(new Set(tags))
+  return Array.from(new Set(tags)).filter(t => t)
 }
 
 interface PromptHistoryItem {
@@ -140,9 +151,11 @@ interface ProductData {
   title: string
   prompt: string
   stage: number
+  mood: "flow" | "grok" | "balanced"
   price: number
   category: string
   tags: string[]
+  sourceUrl?: string
   // QC workflow fields
   status: "draft" | "testing" | "verified" | "live"
   locked: boolean
@@ -166,12 +179,24 @@ async function parseMarkdownFile(
   )
   const stageMatch = content.match(/(?:stage|단계):\s*(\d+)/i)
   const categoryMatch = content.match(/(?:category|카테고리):\s*(.*)/i)
+  const sourceMatch = content.match(
+    /(?:source|ezel|출처):\s*["']?(.*?)["']?(?:\r?\n|$)/i
+  )
 
   if (!promptMatch || !promptMatch[1].trim()) return null
 
   let stage = stageMatch ? parseInt(stageMatch[1], 10) : 1
   // Validating stage range (1-7) as per rainskiss 7-Stage logic
   stage = Math.max(1, Math.min(7, stage))
+
+  // Determine Mood based on stage and content
+  const promptLower = promptMatch[1].toLowerCase()
+  const mood =
+    promptLower.includes("flow") || stage <= 3
+      ? "flow"
+      : promptLower.includes("grok") || stage >= 6
+        ? "grok"
+        : "balanced"
 
   // φ(1.618) 기반 가격 책정: 기본 10$ * φ^stage
   const price = Math.round(10 * Math.pow(PHI, stage))
@@ -187,9 +212,11 @@ async function parseMarkdownFile(
     title: fileName,
     prompt: promptMatch[1].trim(),
     stage,
+    mood,
     price,
     category: categoryMatch ? categoryMatch[1].trim() : "Mathematical Fashion",
     tags: smartTags,
+    sourceUrl: sourceMatch ? sourceMatch[1].trim() : "",
     status: "draft", // 초기 등록 시 초안 상태
     locked: false,
     promptHistory: [],

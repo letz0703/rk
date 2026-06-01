@@ -17,7 +17,9 @@
     "git-deploy": "bash scripts/git-deploy.sh"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.98.0",
     "@google/genai": "^1.21.0",
+    "@google/generative-ai": "^0.24.1",
     "@langchain/community": "^1.1.27",
     "@langchain/core": "^1.1.39",
     "@langchain/google-genai": "^2.1.26",
@@ -37,6 +39,7 @@
     "next-cloudinary": "^6.16.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "react-dropzone": "^15.0.0",
     "react-player": "^3.3.3",
     "tailwind-merge": "^3.0.2",
     "tailwindcss-animate": "^1.0.7",

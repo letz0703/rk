@@ -1,3 +1,6 @@
+// 🤖 자동 생성됨: 2026-05-24T19:31:31.811Z
+// 이미지 스캐너로 업데이트된 제품: 3개
+
 // 🏗️ 최적화됨: 2026-05-24
 // 정적 상품만 유지. 동적 상품은 getProduct()에서 로드
 
@@ -10,10 +13,18 @@ export type MultiLang = {
 }
 
 export type Category =
-  | "Street & Modern"
-  | "Mathematical Fashion"
-  | "Historical"
-  | "Fantasy & Armour"
+  | "Street"
+  | "Uniform"
+  | "Swimwear"
+  | "Bodysuit"
+  | "Spring"
+  | "Summer"
+  | "Fall"
+  | "Winter"
+  | "Shoes"
+  | "Socks"
+  | "Background"
+  | "Accessories"
 
 export type ShopProduct = {
   slug: string
@@ -160,7 +171,9 @@ export const shopProducts: ShopProduct[] = [
     },
     previewImage: "/shop/arc-ezel-collection/1779566901327-w4ff1t.png",
     price: "$15",
-    gallery: ["/shop/arc-ezel-collection/1779566901327-w4ff1t.png"],
+    gallery: [
+      "/shop/arc-ezel-collection/1779566901327-w4ff1t.png"
+    ],
     tieredPrompts: {
       level1_clothing: "fashion outfit from arc ezel collection",
       level2_background: "modern studio setting",
@@ -277,30 +290,39 @@ export async function getAllProducts(): Promise<ShopProduct[]> {
   // Server-side에서만 obsidian 스캔
   if (typeof window === "undefined") {
     try {
-      const fs = require('fs')
-      const path = require('path')
-      const obsidianDir = path.join(process.cwd(), 'obsidian/04_Products')
+      const fs = require("fs")
+      const path = require("path")
+      const obsidianDir = path.join(process.cwd(), "obsidian/04_Products")
 
       if (fs.existsSync(obsidianDir)) {
         const files = fs.readdirSync(obsidianDir)
-        const markdownFiles = files.filter((f: string) => f.endsWith('.md'))
+        const markdownFiles = files.filter((f: string) => f.endsWith(".md"))
 
         for (const file of markdownFiles) {
-          const slug = path.basename(file, '.md')
+          const slug = path.basename(file, ".md")
           // 정적 배열에 없는 상품만 추가
           if (!shopProducts.find(p => p.slug === slug)) {
-            try {
-              const content = fs.readFileSync(path.join(obsidianDir, file), 'utf-8')
-              const product = parseObsidianProduct(content, slug)
-              allProducts.push(product)
-            } catch (error) {
-              console.log(`Failed to parse ${slug}:`, error)
+            // 캐시 확인 및 활용
+            if (obsidianProductCache.has(slug)) {
+              allProducts.push(obsidianProductCache.get(slug)!)
+            } else {
+              try {
+                const content = fs.readFileSync(
+                  path.join(obsidianDir, file),
+                  "utf-8"
+                )
+                const product = parseObsidianProduct(content, slug)
+                obsidianProductCache.set(slug, product) // 캐시 업데이트
+                allProducts.push(product)
+              } catch (error) {
+                console.log(`Failed to parse ${slug}:`, error)
+              }
             }
           }
         }
       }
     } catch (error) {
-      console.log('Obsidian scan failed:', error)
+      console.log("Obsidian scan failed:", error)
     }
   }
 

@@ -17,7 +17,8 @@ import {
   remove,
   update,
   onValue,
-  off
+  off,
+  get
 } from "firebase/database"
 import {v4 as uuid} from "uuid"
 import {
@@ -433,4 +434,87 @@ export async function addSunoTrack(url) {
 
 export async function deleteSunoTrack(id) {
   await remove(ref(database, `sunoPlaylist/${id}`))
+}
+
+// ── Shop Product Upload functions ──────────────────────────────────────────
+
+/**
+ * Upload product image to Firebase Storage
+ */
+export async function uploadProductImage(file) {
+  const id = uuid()
+  const ext = file.name.split(".").pop() || "jpg"
+  const sRef = storageRef(storage, `products/${id}.${ext}`)
+  const snap = await uploadBytes(sRef, file)
+  return getDownloadURL(snap.ref)
+}
+
+/**
+ * Save product for review workflow
+ */
+export async function saveProductForReview(productData) {
+  const id = uuid()
+  const payload = {
+    id,
+    ...productData,
+    reviewStatus: "pending", // pending | approved | rejected
+    reviewNotes: "",
+    reviewedBy: null,
+    reviewedAt: null
+  }
+  return set(ref(database, `products_pending/${id}`), payload)
+}
+
+/**
+ * Get all pending products for review
+ */
+export function onPendingProducts(callback) {
+  const r = ref(database, "products_pending")
+  const listener = snap => {
+    const data = snap.val()
+    const list = data
+      ? Object.values(data).sort(
+          (a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0)
+        )
+      : []
+    callback(list)
+  }
+  onValue(r, listener)
+  return () => off(r, "value", listener)
+}
+
+/**
+ * Approve product and move to live products
+ */
+export async function approveProduct(productId) {
+  // Get product data
+  const pendingRef = ref(database, `products_pending/${productId}`)
+  const snapshot = await get(pendingRef)
+  const productData = snapshot.val()
+
+  if (!productData) throw new Error("Product not found")
+
+  // Move to live products
+  const liveProductData = {
+    ...productData,
+    reviewStatus: "approved",
+    reviewedAt: Date.now(),
+    publishedAt: Date.now()
+  }
+
+  await set(ref(database, `products_live/${productId}`), liveProductData)
+  await remove(pendingRef)
+
+  return liveProductData
+}
+
+/**
+ * Reject product
+ */
+export async function rejectProduct(productId, notes = "") {
+  return update(ref(database, `products_pending/${productId}`), {
+    reviewStatus: "rejected",
+    reviewNotes: notes,
+    reviewedAt: Date.now()
+  })
 }

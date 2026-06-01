@@ -1,0 +1,20 @@
+{
+  "id": "black-lace-sheer-bodysuit",
+  "title": "Black Lace Sheer Bodysuit",
+  "slug": "black-lace-sheer-bodysuit",
+  "category": "Street & Modern",
+  "price": 10,
+  "premiumPrice": 30,
+  "description": "She wears black lace bodysuit with cream cardigan overlay, modest styling, natural daylight",
+  "soft": "She wears black lace bodysuit with cream cardigan overlay, modest styling, natural daylight",
+  "hard": "She wears black lace sheer bodysuit with strategic cutouts, reclining pose on velvet, dramatic lighting, sultry expression",
+  "image": "/images/products/black-lace-bodysuit-01.jpg",
+  "collection": "Arc Ezel Collection",
+  "mood": "grok",
+  "tags": ["black-lace", "bodysuit", "sheer", "arc-ezel"],
+  "materials": ["Lace", "Sheer mesh"],
+  "colors": ["Midnight Black"],
+  "sourceUrl": "https://arc.net/e/1901E6DC-C5B7-4F9F-BD21-0271E75DE8AA",
+  "status": "active",
+  "createdAt": "2026-05-24T23:47:00.000Z"
+}

@@ -12,10 +12,18 @@ import {
 } from "@/data/shop-products"
 
 const categories: Category[] = [
-  "Mathematical Fashion",
-  "Historical",
-  "Street & Modern",
-  "Fantasy & Armour"
+  "Street",
+  "Uniform",
+  "Swimwear",
+  "Bodysuit",
+  "Spring",
+  "Summer",
+  "Fall",
+  "Winter",
+  "Shoes",
+  "Socks",
+  "Background",
+  "Accessories"
 ]
 const sortOptions = [
   {value: "newest", label: "최신순"},
