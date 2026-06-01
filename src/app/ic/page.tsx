@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { ExternalLink } from "lucide-react"
+import { ExternalLink, Search, X } from "lucide-react"
 
 type Product = {
   name: string
@@ -313,6 +313,7 @@ function BrandCard({ brand, onImageUpdate }: { brand: Brand; onImageUpdate: (bra
 export default function ICPage() {
   const [activeCategory, setActiveCategory] = useState("전체")
   const [brandsData, setBrandsData] = useState<Brand[]>(brands)
+  const [query, setQuery] = useState("")
 
   const updateBrandImage = (brandId: string, imageUrl: string) => {
     setBrandsData(prev =>
@@ -322,9 +323,22 @@ export default function ICPage() {
     )
   }
 
-  const filtered = activeCategory === "전체"
-    ? brandsData
-    : brandsData.filter(b => b.category === activeCategory)
+  const q = query.trim().toLowerCase()
+
+  const filtered = brandsData
+    .filter(b => activeCategory === "전체" || b.category === activeCategory)
+    .map(b => {
+      if (!q) return b
+      // 브랜드명 매치 → 모든 제품 표시, 아니면 매치되는 제품만
+      const brandMatch =
+        b.name.toLowerCase().includes(q) || b.category.toLowerCase().includes(q)
+      if (brandMatch) return b
+      const matchedProducts = b.products.filter(p =>
+        p.name.toLowerCase().includes(q)
+      )
+      return { ...b, products: matchedProducts }
+    })
+    .filter(b => b.products.length > 0)
 
   return (
     <div className="min-h-screen bg-[#080808] text-white">
@@ -352,6 +366,31 @@ export default function ICPage() {
         </div>
       </div>
 
+      {/* 검색창 */}
+      <div className="px-6 pt-6 pb-2">
+        <div className="max-w-6xl mx-auto relative">
+          <Search
+            size={16}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none"
+          />
+          <input
+            type="text"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder="상품명·브랜드 검색…"
+            className="w-full bg-white/5 border border-white/10 rounded-full pl-11 pr-11 py-3 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#c10002] transition-colors"
+          />
+          {query && (
+            <button
+              onClick={() => setQuery("")}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white transition-colors"
+            >
+              <X size={16} />
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* 카테고리 필터 */}
       <div className="px-6 py-6 border-b border-white/5">
         <div className="max-w-6xl mx-auto flex flex-wrap gap-2">
@@ -376,11 +415,19 @@ export default function ICPage() {
 
       {/* 그리드 */}
       <div className="px-6 py-10">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filtered.map(brand => (
-            <BrandCard key={brand.id} brand={brand} onImageUpdate={updateBrandImage} />
-          ))}
-        </div>
+        {filtered.length > 0 ? (
+          <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {filtered.map(brand => (
+              <BrandCard key={brand.id} brand={brand} onImageUpdate={updateBrandImage} />
+            ))}
+          </div>
+        ) : (
+          <div className="max-w-6xl mx-auto text-center py-20">
+            <p className="text-white/30 text-sm">
+              {query ? `"${query}" 검색 결과 없음` : "상품 없음"}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* 푸터 */}
