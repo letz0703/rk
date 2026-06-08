@@ -116,6 +116,21 @@ export async function seedModelData(slug, meta) {
   return update(ref(database, `models/${slug}`), meta)
 }
 
+// /ic 제품별 블로그 글 (제목 + 마크다운 본문). slug = `${brandId}-${index}`
+export async function saveIcArticle(slug, data) {
+  return update(ref(database, `icArticles/${slug}`), {
+    ...data,
+    updatedAt: Date.now()
+  })
+}
+
+export function onIcArticle(slug, callback) {
+  const r = ref(database, `icArticles/${slug}`)
+  const listener = snap => callback(snap.val())
+  onValue(r, listener)
+  return () => off(r, "value", listener)
+}
+
 // Storage-only model functions (no Realtime DB)
 
 export async function listModelImages(slug) {

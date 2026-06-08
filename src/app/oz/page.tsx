@@ -1,151 +1,79 @@
-"use client"
-
-import React, {useState, useMemo} from "react"
 import {promptsData, type Prompt} from "@/data/prompts-data"
-import Link from "next/link"
+import OzSearch from "./OzSearch"
+
+// obsidian/04_Products 파일 변경 즉시 반영
+export const dynamic = "force-dynamic"
+
+// 가벼운 frontmatter 파서 (제목/이미지/메타 추출, 본문은 그대로 보존)
+function parseFrontmatter(raw: string): {meta: Record<string, string>; body: string} {
+  const m = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/)
+  if (!m) return {meta: {}, body: raw.trim()}
+
+  const meta: Record<string, string> = {}
+  for (const line of m[1].split("\n")) {
+    const idx = line.indexOf(":")
+    if (idx === -1) continue
+    const key = line.slice(0, idx).trim()
+    const val = line.slice(idx + 1).trim()
+    if (key) meta[key] = val
+  }
+  return {meta, body: m[2].trim()}
+}
+
+// obsidian/04_Products 의 md 프롬프트를 제목 + 본문 전체로 로드
+function loadObsidianPrompts(): Prompt[] {
+  if (typeof window !== "undefined") return []
+
+  try {
+    const fs = require("fs")
+    const path = require("path")
+    const dir = path.join(process.cwd(), "obsidian/04_Products")
+    if (!fs.existsSync(dir)) return []
+
+    const out: Prompt[] = []
+    for (const file of fs.readdirSync(dir)) {
+      if (!file.endsWith(".md")) continue
+      const slug = path.basename(file, ".md")
+      try {
+        const raw = fs.readFileSync(path.join(dir, file), "utf-8")
+        const {meta, body} = parseFrontmatter(raw)
+        const created = meta.createdAt ? new Date(meta.createdAt).getTime() : NaN
+
+        // 표시용 미리보기: 유료 섹션(## Prompts / ## Model Prompt) 중 먼저 오는 곳 이전까지만 노출
+        // 순서 바뀌어도 유료 본문 안 새도록 둘 다 컷
+        const preview = body.split(/^##\s+(?:Prompts|Model Prompt)\b/im)[0].trim() || body.slice(0, 300)
+
+        // searchText는 미리보기 + 메타만 (유료 Soft/Hard 본문은 클라이언트로 안 보냄 = view-source 누수 차단)
+        const tags = (meta.tags || "").replace(/[[\]]/g, "")
+
+        out.push({
+          id: `obsidian-${slug}`,
+          title: meta.title || slug,
+          content: preview, // 미리보기만 표시 (유료 프롬프트 숨김)
+          searchText: `${preview} ${[meta.title, meta.category, meta.collection, meta.mood, tags, slug].filter(Boolean).join(" ")}`.toLowerCase(),
+          images: meta.image ? [meta.image] : undefined,
+          createdAt: Number.isFinite(created) ? created : undefined
+        })
+      } catch (err) {
+        console.log(`oz: failed to parse ${slug}`, err)
+      }
+    }
+    return out
+  } catch (err) {
+    console.log("oz: obsidian scan failed", err)
+    return []
+  }
+}
 
 export default function OzPage() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [copiedId, setCopiedId] = useState<string | null>(null)
+  const obsidianPrompts = loadObsidianPrompts()
 
-  // Fuzzy search through prompts
-  const filteredPrompts = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return promptsData.sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0))
-    }
+  // obsidian 제목과 겹치는 static 프롬프트는 제외 (obsidian 우선)
+  const seenTitles = new Set(obsidianPrompts.map(p => p.title))
+  const merged = [
+    ...obsidianPrompts,
+    ...promptsData.filter(p => !seenTitles.has(p.title))
+  ]
 
-    const query = searchQuery.toLowerCase()
-    return promptsData.filter(prompt =>
-      prompt.title.toLowerCase().includes(query) ||
-      prompt.content.toLowerCase().includes(query) ||
-      (prompt.searchText && prompt.searchText.toLowerCase().includes(query))
-    ).sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0))
-  }, [searchQuery])
-
-  const handleCopy = (e: React.MouseEvent, content: string, id: string) => {
-    e.stopPropagation()
-    navigator.clipboard.writeText(content)
-    setCopiedId(id)
-    setTimeout(() => setCopiedId(null), 1000)
-  }
-
-  return (
-    <div className="w-full min-h-screen bg-[#0e0e0e] text-white">
-      {/* Header */}
-      <div className="sticky top-0 z-50 bg-[#0e0e0e]/95 backdrop-blur border-b border-white/10">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
-          <Link href="/" className="text-xl font-black tracking-tight text-white">
-            RAINSKISS
-          </Link>
-          <div className="text-white/60 text-sm">
-            Prompt Engine
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-4xl mx-auto px-6 py-8">
-        {/* Search Bar */}
-        <div className="mb-8">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search prompts..."
-            className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-[#c10002] text-lg"
-            autoFocus
-          />
-        </div>
-
-        {/* Results Count */}
-        <div className="mb-6 text-white/60 text-sm">
-          {searchQuery ? `${filteredPrompts.length} results for "${searchQuery}"` : `${filteredPrompts.length} total prompts`}
-        </div>
-
-        {/* Prompts List */}
-        <div className="space-y-4">
-          {filteredPrompts.map(prompt => (
-            <div key={prompt.id}
-              className="bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-[#c10002] transition-colors duration-300">
-
-              <div className="p-6">
-                <div className="flex items-start gap-4 mb-4">
-                  {/* Thumbnail */}
-                  {prompt.images && prompt.images.length > 0 && (
-                    <div className="flex-shrink-0">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={prompt.images[0]}
-                        alt={prompt.title}
-                        className="w-16 h-16 rounded-lg object-cover bg-white/10"
-                      />
-                    </div>
-                  )}
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-semibold text-lg text-white">{prompt.title}</h3>
-                      <button
-                        onClick={e => handleCopy(e, prompt.content, prompt.id)}
-                        className="px-4 py-2 bg-[#c10002] hover:bg-[#a00001] text-white text-sm rounded-lg transition-colors duration-200 flex-shrink-0 ml-4">
-                        {copiedId === prompt.id ? "✓ Copied!" : "Copy"}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-black/30 rounded-lg p-4 border border-white/10">
-                  <pre className="whitespace-pre-wrap break-words text-sm text-white/90 leading-relaxed">
-                    {prompt.content}
-                  </pre>
-                </div>
-
-                {/* Search tags */}
-                {prompt.searchText && (
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {prompt.searchText.split(' ').slice(0, 8).map((tag, i) => (
-                      <span key={i} className="text-xs px-2 py-1 bg-white/10 text-white/70 rounded-full">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                {/* Date */}
-                {prompt.createdAt && (
-                  <div className="mt-3 text-xs text-white/40">
-                    {new Date(prompt.createdAt).toLocaleDateString()}
-                  </div>
-                )}
-              </div>
-
-              {/* Images Gallery */}
-              {prompt.images && prompt.images.length > 0 && (
-                <div className="px-6 pb-6 border-t border-white/10 pt-4">
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {prompt.images.map((url, i) => (
-                      <div key={i} className="rounded-lg overflow-hidden bg-white/5">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={url}
-                          alt={`${prompt.title} example ${i + 1}`}
-                          className="w-full h-auto block hover:scale-105 transition-transform duration-200"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-
-        {/* Empty State */}
-        {filteredPrompts.length === 0 && searchQuery && (
-          <div className="text-center py-16 text-white/40">
-            <p>No prompts found for "{searchQuery}"</p>
-          </div>
-        )}
-      </div>
-    </div>
-  )
+  return <OzSearch prompts={merged} />
 }

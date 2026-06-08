@@ -2,7 +2,7 @@
 
 import {useState, useEffect, useMemo} from "react"
 import Link from "next/link"
-import Image from "next/image"
+import ProductCard from "./ProductCard"
 import {useRouter, useSearchParams} from "next/navigation"
 import {useAuthContext} from "@/components/context/AuthContext"
 import {
@@ -218,60 +218,12 @@ export default function ShopPageContent() {
         {filteredAndSortedProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {filteredAndSortedProducts.map(product => (
-              <div
+              <ProductCard
                 key={product.slug}
-                className="group bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-white/20 transition duration-300 relative"
-              >
-                {/* Admin Delete Button */}
-                {isAdmin && (
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault()
-                      deleteProduct(product.slug)
-                    }}
-                    className="absolute top-2 right-2 z-10 w-6 h-6 bg-red-600 hover:bg-red-700 text-white rounded-full flex items-center justify-center text-xs transition opacity-0 group-hover:opacity-100"
-                  >
-                    ×
-                  </button>
-                )}
-
-                <Link href={`/shop/${product.slug}`} className="block">
-                  <div className="relative w-full aspect-[4/5] bg-white/5">
-                    <Image
-                      src={product.previewImage}
-                      alt={product.title.en}
-                      fill
-                      className="object-cover group-hover:scale-105 transition duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                    <div className="absolute bottom-0 left-0 right-0 p-4">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs px-2 py-1 rounded-full bg-white/20 text-white/70">
-                          {product.category}
-                        </span>
-                        <span className="text-xs text-white/40 uppercase tracking-wide">
-                          Flow Preview
-                        </span>
-                      </div>
-                      <h2 className="text-lg font-bold text-white leading-tight mb-1">
-                        {product.title.en}
-                      </h2>
-                      <p className="text-white/60 text-sm line-clamp-2">
-                        {product.tagline.en}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="p-4 flex items-center justify-between">
-                    <span className="text-white/40 text-sm">Get Prompt</span>
-                    <span
-                      className="text-sm font-bold px-3 py-1 rounded-full text-white"
-                      style={{backgroundColor: "#c10002"}}
-                    >
-                      {product.price}
-                    </span>
-                  </div>
-                </Link>
-              </div>
+                product={product}
+                isAdmin={isAdmin}
+                onDelete={deleteProduct}
+              />
             ))}
           </div>
         ) : (
