@@ -28,6 +28,7 @@ const AuthContext = createContext<AuthContextValue>({
 
 const ADMIN_EMAILS = [
   "rainskiss@gmail.com",
+  "icanmart@gmail.com",
   ...(process.env.NEXT_PUBLIC_ADMIN_EMAIL || "").split(",").map(email => email.trim()).filter(Boolean)
 ]
 

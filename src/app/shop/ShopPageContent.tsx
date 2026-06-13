@@ -43,6 +43,17 @@ export default function ShopPageContent() {
   )
   const [sortBy, setSortBy] = useState<SortOption>("newest")
 
+  // 전체 상품(정적 + obsidian) 로드. 초기엔 정적만 즉시 표시 후 API로 갱신.
+  const [allProducts, setAllProducts] = useState<ShopProduct[]>(shopProducts)
+  useEffect(() => {
+    fetch("/api/shop/products")
+      .then(res => (res.ok ? res.json() : null))
+      .then(data => {
+        if (Array.isArray(data)) setAllProducts(data)
+      })
+      .catch(() => {})
+  }, [])
+
   // Delete product function
   const deleteProduct = (slug: string) => {
     if (confirm(`Delete product "${slug}"?`)) {
@@ -82,7 +93,8 @@ export default function ShopPageContent() {
 
   // 검색 및 필터링
   const filteredAndSortedProducts = useMemo(() => {
-    let filtered = shopProducts
+    // 공개 매대 = active만 (draft 작업중은 /oz 작업실에만 노출). status 없으면 active 취급.
+    let filtered = allProducts.filter(p => (p.status ?? "active") === "active")
 
     // 검색 필터링 (AND 방식, 모든 검색어가 포함되어야 함)
     if (searchQuery.trim()) {
@@ -112,23 +124,29 @@ export default function ShopPageContent() {
     })
 
     return filtered
-  }, [searchQuery, selectedCategory, sortBy])
+  }, [allProducts, searchQuery, selectedCategory, sortBy])
 
 
   return (
-    <div className="min-h-screen bg-[#0e0e0e] text-white">
-      <div className="max-w-6xl mx-auto px-6 py-12">
-        {/* 헤더 */}
-        <div className="text-center mb-12">
-          <p className="text-xs font-semibold tracking-widest text-white/30 uppercase mb-3">
-            AI Clothing Prompt Store
+    <div className="min-h-screen bg-[#111111] font-sans text-white antialiased">
+      <div className="mx-auto max-w-[1400px] px-6 py-20 md:px-10">
+        {/* 헤더 — asterix 에디토리얼 */}
+        <div className="mb-20">
+          <p className="mb-6 text-xs font-semibold uppercase tracking-[0.3em] text-white/40">
+            — AI Clothing Prompt Store
           </p>
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-white mb-4">
-            RAINSKISS <span style={{color: "#c10002"}}>COLLECTION</span>
+          <h1
+            className="font-semibold leading-[0.85] tracking-[-0.04em]"
+            style={{fontSize: "clamp(3rem, 9vw, 8rem)"}}
+          >
+            The{" "}
+            <span style={{color: "#c10002"}} className="font-serif font-normal italic">
+              Collection
+            </span>
           </h1>
-          <p className="text-white/60 text-sm max-w-lg mx-auto leading-relaxed mb-8">
-            Professional-grade prompts for Grok & Flow. Each prompt is tested
-            and verified for consistent results.
+          <p className="mt-8 max-w-md text-sm leading-relaxed text-white/50">
+            Grok &amp; Flow를 위한 검증된 프롬프트. 각 프롬프트는 일관된 결과를 위해
+            테스트되었습니다.
           </p>
         </div>
 

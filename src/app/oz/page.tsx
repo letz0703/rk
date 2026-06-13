@@ -1,5 +1,5 @@
 import {promptsData, type Prompt} from "@/data/prompts-data"
-import OzSearch from "./OzSearch"
+import OzSearch, {type OzItem} from "./OzSearch"
 
 // obsidian/04_Products 파일 변경 즉시 반영
 export const dynamic = "force-dynamic"
@@ -20,8 +20,8 @@ function parseFrontmatter(raw: string): {meta: Record<string, string>; body: str
   return {meta, body: m[2].trim()}
 }
 
-// obsidian/04_Products 의 md 프롬프트를 제목 + 본문 전체로 로드
-function loadObsidianPrompts(): Prompt[] {
+// obsidian/04_Products 의 md 상품을 /oz 작업실 아이템으로 로드 (draft + active 전부)
+function loadObsidianPrompts(): OzItem[] {
   if (typeof window !== "undefined") return []
 
   try {
@@ -30,7 +30,7 @@ function loadObsidianPrompts(): Prompt[] {
     const dir = path.join(process.cwd(), "obsidian/04_Products")
     if (!fs.existsSync(dir)) return []
 
-    const out: Prompt[] = []
+    const out: OzItem[] = []
     for (const file of fs.readdirSync(dir)) {
       if (!file.endsWith(".md")) continue
       const slug = path.basename(file, ".md")
@@ -39,19 +39,25 @@ function loadObsidianPrompts(): Prompt[] {
         const {meta, body} = parseFrontmatter(raw)
         const created = meta.createdAt ? new Date(meta.createdAt).getTime() : NaN
 
-        // 표시용 미리보기: 유료 섹션(## Prompts / ## Model Prompt) 중 먼저 오는 곳 이전까지만 노출
-        // 순서 바뀌어도 유료 본문 안 새도록 둘 다 컷
+        // 유료 섹션(## Prompts / ## Model Prompt) 앞까지가 공개 미리보기
         const preview = body.split(/^##\s+(?:Prompts|Model Prompt)\b/im)[0].trim() || body.slice(0, 300)
-
-        // searchText는 미리보기 + 메타만 (유료 Soft/Hard 본문은 클라이언트로 안 보냄 = view-source 누수 차단)
         const tags = (meta.tags || "").replace(/[[\]]/g, "")
+
+        // draft = 작업실(전체 분석 노출), active = 공개 매대용(유료 숨김, /shop에서 판매)
+        const status: "draft" | "active" = meta.status === "draft" ? "draft" : "active"
+        // draft는 전체 본문(분석 전부) 노출, active는 미리보기만 (유료 누수 차단)
+        const display = status === "draft" ? body : preview
+        const thumb = status === "draft" ? meta.referenceUrl || meta.image : meta.image
+        const validThumb = thumb && /^(https?:\/\/|\/)/.test(thumb) ? thumb : undefined
 
         out.push({
           id: `obsidian-${slug}`,
+          slug,
+          status,
           title: meta.title || slug,
-          content: preview, // 미리보기만 표시 (유료 프롬프트 숨김)
-          searchText: `${preview} ${[meta.title, meta.category, meta.collection, meta.mood, tags, slug].filter(Boolean).join(" ")}`.toLowerCase(),
-          images: meta.image ? [meta.image] : undefined,
+          content: display,
+          searchText: `${display} ${[meta.title, meta.category, meta.collection, meta.mood, tags, slug].filter(Boolean).join(" ")}`.toLowerCase(),
+          images: validThumb ? [validThumb] : undefined,
           createdAt: Number.isFinite(created) ? created : undefined
         })
       } catch (err) {
@@ -66,7 +72,7 @@ function loadObsidianPrompts(): Prompt[] {
 }
 
 export default function OzPage() {
-  const obsidianPrompts = loadObsidianPrompts()
+  const obsidianPrompts: OzItem[] = loadObsidianPrompts()
 
   // obsidian 제목과 겹치는 static 프롬프트는 제외 (obsidian 우선)
   const seenTitles = new Set(obsidianPrompts.map(p => p.title))

@@ -107,8 +107,34 @@
   }
   ```
 
+### 2026-06-11 MV 소개 및 다운로드 페이지 추가
+#### 성공 패턴
+- 사용한 방법:
+  1. `src/app/mv/page.tsx` 신규 생성을 통해 유튜브 임베드 및 다운로드 링크 제공.
+  2. 코드 최상단에 `MUSIC_VIDEOS` 배열 상수를 관리하기 쉽게 정렬하고 상세 주석을 남겨 사용자가 직접 다운로드 링크를 커스터마이징하기 편리하게 유도.
+  3. `lucide-react` 및 `framer-motion`을 조합하여 프리미엄 다크 테마 기반의 모던한 영상 갤러리 디자인 구현.
+  4. 루트 페이지 `/` 및 일반 공개 랜딩 `/public`에 `/mv`로 이동하는 링크 및 버튼을 추가하여 접근성 확보.
+  5. 암호 입력이 틀렸거나 미인증 방문자일 시 기존 `/public` 안내창 대신 뮤직 비디오(`/mv`) 페이지로 즉시 리다이렉션되도록 라우팅 흐름을 변경.
+- 핵심 코드:
+  ```typescript
+  // src/app/page.tsx
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (password === "oz") {
+      router.push("/oz")
+    } else if (password === "zo") {
+      // ...
+    } else {
+      // 잘못된/미인증 암호 → 뮤직 비디오 페이지로 바로 이동
+      router.push("/mv")
+    }
+  }
+  ```
+
 #### 학습 포인트
-- **개발 서버 호환성**: 외부 절대 경로인 `https://rainskiss.com/ic` 대신 Next.js 라우터(`router.push`)를 활용하면 로컬 개발 환경(localhost)과 상용 환경(rainskiss.com) 모두에서 유연하게 이동하므로 개발 효율성이 향상됨.
+- **사용자 커스텀 영역 확보**: 다운로드 링크와 같은 동적 설정 요소를 파일 최상단에 주석과 함께 노출시켜 사용자가 소스 코드에서 바로 편리하게 수정할 수 있게 함.
+- **다이렉트 공개 라우팅**: 특별한 인증이 필요 없는 공개 아카이브(뮤직 비디오 등)는 암호 실패 분기에서 바로 랜딩 페이지처럼 연결해 주어, 사용자가 불필요한 단계를 거치지 않고 브랜드의 핵심 미디어를 접할 수 있게 함.
+- **디자인 조화**: 기존 RAINSKISS 브랜드의 테마 컬러(Red, Dark) 및 에스테틱과 일치시켜 세련된 분위기를 그대로 계승함.
 
 ---
-*마지막 업데이트: 2026-06-01 by Antigravity (Learning Loop Active)*
+*마지막 업데이트: 2026-06-11 by Antigravity (Learning Loop Active)*

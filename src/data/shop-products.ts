@@ -30,6 +30,8 @@ export type ShopProduct = {
   slug: string
   category: Category
   mood?: "flow" | "grok" | "balanced"
+  status?: "draft" | "active"
+  referenceUrl?: string
   title: MultiLang
   tagline: MultiLang
   description: MultiLang
@@ -198,6 +200,36 @@ export const shopProducts: ShopProduct[] = [
 // 캐시 for obsidian products (메모리에서 중복 로드 방지)
 const obsidianProductCache = new Map<string, ShopProduct>()
 
+// public/shop 에서 {slug}-NN.(jpg|png|...) 전부 모아 갤러리 구성 (server-side)
+function scanGallery(slug: string, fallback: string): string[] {
+  if (typeof window !== "undefined") return fallback ? [fallback] : []
+  try {
+    const fs = require("fs")
+    const path = require("path")
+    const dir = path.join(process.cwd(), "public/shop")
+    if (!fs.existsSync(dir)) return fallback ? [fallback] : []
+    const re = new RegExp(`^${slug}-(\\d+)\\.(jpg|jpeg|png|webp)$`, "i")
+    const files: string[] = fs
+      .readdirSync(dir)
+      .filter((f: string) => re.test(f))
+      .sort((a: string, b: string) => {
+        const na = parseInt(a.match(re)![1], 10)
+        const nb = parseInt(b.match(re)![1], 10)
+        return na - nb
+      })
+      .map((f: string) => `/shop/${f}`)
+    return files.length ? files : fallback ? [fallback] : []
+  } catch {
+    return fallback ? [fallback] : []
+  }
+}
+
+// md 변경(예: publish로 draft→active) 후 stale 캐시 제거. slug 없으면 전체 비움.
+export function invalidateObsidianCache(slug?: string) {
+  if (slug) obsidianProductCache.delete(slug)
+  else obsidianProductCache.clear()
+}
+
 export async function getProduct(
   slug: string
 ): Promise<ShopProduct | undefined> {
@@ -243,10 +275,24 @@ function parseObsidianProduct(markdown: string, slug: string): ShopProduct {
     }
   })
 
+  // status: 명시 없으면 active (구 상품 호환). draft는 작업중 = /shop 비공개.
+  const status: "draft" | "active" = meta.status === "draft" ? "draft" : "active"
+  // draft는 생성 이미지 없이 reference 이미지로 미리보기. active는 실제 상품 이미지.
+  const displayImage = status === "draft" ? meta.referenceUrl || meta.image || "" : meta.image || ""
+  // active는 public/shop의 {slug}-NN.jpg 전부를 갤러리로. draft는 reference 한 장.
+  const galleryImages =
+    status === "draft"
+      ? displayImage
+        ? [displayImage]
+        : []
+      : scanGallery(slug, meta.image || "")
+
   // ShopProduct 형식으로 변환
   return {
     slug,
     category: meta.category as Category,
+    status,
+    referenceUrl: meta.referenceUrl || "",
     title: {ko: meta.title, ja: meta.title, en: meta.title},
     tagline: {
       ko: "Gemini 등록 상품",
@@ -258,14 +304,14 @@ function parseObsidianProduct(markdown: string, slug: string): ShopProduct {
       ja: "obsidianから読み込み",
       en: "Loaded from obsidian"
     },
-    previewImage: meta.image || "",
+    previewImage: galleryImages[0] || displayImage,
     price: `$${meta.price}`,
-    gallery: [meta.image || ""],
+    gallery: galleryImages.length ? galleryImages : [displayImage],
     content: {
       clothingPrompt: meta.title,
       modelPrompt: "Korean female model",
       slideshowUrl: "",
-      bonusImageUrl: meta.image || ""
+      bonusImageUrl: displayImage
     },
     tieredPrompts: {
       level1_clothing: meta.title,

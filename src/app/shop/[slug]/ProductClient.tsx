@@ -173,15 +173,21 @@ export default function ProductClient({product}: {product: ShopProduct}) {
   }
 
   return (
-    <div className="bg-[#0e0e0e] text-white min-h-screen">
-      <div className="max-w-4xl mx-auto px-6 py-8">
+    <div className="min-h-screen bg-[#111111] font-sans text-white antialiased">
+      <div className="mx-auto max-w-4xl px-6 py-16 md:px-10">
 
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">
+        {/* Header — asterix */}
+        <div className="mb-12">
+          <p className="mb-5 text-xs font-semibold uppercase tracking-[0.3em] text-white/40">
+            — {product.category}
+          </p>
+          <h1
+            className="font-semibold leading-[0.9] tracking-[-0.03em]"
+            style={{fontSize: "clamp(2.25rem, 6vw, 4.5rem)"}}
+          >
             {product.title.en}
           </h1>
-          <p className="text-white/60 italic">
+          <p className="mt-5 font-serif text-lg italic text-white/50">
             {product.tagline.en}
           </p>
         </div>
