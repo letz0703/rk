@@ -261,10 +261,29 @@ export async function getProduct(
   return undefined
 }
 
+// md 본문에서 ### 서브섹션 텍스트 추출 (다음 ###/## 또는 끝까지)
+function mdSubsection(body: string, header: string): string {
+  const re = new RegExp(`(?:^|\\n)###\\s+${header}\\s*\\n([\\s\\S]*?)(?=\\n###|\\n##|$)`, "i")
+  return body.match(re)?.[1].trim() || ""
+}
+// md 본문에서 ## H2 섹션 텍스트 추출 (다음 ## 또는 끝까지)
+function mdH2(body: string, header: string): string {
+  const re = new RegExp(`(?:^|\\n)##\\s+${header}\\s*\\n([\\s\\S]*?)(?=\\n##|$)`, "i")
+  return body.match(re)?.[1].trim() || ""
+}
+
 function parseObsidianProduct(markdown: string, slug: string): ShopProduct {
   const lines = markdown.split("\n")
   const frontmatterEnd = lines.findIndex((line, i) => i > 0 && line === "---")
   const frontmatter = lines.slice(1, frontmatterEnd).join("\n")
+  const body = lines.slice(frontmatterEnd + 1).join("\n")
+
+  // md 본문의 실제 프롬프트 추출 (placeholder 대신 진짜 내용)
+  const softPrompt = mdSubsection(body, "Soft Prompt")
+  const hardPrompt = mdSubsection(body, "Hard Prompt")
+  const softModel = mdSubsection(body, "Soft Model")
+  const hardModel = mdSubsection(body, "Hard Model")
+  const descText = mdH2(body, "Description")
 
   // frontmatter 파싱 (간단한 방식)
   const meta: any = {}
@@ -277,50 +296,54 @@ function parseObsidianProduct(markdown: string, slug: string): ShopProduct {
 
   // status: 명시 없으면 active (구 상품 호환). draft는 작업중 = /shop 비공개.
   const status: "draft" | "active" = meta.status === "draft" ? "draft" : "active"
+  
+  const rawImage = meta.image === "PLACEHOLDER" ? "" : meta.image || ""
+  const rawRefUrl = meta.referenceUrl === "PLACEHOLDER" ? "" : meta.referenceUrl || ""
+
   // draft는 생성 이미지 없이 reference 이미지로 미리보기. active는 실제 상품 이미지.
-  const displayImage = status === "draft" ? meta.referenceUrl || meta.image || "" : meta.image || ""
+  const displayImage = status === "draft" ? rawRefUrl || rawImage : rawImage
   // active는 public/shop의 {slug}-NN.jpg 전부를 갤러리로. draft는 reference 한 장.
   const galleryImages =
     status === "draft"
       ? displayImage
         ? [displayImage]
         : []
-      : scanGallery(slug, meta.image || "")
+      : scanGallery(slug, rawImage)
 
   // ShopProduct 형식으로 변환
   return {
     slug,
     category: meta.category as Category,
     status,
-    referenceUrl: meta.referenceUrl || "",
+    referenceUrl: rawRefUrl,
     title: {ko: meta.title, ja: meta.title, en: meta.title},
     tagline: {
-      ko: "Gemini 등록 상품",
-      ja: "Gemini登録商品",
-      en: "Gemini Registered"
+      ko: meta.collection || "RAINSKISS",
+      ja: meta.collection || "RAINSKISS",
+      en: meta.collection || "RAINSKISS"
     },
     description: {
-      ko: "obsidian에서 로드됨",
-      ja: "obsidianから読み込み",
-      en: "Loaded from obsidian"
+      ko: descText || meta.title,
+      ja: descText || meta.title,
+      en: descText || meta.title
     },
-    previewImage: galleryImages[0] || displayImage,
+    previewImage: galleryImages[0] || displayImage || "",
     price: `$${meta.price}`,
-    gallery: galleryImages.length ? galleryImages : [displayImage],
+    gallery: (galleryImages.length ? galleryImages : [displayImage]).filter(Boolean),
     content: {
-      clothingPrompt: meta.title,
-      modelPrompt: "Korean female model",
+      clothingPrompt: softPrompt || meta.title,
+      modelPrompt: softModel || "",
       slideshowUrl: "",
-      bonusImageUrl: displayImage
+      bonusImageUrl: displayImage || ""
     },
     tieredPrompts: {
-      level1_clothing: meta.title,
-      level2_background: "soft prompt",
-      level3_camera_angle: "camera angle",
-      level4_lighting: "lighting",
-      level5_pose: "pose",
-      level6_erotic_pose: "erotic pose",
-      level7_hard_complete: "hard complete",
+      level1_clothing: softPrompt || meta.title,
+      level2_background: "",
+      level3_camera_angle: "",
+      level4_lighting: "",
+      level5_pose: "",
+      level6_erotic_pose: hardModel || "",
+      level7_hard_complete: hardPrompt || "",
       vaultPath: `obsidian/04_Products/${slug}.md`
     }
   }

@@ -5,11 +5,8 @@ import Link from "next/link"
 import ProductCard from "./ProductCard"
 import {useRouter, useSearchParams} from "next/navigation"
 import {useAuthContext} from "@/components/context/AuthContext"
-import {
-  shopProducts,
-  type Category,
-  type ShopProduct
-} from "@/data/shop-products"
+import {type Category, type ShopProduct} from "@/data/shop-products"
+import {fbSubscribeProducts, fbToShopProduct, fbDeleteProduct, fbFromShopProduct, fbSaveProduct} from "@/api/shopFirebase"
 
 const categories: Category[] = [
   "Street",
@@ -43,22 +40,43 @@ export default function ShopPageContent() {
   )
   const [sortBy, setSortBy] = useState<SortOption>("newest")
 
-  // 전체 상품(정적 + obsidian) 로드. 초기엔 정적만 즉시 표시 후 API로 갱신.
-  const [allProducts, setAllProducts] = useState<ShopProduct[]>(shopProducts)
+  // Firebase /shop-products 실시간 구독
+  const [allProducts, setAllProducts] = useState<ShopProduct[]>([])
   useEffect(() => {
-    fetch("/api/shop/products")
-      .then(res => (res.ok ? res.json() : null))
-      .then(data => {
-        if (Array.isArray(data)) setAllProducts(data)
-      })
-      .catch(() => {})
+    const off = fbSubscribeProducts(list => {
+      setAllProducts(list.map(fbToShopProduct))
+    })
+    return () => off()
   }, [])
 
-  // Delete product function
-  const deleteProduct = (slug: string) => {
-    if (confirm(`Delete product "${slug}"?`)) {
-      // TODO: Remove from Firebase and update local state
-      console.log("Delete product:", slug)
+  // Delete product (admin)
+  const deleteProduct = async (slug: string) => {
+    if (!confirm(`상품 "${slug}" 삭제?`)) return
+    try {
+      await fbDeleteProduct(slug)
+    } catch (e: any) {
+      alert(`삭제 실패: ${e?.message || e}`)
+    }
+  }
+
+  // 일회성: 기존 obsidian/md 상품 → Firebase 이관 (admin)
+  const [migrating, setMigrating] = useState(false)
+  const migrate = async () => {
+    if (!confirm("기존 obsidian 상품을 Firebase로 이관할까요? (덮어씀)")) return
+    setMigrating(true)
+    try {
+      const res = await fetch("/api/shop/products")
+      const data = res.ok ? await res.json() : []
+      let n = 0
+      for (const sp of Array.isArray(data) ? data : []) {
+        await fbSaveProduct(fbFromShopProduct(sp))
+        n++
+      }
+      alert(`${n}개 상품 이관 완료`)
+    } catch (e: any) {
+      alert(`이관 실패: ${e?.message || e}`)
+    } finally {
+      setMigrating(false)
     }
   }
 
@@ -93,8 +111,8 @@ export default function ShopPageContent() {
 
   // 검색 및 필터링
   const filteredAndSortedProducts = useMemo(() => {
-    // 공개 매대 = active만 (draft 작업중은 /oz 작업실에만 노출). status 없으면 active 취급.
-    let filtered = allProducts.filter(p => (p.status ?? "active") === "active")
+    // 공개 매대 = active(전시 on)만. admin은 비전시(off)도 모두 봄(관리용).
+    let filtered = allProducts.filter(p => isAdmin || (p.status ?? "active") === "active")
 
     // 검색 필터링 (AND 방식, 모든 검색어가 포함되어야 함)
     if (searchQuery.trim()) {
@@ -124,7 +142,7 @@ export default function ShopPageContent() {
     })
 
     return filtered
-  }, [allProducts, searchQuery, selectedCategory, sortBy])
+  }, [allProducts, searchQuery, selectedCategory, sortBy, isAdmin])
 
 
   return (
@@ -219,15 +237,26 @@ export default function ShopPageContent() {
           {isAdmin && (
             <button
               onClick={() => {
-                const title = prompt("상품 제목을 입력하세요:")
-                if (title) {
-                  // TODO: 상품 추가 로직
-                  alert("상품 추가 기능은 준비 중입니다.")
+                const slug = prompt("상품 slug 입력 (영소문자-하이픈, 예: tennis-set-green):")?.trim()
+                if (!slug) return
+                if (!/^[a-z0-9-]+$/.test(slug)) {
+                  alert("slug는 영소문자/숫자/하이픈만 가능")
+                  return
                 }
+                router.push(`/shop/${slug}`)
               }}
               className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm rounded transition"
             >
               + 상품 추가
+            </button>
+          )}
+          {isAdmin && (
+            <button
+              onClick={migrate}
+              disabled={migrating}
+              className="ml-2 px-4 py-2 bg-white/10 hover:bg-white/20 disabled:opacity-50 text-white text-sm rounded transition"
+            >
+              {migrating ? "이관중…" : "↺ obsidian 이관"}
             </button>
           )}
         </div>

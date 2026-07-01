@@ -131,6 +131,21 @@ export function onIcArticle(slug, callback) {
   return () => off(r, "value", listener)
 }
 
+// /dambe 제품별 블로그 글. slug = `${brandId}-${index}`
+export async function saveDambeArticle(slug, data) {
+  return update(ref(database, `dambeArticles/${slug}`), {
+    ...data,
+    updatedAt: Date.now()
+  })
+}
+
+export function onDambeArticle(slug, callback) {
+  const r = ref(database, `dambeArticles/${slug}`)
+  const listener = snap => callback(snap.val())
+  onValue(r, listener)
+  return () => off(r, "value", listener)
+}
+
 // Storage-only model functions (no Realtime DB)
 
 export async function listModelImages(slug) {

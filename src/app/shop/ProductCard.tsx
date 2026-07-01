@@ -5,6 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import {motion, useMotionValue, useSpring, useTransform} from "framer-motion"
 import {type ShopProduct} from "@/data/shop-products"
+import {isValidImageUrl} from "@/utils/image"
 
 const ACCENT = "#c10002"
 
@@ -80,12 +81,18 @@ export default function ProductCard({
 
         <Link href={`/shop/${product.slug}`} className="block">
           <div className="relative w-full aspect-[4/5] bg-white/5">
-            <Image
-              src={product.previewImage}
-              alt={product.title.en}
-              fill
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.07]"
-            />
+            {isValidImageUrl(product.previewImage) ? (
+              <Image
+                src={product.previewImage}
+                alt={product.title.en}
+                fill
+                className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.07]"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-white/20 text-sm">
+                이미지 없음
+              </div>
+            )}
 
             {/* 커서 추적 글레어 */}
             <motion.div

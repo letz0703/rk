@@ -174,9 +174,6 @@ export default function ProductPage({params}: {params: {id: string}}) {
                 </p>
               </div>
             </div>
-                </div>
-              </div>
-            </div>
 
             {/* Metadata */}
             <div

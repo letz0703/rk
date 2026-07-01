@@ -13,19 +13,17 @@ import {
   Save,
   Upload,
   Loader2,
-  Check,
-  ShoppingBag
+  Check
 } from "lucide-react"
-import {getProductBySlug, productSlug, type Product} from "@/data/ic-brands"
+import {getProductBySlug, productSlug} from "@/data/dambe-brands"
 import {useAuthContext} from "@/components/context/AuthContext"
-import {saveIcArticle, onIcArticle} from "@/api/firebase"
+import {saveDambeArticle, onDambeArticle} from "@/api/firebase"
 import {
   fbSubscribeBrands,
   fbUploadBrandImage,
-  fbUpdateProductImage,
-  fbCreateOrder
-} from "@/api/icFirebase"
-import type {Brand} from "@/data/ic-brands"
+  fbUpdateProductImage
+} from "@/api/dambeFirebase"
+import type {Brand} from "@/data/dambe-brands"
 
 type Article = {
   title?: string
@@ -111,163 +109,7 @@ const mdComponents = {
   )
 }
 
-// 픽업 주문 모달
-function OrderModal({
-  slug,
-  brandName,
-  product,
-  onClose
-}: {
-  slug: string
-  brandName: string
-  product: Product
-  onClose: () => void
-}) {
-  const [qty, setQty] = useState(1)
-  const [customerName, setCustomerName] = useState("")
-  const [phone, setPhone] = useState("")
-  const [pickupDate, setPickupDate] = useState("")
-  const [memo, setMemo] = useState("")
-  const [submitting, setSubmitting] = useState(false)
-  const [done, setDone] = useState(false)
-
-  const phoneOk = /^0\d{1,2}-?\d{3,4}-?\d{4}$/.test(phone.trim())
-  const canSubmit = customerName.trim() && phoneOk && qty > 0 && !submitting
-
-  async function submit() {
-    if (!canSubmit) return
-    setSubmitting(true)
-    try {
-      await fbCreateOrder({
-        slug,
-        productName: product.name,
-        brandName,
-        qty,
-        customerName: customerName.trim(),
-        phone: phone.trim(),
-        pickupDate: pickupDate.trim(),
-        memo: memo.trim()
-      })
-      setDone(true)
-    } catch (e) {
-      alert("주문 실패: " + (e as Error).message)
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-0 sm:p-6"
-      onClick={onClose}
-    >
-      <div
-        className="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl p-6 max-h-[90vh] overflow-y-auto"
-        onClick={e => e.stopPropagation()}
-      >
-        {done ? (
-          <div className="text-center py-8">
-            <div className="w-14 h-14 rounded-full bg-[#c10002]/10 flex items-center justify-center mx-auto mb-4">
-              <Check size={26} className="text-[#c10002]" />
-            </div>
-            <h3 className="text-lg font-black text-gray-900 mb-2">주문 접수됨</h3>
-            <p className="text-sm text-gray-500 leading-6">
-              준비되면 입력하신 번호로
-              <br />
-              문자 드릴게요. 방문 픽업·현장결제입니다.
-            </p>
-            <button
-              onClick={onClose}
-              className="mt-6 w-full bg-gray-900 text-white text-sm font-black py-3 rounded-full"
-            >
-              확인
-            </button>
-          </div>
-        ) : (
-          <>
-            <div className="flex justify-between items-start mb-1">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#c10002]">
-                픽업 주문
-              </p>
-              <button onClick={onClose} className="text-gray-400 hover:text-gray-700">
-                <X size={18} />
-              </button>
-            </div>
-            <h3 className="text-lg font-black text-gray-900 mb-1">{product.name}</h3>
-            <p className="text-sm font-black text-[#c10002] mb-5">
-              {product.price !== null
-                ? `₩${product.price.toLocaleString()}`
-                : "가격 문의"}
-            </p>
-
-            <div className="space-y-3">
-              {/* 수량 */}
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-700 font-bold">수량</span>
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => setQty(q => Math.max(1, q - 1))}
-                    className="w-8 h-8 rounded-full bg-gray-100 text-gray-700 font-black"
-                  >
-                    −
-                  </button>
-                  <span className="w-6 text-center font-black">{qty}</span>
-                  <button
-                    onClick={() => setQty(q => q + 1)}
-                    className="w-8 h-8 rounded-full bg-gray-100 text-gray-700 font-black"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-              <input
-                value={customerName}
-                onChange={e => setCustomerName(e.target.value)}
-                placeholder="이름"
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#c10002]"
-              />
-              <input
-                value={phone}
-                onChange={e => setPhone(e.target.value)}
-                inputMode="tel"
-                placeholder="전화번호 (예: 010-1234-5678)"
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#c10002]"
-              />
-              <input
-                value={pickupDate}
-                onChange={e => setPickupDate(e.target.value)}
-                placeholder="픽업 희망일 (선택, 예: 토요일 오후)"
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#c10002]"
-              />
-              <textarea
-                value={memo}
-                onChange={e => setMemo(e.target.value)}
-                placeholder="요청사항 (선택)"
-                rows={2}
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#c10002] resize-none"
-              />
-            </div>
-
-            <button
-              onClick={submit}
-              disabled={!canSubmit}
-              className="mt-5 w-full bg-[#c10002] disabled:opacity-40 text-white text-sm font-black py-3.5 rounded-full transition"
-            >
-              {submitting ? "접수 중…" : "픽업 주문하기"}
-            </button>
-            <p className="text-[11px] text-gray-400 text-center mt-3 leading-5">
-              온라인 결제 없음 · 방문 픽업 현장결제
-              <br />
-              준비완료 시 문자 안내
-            </p>
-          </>
-        )}
-      </div>
-    </div>
-  )
-}
-
-export default function ICProductPage() {
+export default function DambeProductPage() {
   const params = useParams()
   const slug = String(params.slug)
   const {isAdmin} = useAuthContext()
@@ -291,14 +133,13 @@ export default function ICProductPage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
   const [justSaved, setJustSaved] = useState(false)
-  const [showOrder, setShowOrder] = useState(false)
 
   useEffect(() => {
     if (!hit) {
       setLoading(false)
       return
     }
-    const unsub = onIcArticle(slug, (data: Article | null) => {
+    const unsub = onDambeArticle(slug, (data: Article | null) => {
       setArticle(data)
       setLoading(false)
     })
@@ -310,7 +151,7 @@ export default function ICProductPage() {
       <div className="min-h-screen bg-white text-gray-900 flex flex-col items-center justify-center px-6">
         <p className="text-sm text-gray-500 mb-4">제품을 찾을 수 없습니다.</p>
         <Link
-          href="/ic"
+          href="/dambe"
           className="text-[10px] font-black uppercase tracking-widest text-[#c10002]"
         >
           ← 가격표로
@@ -322,8 +163,8 @@ export default function ICProductPage() {
   // 정적 hit + Firebase override 병합 → 가격·이미지 최신 반영
   const brand = overrides[hit.brand.id] ?? hit.brand
   const product = brand.products[hit.index] ?? hit.product
-  // 제품 이미지 우선, 없으면 브랜드 대표이미지
-  const heroImage = product.image || brand.imageUrl || brand.image
+  // 제품 이미지 우선, 없으면 브랜드 대표이미지 (없을 수 있음)
+  const heroImage = product.image || brand.imageUrl || brand.image || ""
   // 같은 브랜드 다른 상품 (현재 상품 제외)
   const siblings = brand.products
     .map((p, i) => ({p, i}))
@@ -354,7 +195,7 @@ export default function ICProductPage() {
   async function handleSave() {
     setSaving(true)
     try {
-      await saveIcArticle(slug, {
+      await saveDambeArticle(slug, {
         title: draftTitle,
         body: draftBody,
         videoUrl: draftVideo.trim()
@@ -384,10 +225,10 @@ export default function ICProductPage() {
       <div className="px-6 pt-14 pb-8 border-b border-gray-100">
         <div className="max-w-3xl mx-auto">
           <Link
-            href="/ic"
+            href="/dambe"
             className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-600 transition mb-8"
           >
-            ← 깡통시장 가격표
+            ← 담배 가격표
           </Link>
 
           <div className="flex gap-5 items-start">
@@ -403,13 +244,21 @@ export default function ICProductPage() {
                 handleImageFile(e.dataTransfer.files[0])
               }}
             >
-              <Image
-                src={heroImage}
-                alt={product.name}
-                fill
-                className="object-cover"
-                unoptimized
-              />
+              {heroImage ? (
+                <Image
+                  src={heroImage}
+                  alt={product.name}
+                  fill
+                  className="object-cover"
+                  unoptimized
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-center px-1">
+                  <span className="text-[9px] font-black uppercase tracking-widest text-gray-300">
+                    {brand.name}
+                  </span>
+                </div>
+              )}
               {/* admin: 이미지 업로드 오버레이 */}
               {isAdmin && (
                 <div
@@ -469,14 +318,10 @@ export default function ICProductPage() {
                   </span>
                 </a>
               )}
-              {/* 픽업 주문 버튼 (고객) */}
-              <button
-                onClick={() => setShowOrder(true)}
-                className="mt-4 inline-flex items-center gap-1.5 bg-[#c10002] hover:bg-[#a00001] text-white text-sm font-black px-5 py-2.5 rounded-full transition"
-              >
-                <ShoppingBag size={14} />
-                픽업 주문
-              </button>
+              {/* 담배는 대면판매만 (담배사업법 §13의2). 온라인 주문·결제 미지원 */}
+              <p className="mt-4 text-[11px] text-gray-400 leading-5 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
+                🏬 매장 방문 대면 구매만 가능 · 온라인 판매/결제 미지원
+              </p>
             </div>
 
             {isAdmin && !editing && (
@@ -630,7 +475,7 @@ export default function ICProductPage() {
                 {siblings.map(({p, i}) => (
                   <Link
                     key={i}
-                    href={`/ic/${productSlug(brand.id, i)}`}
+                    href={`/dambe/${productSlug(brand.id, i)}`}
                     className="flex justify-between items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-gray-50 transition-colors"
                   >
                     <span className="text-sm text-gray-700">{p.name}</span>
@@ -648,16 +493,6 @@ export default function ICProductPage() {
           )}
         </div>
       </div>
-
-      {/* 픽업 주문 모달 */}
-      {showOrder && (
-        <OrderModal
-          slug={slug}
-          brandName={brand.name}
-          product={product}
-          onClose={() => setShowOrder(false)}
-        />
-      )}
     </div>
   )
 }

@@ -6,6 +6,7 @@ import {database} from "@/api/firebase"
 import {ref, push, set, onValue, remove, get} from "firebase/database"
 import type {ShopProduct} from "@/data/shop-products"
 import {useAuthContext} from "@/components/context/AuthContext"
+import {isValidImageUrl} from "@/utils/image"
 
 type GalleryItem = {id: string; url: string}
 
@@ -23,13 +24,23 @@ export default function ProductClient({product}: {product: ShopProduct}) {
   const [blogNote, setBlogNote] = useState("")
   const [editingBlog, setEditingBlog] = useState(false)
 
-  // Gallery states
   const [gallery, setGallery] = useState<GalleryItem[]>(
-    product.gallery.map((url, i) => ({id: `static-${i}`, url}))
+    product.gallery
+      .filter(isValidImageUrl)
+      .map((url, i) => ({id: `static-${i}`, url}))
   )
   const [dragging, setDragging] = useState(false)
   const [uploading, setUploading] = useState(false)
   const dropRef = useRef<HTMLDivElement>(null)
+
+  // 갤러리 이미지별 admin 전용 프롬프트/메모
+  const [galleryNotes, setGalleryNotes] = useState<{[key: string]: string}>({})
+  const [editingNote, setEditingNote] = useState<string | null>(null)
+
+  // 이미지 URL → Firebase 안전 키 (파일명 베이스, 확장자/특수문자 제거)
+  function noteKey(url: string) {
+    return (url.split("/").pop() || url).replace(/\.[^.]+$/, "").replace(/[.#$/[\]]/g, "_")
+  }
 
   function copyToClipboard(text: string, key: string) {
     navigator.clipboard.writeText(text)
@@ -84,6 +95,21 @@ export default function ProductClient({product}: {product: ShopProduct}) {
     }
   }
 
+  async function saveGalleryNote(url: string) {
+    if (!isAdmin) return
+    const key = noteKey(url)
+    try {
+      await set(ref(database, `/fashion-diary/${product.slug}/galleryNotes/${key}`), {
+        text: galleryNotes[key] || "",
+        timestamp: new Date().toISOString()
+      })
+      setEditingNote(null)
+    } catch (error: any) {
+      console.error("Failed to save gallery note:", error)
+      alert(`Save failed: ${error?.message || "Unknown error"}`)
+    }
+  }
+
   // Load saved data from Firebase
   useEffect(() => {
     if (!user?.email || !isAdmin) return
@@ -117,6 +143,19 @@ export default function ProductClient({product}: {product: ShopProduct}) {
         console.log("No prompts data found")
       }
     }).catch((error: any) => console.error("Prompts load error:", error))
+
+    // Load gallery notes (이미지별 admin 전용 메모)
+    const notesRef = ref(database, `/fashion-diary/${product.slug}/galleryNotes`)
+    get(notesRef).then(snap => {
+      if (snap.exists()) {
+        const data = snap.val()
+        const notes: {[key: string]: string} = {}
+        Object.entries(data).forEach(([k, v]: [string, any]) => {
+          notes[k] = v.text || ""
+        })
+        setGalleryNotes(notes)
+      }
+    }).catch((error: any) => console.error("Gallery notes load error:", error))
   }, [product.slug, user?.email, isAdmin])
 
   async function uploadFiles(files: FileList | File[]) {
@@ -265,24 +304,54 @@ export default function ProductClient({product}: {product: ShopProduct}) {
               dragging && isAdmin ? 'bg-blue-500/10 border-2 border-dashed border-blue-500' : ''
             } ${isAdmin ? 'p-4 rounded-lg' : ''}`}
           >
-            {gallery.map((item, i) => (
-              <div key={item.id} className="relative aspect-[4/5] rounded-lg overflow-hidden group">
-                <Image
-                  src={item.url}
-                  alt={`${product.title.en} ${i + 1}`}
-                  fill
-                  className="object-cover"
-                />
-                {isAdmin && !item.id.startsWith('static-') && (
-                  <button
-                    onClick={() => deleteImage(item)}
-                    className="absolute top-2 right-2 w-6 h-6 bg-red-600 hover:bg-red-700 text-white rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition"
-                  >
-                    ×
-                  </button>
+            {gallery.filter(item => isValidImageUrl(item.url)).map((item, i) => {
+              const k = noteKey(item.url)
+              return (
+              <div key={item.id} className="flex flex-col gap-2">
+                <div className="relative aspect-[4/5] rounded-lg overflow-hidden group">
+                  <Image
+                    src={item.url}
+                    alt={`${product.title.en} ${i + 1}`}
+                    fill
+                    className="object-cover"
+                  />
+                  {isAdmin && !item.id.startsWith('static-') && (
+                    <button
+                      onClick={() => deleteImage(item)}
+                      className="absolute top-2 right-2 w-6 h-6 bg-red-600 hover:bg-red-700 text-white rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+                {/* 이미지별 admin 전용 프롬프트/메모 (공개 X) */}
+                {isAdmin && (
+                  <div className="text-xs">
+                    {editingNote === k ? (
+                      <div className="space-y-1">
+                        <textarea
+                          value={galleryNotes[k] || ""}
+                          onChange={e => setGalleryNotes({...galleryNotes, [k]: e.target.value})}
+                          placeholder="이 이미지 프롬프트/메모 (admin 전용)"
+                          className="w-full h-20 px-2 py-1 bg-white/10 border border-white/20 rounded text-white placeholder-white/30 resize-none focus:outline-none focus:ring-1 focus:ring-blue-400"
+                        />
+                        <div className="flex gap-1">
+                          <button onClick={() => saveGalleryNote(item.url)} className="px-2 py-0.5 bg-green-600 hover:bg-green-500 text-white rounded text-[11px] transition">저장</button>
+                          <button onClick={() => setEditingNote(null)} className="px-2 py-0.5 bg-gray-600 hover:bg-gray-500 text-white rounded text-[11px] transition">취소</button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setEditingNote(k)}
+                        className="w-full text-left text-white/45 hover:text-white/80 whitespace-pre-wrap transition"
+                      >
+                        {galleryNotes[k] || "+ 프롬프트/메모 추가 (admin)"}
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
-            ))}
+            )})}
 
             {isAdmin && gallery.length === 0 && (
               <div className="col-span-2 border-2 border-dashed border-white/20 rounded-lg p-8 text-center text-white/40">

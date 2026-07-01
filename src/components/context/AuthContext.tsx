@@ -40,6 +40,11 @@ export function AuthContextProvider({children}: {children: ReactNode}) {
     const unsub = onAuthStateChanged(auth, u => {
       setUser(u)
       setIsLoading(false)
+      // 로그인 사용자 이메일 localStorage 기록 (dev: 페이지 권한 판단용)
+      if (typeof window !== "undefined") {
+        if (u?.email) localStorage.setItem("rk_user_email", u.email)
+        else localStorage.removeItem("rk_user_email")
+      }
     })
     return () => unsub()
   }, [])

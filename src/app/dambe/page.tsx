@@ -13,7 +13,7 @@ import {
   Plus,
   Trash2
 } from "lucide-react"
-import {brands, productSlug, type Brand} from "@/data/ic-brands"
+import {brands, productSlug, type Brand} from "@/data/dambe-brands"
 import {useAuthContext} from "@/components/context/AuthContext"
 import {
   fbSubscribeBrands,
@@ -22,46 +22,34 @@ import {
   fbUploadBrandImage,
   fbAddProduct,
   fbRemoveProduct
-} from "@/api/icFirebase"
+} from "@/api/dambeFirebase"
 
-const CATEGORIES = [
-  "전체",
-  "싱글몰트",
-  "블렌디드",
-  "일본위스키",
-  "코냑",
-  "버번·테네시",
-  "기타"
-]
-
-const CATEGORY_COLORS: Record<string, string> = {
-  싱글몰트: "#3b82f6",
-  블렌디드: "#f59e0b",
-  일본위스키: "#ec4899",
-  코냑: "#a78bfa",
-  "버번·테네시": "#f97316",
-  기타: "#6b7280"
-}
+const CATEGORIES = ["전체", "국산", "수입", "전자담배", "기타"]
 
 // 브랜드 한글 검색 별칭 (영문 brand.name으로는 한글 검색 안 되므로)
 const BRAND_ALIASES: Record<string, string> = {
-  glenfiddich: "글랜피딕 글렌피딕",
-  macallan: "맥캘란 맥켈란 맥켈렌",
-  balvenie: "발베니 발버니",
-  bluemamba: "블루맘바 블루망다",
-  royalsalute: "로얄살루트",
-  ballantines: "발렌타인 바렌타인",
-  chivas: "시바스리갈 시바스",
-  johnniewalker: "조니워커 존니워커 조나",
-  yamazaki: "야마자키",
-  suntory: "산토리",
-  hennessy: "헤네시 화네시",
-  camus: "카무스 까뮤",
-  jackdaniels: "잭다니엘 잭다니엘스",
-  apple: "애플",
-  tequila: "데킬라 데큐라 데낄라",
-  midleton: "미들턴 마쿠라이",
-  manju: "만주 만쥬 쿠보타 쿠포타"
+  esse: "에쎄 에세",
+  this: "디스",
+  theone: "더원",
+  raison: "레종",
+  bohem: "보헴",
+  simple: "심플",
+  marlboro: "말보로 말보루",
+  mevius: "메비우스 뫼비우스",
+  dunhill: "던힐",
+  virginia: "버지니아",
+  manchester: "맨체스터",
+  americanlegend: "아메리칸레전드 레전드",
+  sevenstar: "세븐스타 세븐스타스",
+  cloud: "클라우드",
+  handmade: "수제담배 수제"
+}
+
+const CATEGORY_COLORS: Record<string, string> = {
+  국산: "#3b82f6",
+  수입: "#f59e0b",
+  전자담배: "#10b981",
+  기타: "#6b7280"
 }
 
 // 가격 한 줄 (admin = 인라인 입력, 일반 = 링크)
@@ -140,7 +128,7 @@ function PriceRow({
           </button>
           {/* 상세 페이지(글 작성) 이동 */}
           <Link
-            href={`/ic/${productSlug(brand.id, index)}`}
+            href={`/dambe/${productSlug(brand.id, index)}`}
             className="text-gray-300 hover:text-[#c10002] transition-colors"
             title="상세 페이지 / 글 작성"
           >
@@ -153,7 +141,7 @@ function PriceRow({
 
   return (
     <Link
-      href={`/ic/${productSlug(brand.id, index)}`}
+      href={`/dambe/${productSlug(brand.id, index)}`}
       className="group/row flex justify-between items-center gap-2 -mx-1 px-1 py-0.5 rounded hover:bg-gray-50 transition-colors"
     >
       <span className="text-xs text-gray-600 group-hover/row:text-gray-900 transition-colors truncate">
@@ -379,11 +367,28 @@ function BrandCard({
   )
 }
 
-export default function ICPage() {
+export default function DambePage() {
   const {isAdmin, user, login, logout} = useAuthContext()
   const [activeCategory, setActiveCategory] = useState("전체")
   const [overrides, setOverrides] = useState<Record<string, Brand>>({})
   const [query, setQuery] = useState("")
+  const [seeding, setSeeding] = useState(false)
+
+  // 정적 카탈로그 전체를 FB에 일괄 등록(덮어쓰기). 옛 override까지 정리.
+  const handleSeedAll = async () => {
+    if (!confirm("가게 가격표 전체를 등록할까요?\n기존 편집 내용은 카탈로그 기준으로 덮어써집니다.")) return
+    setSeeding(true)
+    try {
+      for (const b of brands) {
+        await fbSaveBrand(b)
+      }
+      alert("등록 완료! 전체 카탈로그가 반영됐습니다.")
+    } catch (e) {
+      alert("등록 실패: " + (e as Error).message)
+    } finally {
+      setSeeding(false)
+    }
+  }
 
   // Firebase override 구독 (정적 brands 위에 덮어씀)
   useEffect(() => {
@@ -403,7 +408,7 @@ export default function ICPage() {
     await fbUpdateProductPrice(brand, index, price)
   }
 
-  // 이미지 업로드 → Storage → imageUrl 저장
+  // 이미지 업로드 → Cloudinary → imageUrl 저장
   const handleImageUpload = async (brand: Brand, file: File) => {
     const url = await fbUploadBrandImage(brand.id, file)
     await fbSaveBrand({...brand, imageUrl: url})
@@ -453,49 +458,60 @@ export default function ICPage() {
             >
               ← rainskiss
             </Link>
-            {/* 사장님 메뉴 (주문관리 + 로그인) */}
-            <div className="flex items-center gap-4">
-              {/* 주문 관리: admin(rainskiss/icanmart) 로그인 시에만 노출 */}
-              {isAdmin && (
-                <Link
-                  href="/ic/orders"
-                  className="text-[10px] font-black uppercase tracking-widest text-[#c10002] hover:opacity-70 transition"
-                >
-                  주문 관리
-                </Link>
-              )}
-              {user ? (
+            {/* 사장님 로그인 (로그인해야 가격·이미지 편집 가능) */}
+            {user ? (
+              <div className="flex items-center gap-4">
+                {isAdmin && (
+                  <button
+                    onClick={handleSeedAll}
+                    disabled={seeding}
+                    className="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-[#c10002] transition disabled:opacity-40"
+                  >
+                    {seeding ? "등록중…" : "카탈로그 등록"}
+                  </button>
+                )}
                 <button
                   onClick={() => logout()}
                   className="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-[#c10002] transition"
                 >
                   {isAdmin ? "편집중 · 로그아웃" : "로그아웃"}
                 </button>
-              ) : (
-                <button
-                  onClick={() => login()}
-                  className="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-[#c10002] transition"
-                >
-                  사장님 로그인
-                </button>
-              )}
-            </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => login()}
+                className="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-[#c10002] transition"
+              >
+                사장님 로그인
+              </button>
+            )}
           </div>
           <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#c10002] mb-4">
             Price List
           </p>
           <h1 className="text-[clamp(3rem,10vw,7rem)] font-black leading-none tracking-tighter uppercase italic text-black">
-            깡 통 시 장
+            담 배
           </h1>
           <p className="text-gray-400 text-xs tracking-[0.4em] uppercase mt-2">
             busan, korea
           </p>
           <p className="text-gray-500 text-sm mt-3">
-            주류 가격표 · {brandsData.length}종
+            담배 가격표 · {brandsData.length}종
             {isAdmin && (
               <span className="ml-2 text-[#c10002] font-black">· 편집 모드</span>
             )}
           </p>
+          {/* 법적 면책: 담배는 대면판매 강제(담배사업법 §13의2). 온라인 판매·결제·주문 불가 */}
+          <div className="mt-5 inline-block rounded-xl bg-gray-100 border border-gray-200 px-4 py-2.5">
+            <p className="text-[11px] text-gray-500 leading-5">
+              📋 매장 진열 상품 안내(디지털 메뉴판)
+              <br />
+              <span className="text-gray-400">
+                본 페이지는 정보 제공용이며, 온라인 판매·결제·주문을 지원하지
+                않습니다. 담배는 매장 방문 후 대면 구매만 가능합니다.
+              </span>
+            </p>
+          </div>
         </div>
       </div>
 

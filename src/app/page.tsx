@@ -24,6 +24,8 @@ export default function HomePage() {
       router.push("/zo")
     } else if (password === "ic") {
       router.push("/ic")
+    } else if (password === "shop") {
+      router.push("/shop")
     } else {
       // 잘못된/미인증 암호 → 뮤직 비디오 페이지로 바로 이동
       router.push("/mv")

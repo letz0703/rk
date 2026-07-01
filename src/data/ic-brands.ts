@@ -1,6 +1,7 @@
 export type Product = {
   name: string
   price: number | null
+  image?: string | null // 제품별 이미지 (없으면 브랜드 대표이미지 사용)
 }
 
 export type Brand = {
