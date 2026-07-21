@@ -66,7 +66,7 @@ export default function UploadPageContent() {
       router.push("/shop")
     } catch (error) {
       console.error("Submit error:", error)
-      alert("등록 실패: " + error.message)
+      alert("등록 실패: " + (error as Error).message)
     } finally {
       setSubmitting(false)
     }
@@ -132,7 +132,7 @@ export default function UploadPageContent() {
                 <h3 className="text-lg font-semibold text-green-400 mb-3">Flow (Soft) - Public</h3>
                 <textarea
                   value={analysisResult.flowSoft}
-                  onChange={(e) => setAnalysisResult(prev => prev ? {...prev, flowSoft: e.target.value} : null)}
+                  onChange={(e) => setAnalysisResult(prev => ({...prev, flowSoft: e.target.value}))}
                   className="w-full h-32 bg-white/5 border border-white/20 rounded-lg p-3 text-white text-sm resize-none"
                   placeholder="Flow prompt..."
                 />
@@ -143,7 +143,7 @@ export default function UploadPageContent() {
                 <h3 className="text-lg font-semibold text-orange-400 mb-3">Grok (Hard) - Link Only</h3>
                 <textarea
                   value={analysisResult.grokHard}
-                  onChange={(e) => setAnalysisResult(prev => prev ? {...prev, grokHard: e.target.value} : null)}
+                  onChange={(e) => setAnalysisResult(prev => ({...prev, grokHard: e.target.value}))}
                   className="w-full h-32 bg-white/5 border border-white/20 rounded-lg p-3 text-white text-sm resize-none"
                   placeholder="Grok prompt..."
                 />
@@ -155,7 +155,7 @@ export default function UploadPageContent() {
               <h3 className="text-lg font-semibold text-blue-400 mb-3">Korean Keywords</h3>
               <textarea
                 value={analysisResult.koreanKeywords}
-                onChange={(e) => setAnalysisResult(prev => prev ? {...prev, koreanKeywords: e.target.value} : null)}
+                onChange={(e) => setAnalysisResult(prev => ({...prev, koreanKeywords: e.target.value}))}
                 className="w-full h-24 bg-white/5 border border-white/20 rounded-lg p-3 text-white text-sm resize-none"
                 placeholder="She is wearing..."
               />
@@ -166,7 +166,7 @@ export default function UploadPageContent() {
               <h3 className="text-lg font-semibold text-purple-400 mb-3">JSON Format</h3>
               <textarea
                 value={analysisResult.jsonFormat}
-                onChange={(e) => setAnalysisResult(prev => prev ? {...prev, jsonFormat: e.target.value} : null)}
+                onChange={(e) => setAnalysisResult(prev => ({...prev, jsonFormat: e.target.value}))}
                 className="w-full h-32 bg-white/5 border border-white/20 rounded-lg p-3 text-white text-sm font-mono resize-none"
                 placeholder="JSON data..."
               />

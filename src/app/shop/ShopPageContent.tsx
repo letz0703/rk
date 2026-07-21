@@ -10,6 +10,7 @@ import {fbSubscribeProducts, fbToShopProduct, fbDeleteProduct, fbFromShopProduct
 
 const categories: Category[] = [
   "Street",
+  "Street & Modern",
   "Uniform",
   "Swimwear",
   "Bodysuit",

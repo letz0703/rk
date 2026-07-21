@@ -14,6 +14,7 @@ export type MultiLang = {
 
 export type Category =
   | "Street"
+  | "Street & Modern"
   | "Uniform"
   | "Swimwear"
   | "Bodysuit"

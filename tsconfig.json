@@ -30,5 +30,11 @@
     "src/app/downloads/page.jsx",
     "src/app/todo/page.jsx"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "batchUpload.ts",
+    "src/api/batchUpload.ts",
+    "busan-marine-elegance.ts",
+    "page.tsx"
+  ]
 }

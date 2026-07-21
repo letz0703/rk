@@ -196,6 +196,60 @@ export const brands: Brand[] = [
       {name: "만주(쿠포타)", price: 95000},
       {name: "쿠포타만주", price: null}
     ]
+  },
+  // ── 손수건 ──────────────────────────────
+  {
+    id: "handkerchief",
+    name: "손수건",
+    category: "손수건",
+    website: null,
+    image: "",
+    imageUrl: null,
+    products: [
+      {name: "신사 손수건", price: null},
+      {name: "숙녀 손수건", price: null},
+      {name: "자수 손수건", price: null}
+    ]
+  },
+  // ── 담배 ────────────────────────────────
+  {
+    id: "marlboro",
+    name: "MARLBORO",
+    category: "담배",
+    website: null,
+    image: "",
+    imageUrl: null,
+    products: [
+      {name: "말보로 레드", price: null},
+      {name: "말보로 골드", price: null}
+    ]
+  },
+  {
+    id: "dunhill",
+    name: "DUNHILL",
+    category: "담배",
+    website: null,
+    image: "",
+    imageUrl: null,
+    products: [{name: "던힐", price: null}]
+  },
+  {
+    id: "parliament",
+    name: "PARLIAMENT",
+    category: "담배",
+    website: null,
+    image: "",
+    imageUrl: null,
+    products: [{name: "팔러먼트 아쿠아", price: null}]
+  },
+  {
+    id: "mevius",
+    name: "MEVIUS",
+    category: "담배",
+    website: null,
+    image: "",
+    imageUrl: null,
+    products: [{name: "메비우스", price: null}]
   }
 ]
 
@@ -212,7 +266,15 @@ export type ProductHit = {
 
 // slug 로 제품 1개 역참조. 없으면 null.
 export function getProductBySlug(slug: string): ProductHit | null {
-  for (const brand of brands) {
+  return getProductBySlugIn(brands, slug)
+}
+
+// 임의 브랜드 목록(FB 병합본 포함)에서 slug 역참조.
+export function getProductBySlugIn(
+  list: Brand[],
+  slug: string
+): ProductHit | null {
+  for (const brand of list) {
     for (let index = 0; index < brand.products.length; index++) {
       if (productSlug(brand.id, index) === slug) {
         return {brand, product: brand.products[index], index}
@@ -220,4 +282,16 @@ export function getProductBySlug(slug: string): ProductHit | null {
     }
   }
   return null
+}
+
+// 정적 시드 + Firebase override 병합.
+// 시드에 없는 FB 전용 브랜드(사장님이 사이트에서 추가한 카드)도 포함.
+// Firebase는 빈 배열을 저장 안 하므로 products 누락 방어.
+export function mergeBrands(overrides: Record<string, Brand>): Brand[] {
+  const seedIds = new Set(brands.map(b => b.id))
+  const merged = brands.map(b => overrides[b.id] ?? b)
+  const extras = Object.values(overrides).filter(
+    b => b && b.id && !seedIds.has(b.id)
+  )
+  return [...merged, ...extras].map(b => ({...b, products: b.products ?? []}))
 }

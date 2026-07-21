@@ -68,6 +68,11 @@ export async function fbRemoveProduct(
   await fbSaveBrand({...brand, products})
 }
 
+// 브랜드(카드) 통째 삭제. 정적 시드 카드는 FB에서만 지워지고 시드로 복원됨.
+export async function fbDeleteBrand(id: string): Promise<void> {
+  await remove(ref(database, `${ROOT}/${id}`))
+}
+
 // 이미지 업로드 → Cloudinary(/api/ic-image) → secure_url 반환
 // Firebase Storage는 Blaze 플랜 필요해서 안 씀. Cloudinary 무료 사용.
 // key = 고유 식별자 (브랜드 "glenfiddich" 또는 제품 "glenfiddich-0")

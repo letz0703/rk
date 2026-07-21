@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
     console.log('Gemini raw response:', text)
 
     // Extract JSON array from response
-    const jsonMatch = text.match(/\[.*?\]/s)
+    const jsonMatch = text.match(/\[[\s\S]*?\]/)
     if (!jsonMatch) {
       console.error('No JSON array found in response:', text)
       throw new Error("Invalid response format from Gemini")
@@ -80,11 +80,17 @@ export async function POST(req: NextRequest) {
     })
 
   } catch (error) {
+    const err = error as {
+      message?: string
+      status?: number
+      errorInfo?: unknown
+      stack?: string
+    }
     console.error('Gemini API Error Details:', {
-      message: error.message,
-      status: error.status,
-      errorInfo: error.errorInfo,
-      stack: error.stack
+      message: err.message,
+      status: err.status,
+      errorInfo: err.errorInfo,
+      stack: err.stack
     })
 
     // Fallback to mock data if Gemini fails

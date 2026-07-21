@@ -458,8 +458,19 @@ export default function DambePage() {
             >
               ← rainskiss
             </Link>
-            {/* 사장님 로그인 (로그인해야 가격·이미지 편집 가능) */}
-            {user ? (
+            {/* 우측: 데일리샷 바로가기 + 로그인 */}
+            <div className="flex items-center gap-4">
+              <a
+                href="https://dailyshot.co/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-[#c10002] transition"
+              >
+                Daily Shot
+                <ExternalLink size={11} />
+              </a>
+              {/* 사장님 로그인 (로그인해야 가격·이미지 편집 가능) */}
+              {user ? (
               <div className="flex items-center gap-4">
                 {isAdmin && (
                   <button
@@ -484,7 +495,8 @@ export default function DambePage() {
               >
                 사장님 로그인
               </button>
-            )}
+              )}
+            </div>
           </div>
           <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#c10002] mb-4">
             Price List

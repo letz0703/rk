@@ -44,14 +44,15 @@ export function emptyProduct(slug = ""): FBProduct {
 }
 
 // Firebase는 빈 배열/객체/문자열을 드롭하므로, 읽을 때 누락 필드를 기본값으로 채움
-function normalize(raw: any, slug: string): FBProduct {
+function normalize(raw: Record<string, unknown> | null | undefined, slug: string): FBProduct {
   const base = emptyProduct(slug)
+  const r = (raw || {}) as Partial<FBProduct>
   return {
     ...base,
-    ...raw,
-    slug: raw?.slug || slug,
-    gallery: Array.isArray(raw?.gallery) ? raw.gallery : [],
-    prompts: {...base.prompts, ...(raw?.prompts || {})}
+    ...r,
+    slug: r.slug || slug,
+    gallery: Array.isArray(r.gallery) ? r.gallery : [],
+    prompts: {...base.prompts, ...(r.prompts || {})}
   }
 }
 
@@ -65,7 +66,7 @@ export async function fbGetProduct(slug: string): Promise<FBProduct | null> {
 export async function fbListProducts(): Promise<FBProduct[]> {
   const snap = await get(ref(database, ROOT))
   if (!snap.exists()) return []
-  const obj = snap.val() as Record<string, any>
+  const obj = snap.val() as Record<string, Record<string, unknown>>
   return Object.entries(obj).map(([slug, v]) => normalize(v, slug))
 }
 
@@ -74,7 +75,7 @@ export function fbSubscribeProducts(cb: (products: FBProduct[]) => void): () => 
   const r = ref(database, ROOT)
   const off = onValue(r, snap => {
     if (!snap.exists()) return cb([])
-    const obj = snap.val() as Record<string, any>
+    const obj = snap.val() as Record<string, Record<string, unknown>>
     cb(Object.entries(obj).map(([slug, v]) => normalize(v, slug)))
   })
   return off

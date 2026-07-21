@@ -24,6 +24,11 @@ export default function ProductFirebaseClient({slug}: {slug: string}) {
   const {isAdmin} = useAuthContext()
   const router = useRouter()
 
+  // 구독 티어 접목 지점 — 지금은 미구축(false). 결제/구독자 판별 붙이면 여기만 교체.
+  const isSubscriber = false
+  // HARD 프롬프트 열람 권한 = 관리자 또는 월구독자
+  const canViewHard = isAdmin || isSubscriber
+
   const [product, setProduct] = useState<FBProduct | null>(null)
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(false)
@@ -279,21 +284,42 @@ export default function ProductFirebaseClient({slug}: {slug: string}) {
         </div>
       )}
 
-      {/* 프롬프트 — admin만 평문, 비admin은 잠금 */}
-      <div className="mt-10 space-y-4">
-        <h3 className="text-lg font-semibold">프롬프트</h3>
-        {isAdmin ? (
-          <div className="space-y-3">
-            <PromptBox label="SOFT" text={p.prompts.soft} />
-            <PromptBox label="HARD" text={p.prompts.hard} />
-            <PromptBox label="SOFT MODEL" text={p.prompts.softModel} />
-            <PromptBox label="HARD MODEL" text={p.prompts.hardModel} />
-          </div>
-        ) : (
-          <div className="rounded-lg border border-white/10 bg-white/5 p-6 text-center text-white/40">
-            🔒 구매 시 프롬프트가 공개됩니다.
-          </div>
-        )}
+      {/* 프롬프트 — SOFT 공개 / HARD는 관리자·구독자만 */}
+      <div className="mt-10 space-y-6">
+        {/* SOFT = 전체 공개 */}
+        <div className="space-y-3">
+          <h3 className="text-lg font-semibold">
+            SOFT 프롬프트 <span className="text-xs font-normal text-white/40">· 공개</span>
+          </h3>
+          <PromptBox label="SOFT" text={p.prompts.soft} />
+          <PromptBox label="SOFT MODEL" text={p.prompts.softModel} />
+        </div>
+
+        {/* HARD = 관리자·월구독자만 */}
+        <div className="space-y-3">
+          <h3 className="text-lg font-semibold">
+            HARD 프롬프트{" "}
+            <span className="text-xs font-normal" style={{color: "#c10002"}}>
+              · 구독자 전용
+            </span>
+          </h3>
+          {canViewHard ? (
+            <>
+              <PromptBox label="HARD" text={p.prompts.hard} />
+              <PromptBox label="HARD MODEL" text={p.prompts.hardModel} />
+            </>
+          ) : (
+            <div className="rounded-lg border border-[#c10002]/30 bg-[#c10002]/5 p-6 text-center">
+              <div className="mb-1 text-2xl">🔒</div>
+              <div className="text-sm text-white/70">
+                HARD 프롬프트는 월구독자에게만 공개됩니다.
+              </div>
+              <div className="mt-1 text-xs text-white/40">
+                SOFT는 위에서 바로 사용하세요.
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

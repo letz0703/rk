@@ -16,7 +16,14 @@ import {
   Check,
   ShoppingBag
 } from "lucide-react"
-import {getProductBySlug, productSlug, type Product} from "@/data/ic-brands"
+import {
+  getProductBySlug,
+  getProductBySlugIn,
+  mergeBrands,
+  productSlug,
+  type Product
+} from "@/data/ic-brands"
+import {getIcDescription} from "@/data/ic-descriptions"
 import {useAuthContext} from "@/components/context/AuthContext"
 import {saveIcArticle, onIcArticle} from "@/api/firebase"
 import {
@@ -272,8 +279,6 @@ export default function ICProductPage() {
   const slug = String(params.slug)
   const {isAdmin} = useAuthContext()
 
-  const hit = getProductBySlug(slug)
-
   const [overrides, setOverrides] = useState<Record<string, Brand>>({})
   const [article, setArticle] = useState<Article | null>(null)
   const [loading, setLoading] = useState(true)
@@ -283,6 +288,12 @@ export default function ICProductPage() {
     const off = fbSubscribeBrands(setOverrides)
     return () => off()
   }, [])
+
+  // 정적 시드 + FB 병합본에서 제품 역참조.
+  // 시드 카드(양주·손수건·담배)는 즉시, 사장님이 사이트에서 추가한
+  // FB 전용 카드는 override 로드 후 해석됨.
+  const hit =
+    getProductBySlugIn(mergeBrands(overrides), slug) || getProductBySlug(slug)
   const [editing, setEditing] = useState(false)
   const [draftTitle, setDraftTitle] = useState("")
   const [draftBody, setDraftBody] = useState("")
@@ -319,7 +330,7 @@ export default function ICProductPage() {
     )
   }
 
-  // 정적 hit + Firebase override 병합 → 가격·이미지 최신 반영
+  // hit 자체가 이미 병합본 기준 → 그대로 사용
   const brand = overrides[hit.brand.id] ?? hit.brand
   const product = brand.products[hit.index] ?? hit.product
   // 제품 이미지 우선, 없으면 브랜드 대표이미지
@@ -344,9 +355,13 @@ export default function ICProductPage() {
     }
   }
 
+  // 초안 시드 (Firebase 글 없을 때 기본값). 사장님이 저장하면 article이 우선.
+  const seed = getIcDescription(slug)
+
   function startEdit() {
-    setDraftTitle(article?.title || product.name)
-    setDraftBody(article?.body || "")
+    // 아직 저장된 글이 없으면 초안 시드를 에디터에 채워 바로 수정 가능하게
+    setDraftTitle(article?.title || seed?.title || product.name)
+    setDraftBody(article?.body ?? seed?.body ?? "")
     setDraftVideo(article?.videoUrl || "")
     setEditing(true)
   }
@@ -367,16 +382,18 @@ export default function ICProductPage() {
     }
   }
 
+  // 표시용 본문/제목: 저장된 글(article) 우선, 없으면 초안 시드(seed) 폴백
+  const effectiveBody = article?.body ?? seed?.body ?? ""
   // 유튜브칸 우선, 없으면 본문에서 자동 탐지
-  const videoId = youtubeId(article?.videoUrl) || youtubeId(article?.body)
+  const videoId = youtubeId(article?.videoUrl) || youtubeId(effectiveBody)
   // 본문에서 단독 유튜브 URL 줄 제거 (영상으로 임베드되므로 중복 방지)
-  const bodyWithoutVideo = (article?.body || "")
+  const bodyWithoutVideo = effectiveBody
     .split("\n")
     .filter(line => !youtubeId(line.trim()) || line.trim().length > 60)
     .join("\n")
     .trim()
   const hasContent = !!bodyWithoutVideo || !!videoId
-  const displayTitle = article?.title || product.name
+  const displayTitle = article?.title || seed?.title || product.name
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
