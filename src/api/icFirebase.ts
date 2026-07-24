@@ -147,3 +147,105 @@ export async function fbSetOrderStatus(
 export async function fbDeleteOrder(id: string): Promise<void> {
   await remove(ref(database, `${ORDERS}/${id}`))
 }
+
+// ── 문의 게시판 (공개 Q&A) ──────────────────────────────────────────────
+// 개인정보(전화·비밀글 내용·비공개 답변)는 공개 노드에 두지 않는다.
+// 공개 노드(ic-board)엔 공개 안전 필드만, 민감정보는 admin 전용
+// 노드(ic-board-private)에 분리 저장 → 공개 읽기해도 전화 안 샌다.
+//
+// Firebase 규칙 권장:
+//   ic-board          읽기=공개, 쓰기=생성만(push), reply/삭제=admin
+//   ic-board-private  읽기=admin 전용, 쓰기=생성만, 수정/삭제=admin
+const BOARD = "ic-board"
+const BOARDP = "ic-board-private"
+
+export type IcPost = {
+  id: string
+  product?: string // 문의 상품명 (선택)
+  author: string // 작성자 이름
+  question: string // 공개 목록에선 비밀글이면 "" (admin은 private에서 원문 받음)
+  secret?: boolean // 비밀글 = 질문 내용 비공개(담당자만)
+  phone?: string // 연락처 (admin 전용, private 노드)
+  reply?: string // 담당자 답변 (공개답변이면 여기, 비공개답변이면 private)
+  replyPublic?: boolean // 답변 공개 여부
+  createdAt: number
+  repliedAt?: number
+}
+
+// 문의 작성 (고객, 비로그인).
+// 공개 노드엔 공개 안전 필드만, 전화·(비밀)원문은 private 노드에.
+export async function fbCreatePost(input: {
+  product?: string
+  author: string
+  question: string
+  secret?: boolean
+  phone?: string
+}): Promise<string> {
+  const pub = {
+    product: input.product || "",
+    author: input.author,
+    question: input.secret ? "" : input.question,
+    secret: !!input.secret,
+    createdAt: Date.now()
+  }
+  const r = await push(ref(database, BOARD), JSON.parse(JSON.stringify(pub)))
+  const id = r.key as string
+  // private: 전화 + 원문 질문 (admin 전용)
+  const priv = {phone: input.phone || "", question: input.question}
+  await set(ref(database, `${BOARDP}/${id}`), JSON.parse(JSON.stringify(priv)))
+  return id
+}
+
+// 공개 문의 구독 (모두). 최신순. 비밀글은 question=""로 옴.
+export function fbSubscribePosts(cb: (posts: IcPost[]) => void): () => void {
+  const r = ref(database, BOARD)
+  return onValue(r, snap => {
+    if (!snap.exists()) return cb([])
+    const obj = snap.val() as Record<string, Omit<IcPost, "id">>
+    const list = Object.entries(obj).map(([id, v]) => ({...v, id}))
+    list.sort((a, b) => b.createdAt - a.createdAt)
+    cb(list)
+  })
+}
+
+// private 구독 (admin 전용): {id: {phone, question, reply?}}
+export type IcPostPrivate = {phone?: string; question?: string; reply?: string}
+export function fbSubscribePostsPrivate(
+  cb: (map: Record<string, IcPostPrivate>) => void
+): () => void {
+  const r = ref(database, BOARDP)
+  return onValue(r, snap => {
+    cb(snap.exists() ? (snap.val() as Record<string, IcPostPrivate>) : {})
+  })
+}
+
+// 답변 등록/수정 (admin). isPublic=true면 공개 노드, false면 private 노드에.
+export async function fbSetPostReply(
+  id: string,
+  reply: string,
+  isPublic: boolean
+): Promise<void> {
+  if (isPublic) {
+    await update(ref(database, `${BOARD}/${id}`), {
+      reply,
+      replyPublic: true,
+      repliedAt: Date.now()
+    })
+    // private에 남아있던 비공개 답변 정리
+    await update(ref(database, `${BOARDP}/${id}`), {reply: null})
+  } else {
+    // 공개 노드엔 "답변완료·비공개" 표시만, 원문은 private로
+    await update(ref(database, `${BOARD}/${id}`), {
+      reply: "",
+      replyPublic: false,
+      repliedAt: Date.now()
+    })
+    await update(ref(database, `${BOARDP}/${id}`), {reply})
+  }
+}
+
+// 문의 삭제 (admin) — 공개·private 둘 다
+export async function fbDeletePost(id: string): Promise<void> {
+  await remove(ref(database, `${BOARD}/${id}`))
+  await remove(ref(database, `${BOARDP}/${id}`))
+}

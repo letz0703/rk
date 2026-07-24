@@ -14,7 +14,8 @@ import {
   Upload,
   Loader2,
   Check,
-  ShoppingBag
+  ShoppingBag,
+  MessageCircle
 } from "lucide-react"
 import {
   getProductBySlug,
@@ -177,11 +178,14 @@ function OrderModal({
             <div className="w-14 h-14 rounded-full bg-[#c10002]/10 flex items-center justify-center mx-auto mb-4">
               <Check size={26} className="text-[#c10002]" />
             </div>
-            <h3 className="text-lg font-black text-gray-900 mb-2">주문 접수됨</h3>
+            <h3 className="text-lg font-black text-gray-900 mb-2">문의 접수됨</h3>
             <p className="text-sm text-gray-500 leading-6">
-              준비되면 입력하신 번호로
+              깡통시장 현재 시세 확인 후
               <br />
-              문자 드릴게요. 방문 픽업·현장결제입니다.
+              입력하신 번호로 문자 드릴게요.
+              <br />
+              방문은 <span className="font-black text-[#c10002]">하루 전 문자</span>{" "}
+              부탁드립니다. (현장 결제)
             </p>
             <button
               onClick={onClose}
@@ -194,7 +198,7 @@ function OrderModal({
           <>
             <div className="flex justify-between items-start mb-1">
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#c10002]">
-                픽업 주문
+                가격 문의 · 방문 예약
               </p>
               <button onClick={onClose} className="text-gray-400 hover:text-gray-700">
                 <X size={18} />
@@ -243,7 +247,7 @@ function OrderModal({
               <input
                 value={pickupDate}
                 onChange={e => setPickupDate(e.target.value)}
-                placeholder="픽업 희망일 (선택, 예: 토요일 오후)"
+                placeholder="방문 예정일 (선택, 예: 토요일 오후)"
                 className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#c10002]"
               />
               <textarea
@@ -260,12 +264,12 @@ function OrderModal({
               disabled={!canSubmit}
               className="mt-5 w-full bg-[#c10002] disabled:opacity-40 text-white text-sm font-black py-3.5 rounded-full transition"
             >
-              {submitting ? "접수 중…" : "픽업 주문하기"}
+              {submitting ? "접수 중…" : "가격 문의 · 예약 접수"}
             </button>
             <p className="text-[11px] text-gray-400 text-center mt-3 leading-5">
-              온라인 결제 없음 · 방문 픽업 현장결제
+              시세 확인 후 문자 안내 · 온라인 결제 없음
               <br />
-              준비완료 시 문자 안내
+              방문 하루 전 문자 필수 · 현장 결제
             </p>
           </>
         )}
@@ -486,14 +490,23 @@ export default function ICProductPage() {
                   </span>
                 </a>
               )}
-              {/* 픽업 주문 버튼 (고객) */}
-              <button
-                onClick={() => setShowOrder(true)}
-                className="mt-4 inline-flex items-center gap-1.5 bg-[#c10002] hover:bg-[#a00001] text-white text-sm font-black px-5 py-2.5 rounded-full transition"
-              >
-                <ShoppingBag size={14} />
-                픽업 주문
-              </button>
+              {/* 문의/예약 버튼 (고객) */}
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Link
+                  href={`/ic/board?product=${encodeURIComponent(product.name)}`}
+                  className="inline-flex items-center gap-1.5 bg-[#c10002] hover:bg-[#a00001] text-white text-sm font-black px-5 py-2.5 rounded-full transition"
+                >
+                  <MessageCircle size={14} />
+                  게시판 문의
+                </Link>
+                <button
+                  onClick={() => setShowOrder(true)}
+                  className="inline-flex items-center gap-1.5 bg-gray-900 hover:bg-black text-white text-sm font-black px-5 py-2.5 rounded-full transition"
+                >
+                  <ShoppingBag size={14} />
+                  방문 예약
+                </button>
+              </div>
             </div>
 
             {isAdmin && !editing && (

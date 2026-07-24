@@ -55,15 +55,6 @@ export const brands: Brand[] = [
     ]
   },
   {
-    id: "bluemamba",
-    name: "BLUE MAMBA",
-    category: "싱글몰트",
-    website: null,
-    image: "https://img.thewhiskyexchange.com/500/jwob.bluev2.jpg",
-    imageUrl: null,
-    products: [{name: "융띠 블루망다", price: 549000}]
-  },
-  {
     id: "royalsalute",
     name: "ROYAL SALUTE",
     category: "블렌디드",

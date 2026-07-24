@@ -74,7 +74,6 @@ const BRAND_ALIASES: Record<string, string> = {
   glenfiddich: "글랜피딕 글렌피딕",
   macallan: "맥캘란 맥켈란 맥켈렌",
   balvenie: "발베니 발버니",
-  bluemamba: "블루맘바 블루망다",
   royalsalute: "로얄살루트",
   ballantines: "발렌타인 바렌타인",
   chivas: "시바스리갈 시바스",
@@ -137,7 +136,13 @@ function PriceRow({
   if (isAdmin) {
     return (
       <div className="flex justify-between items-center gap-2 -mx-1 px-1 py-0.5">
-        <span className="text-xs text-gray-700 truncate">{product.name}</span>
+        <Link
+          href={`/ic/${productSlug(brand.id, index)}`}
+          className="text-xs text-gray-700 truncate hover:text-[#c10002] hover:underline transition-colors"
+          title="상세 페이지 보기"
+        >
+          {product.name}
+        </Link>
         <div className="flex items-center gap-1 shrink-0">
           <span className="text-xs text-gray-400">₩</span>
           <input
@@ -552,6 +557,13 @@ export default function ICPage() {
             </Link>
             {/* 사장님 메뉴 (주문관리 + 로그인) */}
             <div className="flex items-center gap-4">
+              {/* 문의 게시판: 모두에게 노출 */}
+              <Link
+                href="/ic/board"
+                className="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-[#c10002] transition"
+              >
+                문의 게시판
+              </Link>
               {/* 주문 관리: admin(rainskiss/icanmart) 로그인 시에만 노출 */}
               {isAdmin && (
                 <Link
@@ -601,18 +613,25 @@ export default function ICPage() {
             </p>
             <ol className="space-y-1.5 text-sm text-gray-600">
               <li>
-                <span className="font-black text-gray-900">1.</span> 가격표에서
-                상품 선택 → <span className="font-black">픽업 예약</span> 접수
+                <span className="font-black text-gray-900">1.</span>{" "}
+                <Link
+                  href="/ic/board"
+                  className="font-black text-[#c10002] underline underline-offset-2"
+                >
+                  문의 게시판
+                </Link>
+                에 상품·가격·재고 문의 접수 (연락처는 비밀글로)
               </li>
               <li>
-                <span className="font-black text-gray-900">2.</span> 사장님이
-                깡통시장에서 물건 확보 후{" "}
-                <span className="font-black">문자로 안내</span>
+                <span className="font-black text-gray-900">2.</span> 담당자가
+                깡통시장 현재 시세 확인 후{" "}
+                <span className="font-black">게시판 답변</span>으로 안내
               </li>
               <li>
-                <span className="font-black text-gray-900">3.</span> 매장 방문{" "}
-                <span className="font-black">현장 픽업 · 현장 결제</span>{" "}
-                (온라인 결제 없음)
+                <span className="font-black text-gray-900">3.</span>{" "}
+                <span className="font-black">방문 예약</span> — 방문{" "}
+                <span className="font-black text-[#c10002]">하루 전 게시판 문의 필수</span>{" "}
+                · 매장 현장 픽업 · 현장 결제 (온라인 결제 없음)
               </li>
             </ol>
           </div>

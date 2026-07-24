@@ -17,6 +17,37 @@ export default function ZoPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // 저장된 등록 목록 + 검색
+  type ZoResult = {
+    id: number
+    originalImage: string
+    prompt: string
+    userMemo: string
+    created: string
+  }
+  const [results, setResults] = useState<ZoResult[]>([])
+  const [search, setSearch] = useState("")
+
+  const loadResults = useCallback(() => {
+    try {
+      const raw = JSON.parse(localStorage.getItem("zo-results") || "[]")
+      setResults(Array.isArray(raw) ? raw : [])
+    } catch {
+      setResults([])
+    }
+  }, [])
+
+  // 마운트 시 저장분 로드
+  useEffect(() => {
+    loadResults()
+  }, [loadResults])
+
+  const deleteResult = (id: number) => {
+    const next = results.filter(r => r.id !== id)
+    setResults(next)
+    localStorage.setItem("zo-results", JSON.stringify(next))
+  }
+
   // Cleanup blob URL on unmount or when image changes
   useEffect(() => {
     return () => {
@@ -34,19 +65,21 @@ export default function ZoPage() {
     setIsLoading(true)
 
     try {
-      // Cleanup previous blob URL if exists
-      if (uploadedImage && uploadedImage.startsWith('blob:')) {
-        URL.revokeObjectURL(uploadedImage)
-      }
-
-      setUploadedImage(URL.createObjectURL(file))
+      // base64 data URL로 읽음 → localStorage 저장 후 새로고침해도 이미지 유지
+      const dataUrl: string = await new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => resolve(reader.result as string)
+        reader.onerror = reject
+        reader.readAsDataURL(file)
+      })
+      setUploadedImage(dataUrl)
     } catch (err) {
       setError('이미지 처리 중 오류가 발생했습니다.')
       console.error('Image processing error:', err)
     } finally {
       setIsLoading(false)
     }
-  }, [uploadedImage])
+  }, [])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -78,6 +111,7 @@ export default function ZoPage() {
       const existing = JSON.parse(localStorage.getItem('zo-results') || '[]')
       existing.unshift(saveData)
       localStorage.setItem('zo-results', JSON.stringify(existing))
+      loadResults()
 
       // Show success message briefly
       setError(null)
@@ -265,6 +299,93 @@ Prompt Studio
           <p>의상 이미지 업로드 후</p>
           <p>프롬프트와 메모를 작성하여 저장하세요</p>
         </div>
+      </div>
+
+      {/* 저장된 등록 목록 + 검색 */}
+      <div className="max-w-5xl mx-auto px-6 pb-20">
+        <div className="flex items-center justify-between gap-4 mb-6">
+          <h2 className="text-lg font-semibold">
+            내 등록{" "}
+            <span className="text-white/40 text-sm">({results.length})</span>
+          </h2>
+          <input
+            type="text"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="프롬프트·메모 검색…"
+            className="w-64 max-w-[50%] px-4 py-2 bg-white/5 border border-white/10 rounded-full text-sm text-white placeholder-white/40 focus:outline-none focus:border-[#c10002]"
+          />
+        </div>
+
+        {(() => {
+          const q = search.trim().toLowerCase()
+          const filtered = q
+            ? results.filter(
+                r =>
+                  r.prompt.toLowerCase().includes(q) ||
+                  r.userMemo.toLowerCase().includes(q)
+              )
+            : results
+
+          if (results.length === 0) {
+            return (
+              <p className="text-center text-white/40 text-sm py-12">
+                아직 등록 없음. 위에서 이미지+프롬프트 저장하면 여기 나옴.
+              </p>
+            )
+          }
+          if (filtered.length === 0) {
+            return (
+              <p className="text-center text-white/40 text-sm py-12">
+                &quot;{search}&quot; 검색 결과 없음
+              </p>
+            )
+          }
+
+          return (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {filtered.map(r => (
+                <div
+                  key={r.id}
+                  className="bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-[#c10002]/50 transition-colors"
+                >
+                  {r.originalImage && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={r.originalImage}
+                      alt="등록 이미지"
+                      className="w-full aspect-[3/4] object-cover"
+                    />
+                  )}
+                  <div className="p-4 space-y-3">
+                    <p className="text-xs text-white/80 whitespace-pre-wrap break-words line-clamp-4 font-mono">
+                      {r.prompt}
+                    </p>
+                    {r.userMemo && (
+                      <p className="text-[11px] text-white/50 whitespace-pre-wrap break-words line-clamp-2">
+                        📝 {r.userMemo}
+                      </p>
+                    )}
+                    <div className="flex items-center justify-between pt-1">
+                      <button
+                        onClick={() => copyToClipboard(r.prompt)}
+                        className="text-[11px] font-semibold text-[#c10002] hover:opacity-70 transition"
+                      >
+                        프롬프트 복사
+                      </button>
+                      <button
+                        onClick={() => deleteResult(r.id)}
+                        className="text-[11px] text-white/30 hover:text-red-400 transition"
+                      >
+                        삭제
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )
+        })()}
       </div>
     </div>
   )
