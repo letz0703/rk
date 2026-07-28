@@ -1,0 +1,40 @@
+name: RAINSKISS Shorten
+identifier: com.rainskiss.shorten
+description: 선택한 URL을 rainskiss.com 단축링크로 만들어 클립보드에 복사
+icon: symbol:link
+popclip version: 4225
+
+# 사용자 설정 — PopClip 환경설정에서 입력 (토큰은 절대 커밋 금지라 기본값 비움)
+options:
+  - identifier: token
+    label: API Token
+    type: string
+    description: 서버 .env 의 SHORTLINK_TOKEN 값을 붙여넣으세요.
+  - identifier: endpoint
+    label: API Endpoint
+    type: string
+    default value: https://rainskiss.com/s/api/create
+    description: 배포=rainskiss.com, 로컬테스트=http://localhost:3000/s/api/create
+
+actions:
+  - title: RAINSKISS Shorten
+    # http/https URL을 선택했을 때만 팝업에 표시
+    requirements: [text]
+    regex: ^\s*https?://\S+\s*$
+    # 스크립트 stdout 을 클립보드로 복사
+    after: copy-result
+    interpreter: /bin/bash
+    shell script: |
+      URL=$(echo "$POPCLIP_TEXT" | tr -d '[:space:]')
+      RESP=$(curl -s -X POST "$POPCLIP_OPTION_ENDPOINT" \
+        -H "Authorization: Bearer $POPCLIP_OPTION_TOKEN" \
+        -H "Content-Type: application/json" \
+        -d "{\"url\":\"$URL\"}")
+      # 성공: {"short":"https://rainskiss.com/s/xxxxxx"} 에서 short 추출
+      SHORT=$(echo "$RESP" | grep -o '"short":"[^"]*"' | sed 's/"short":"//;s/"//')
+      if [ -n "$SHORT" ]; then
+        printf '%s' "$SHORT"
+      else
+        # 실패 시 에러 메시지를 클립보드로 (원인 파악용)
+        printf 'ERR: %s' "$RESP"
+      fi

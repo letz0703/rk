@@ -63,3 +63,7 @@ claude-defuddle/
 
 # Obsidian specific (전체 폴더 제외 - Google Drive 전용)
 obsidian/
+
+# Firebase 서비스계정 키 (절대 커밋 금지)
+serviceAccountKey.json
+.secrets/
