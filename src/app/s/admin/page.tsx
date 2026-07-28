@@ -18,11 +18,8 @@ export default function ShortlinkAdminPage() {
   const [customSlug, setCustomSlug] = useState("")
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState<string | null>(null)
-  const [origin, setOrigin] = useState("")
-
-  useEffect(() => {
-    setOrigin(window.location.origin)
-  }, [])
+  // 표시·복사는 항상 공개 도메인 기준 (로컬서 만들어도 rainskiss.com 링크)
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || "https://rainskiss.com"
 
   const refresh = async () => {
     try {

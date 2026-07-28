@@ -66,6 +66,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({error: "db write failed"}, {status: 502})
   }
 
-  const origin = new URL(req.url).origin
-  return NextResponse.json({slug, url, short: `${origin}/s/${slug}`})
+  // 어디서 생성하든(로컬 포함) 공개 도메인으로 반환 — 같은 Firebase라 프로덕션서 열림
+  const base = process.env.NEXT_PUBLIC_SITE_URL || "https://rainskiss.com"
+  return NextResponse.json({slug, url, short: `${base}/s/${slug}`})
 }
