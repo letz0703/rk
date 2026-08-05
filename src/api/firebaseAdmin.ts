@@ -7,20 +7,38 @@ import {join} from "path"
 
 let app: App | null = null
 
-// 서비스계정 소스: 배포=env(FIREBASE_SERVICE_ACCOUNT JSON 문자열),
-// 로컬=gitignore된 serviceAccountKey.json 파일. env 우선.
+// private_key 줄바꿈 정규화 (env 저장 시 \n이 뭉개지는 고질병 방어).
+function fixKey(sa: Record<string, unknown>): Record<string, unknown> {
+  if (typeof sa.private_key === "string") {
+    sa.private_key = sa.private_key.replace(/\\n/g, "\n")
+  }
+  return sa
+}
+
+// 서비스계정 소스 우선순위:
+// 1) FIREBASE_SERVICE_ACCOUNT_B64 (base64 인코딩 JSON — env 안전, 배포 권장)
+// 2) FIREBASE_SERVICE_ACCOUNT (raw JSON 문자열)
+// 3) 로컬 gitignore된 serviceAccountKey.json 파일
 function loadServiceAccount(): Record<string, unknown> | null {
+  const b64 = process.env.FIREBASE_SERVICE_ACCOUNT_B64
+  if (b64) {
+    try {
+      return fixKey(JSON.parse(Buffer.from(b64, "base64").toString("utf-8")))
+    } catch {
+      return null
+    }
+  }
   const raw = process.env.FIREBASE_SERVICE_ACCOUNT
   if (raw) {
     try {
-      return JSON.parse(raw)
+      return fixKey(JSON.parse(raw))
     } catch {
       return null
     }
   }
   try {
     const file = readFileSync(join(process.cwd(), "serviceAccountKey.json"), "utf-8")
-    return JSON.parse(file)
+    return fixKey(JSON.parse(file))
   } catch {
     return null
   }
