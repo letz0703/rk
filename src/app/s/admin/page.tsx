@@ -18,6 +18,8 @@ export default function ShortlinkAdminPage() {
   const [customSlug, setCustomSlug] = useState("")
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState<string | null>(null)
+  const [created, setCreated] = useState<string | null>(null) // 방금 만든 단축 URL
+  const [copied, setCopied] = useState(false)
   // 표시·복사는 항상 공개 도메인 기준 (로컬서 만들어도 rainskiss.com 링크)
   const origin = process.env.NEXT_PUBLIC_SITE_URL || "https://rainskiss.com"
 
@@ -36,10 +38,12 @@ export default function ShortlinkAdminPage() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
     setMsg(null)
+    setCreated(null)
+    setCopied(false)
     setBusy(true)
     try {
       const link = await createShortlink(url.trim(), customSlug.trim() || undefined)
-      setMsg(`✅ 생성: ${origin}/s/${link.slug}`)
+      setCreated(`${origin}/s/${link.slug}`)
       setUrl("")
       setCustomSlug("")
       await refresh()
@@ -48,6 +52,14 @@ export default function ShortlinkAdminPage() {
     } finally {
       setBusy(false)
     }
+  }
+
+  // 결과 복사 + "복사됨" 피드백
+  const copyCreated = async () => {
+    if (!created) return
+    await navigator.clipboard.writeText(created)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1500)
   }
 
   const handleDelete = async (slug: string) => {
@@ -120,6 +132,27 @@ export default function ShortlinkAdminPage() {
             </button>
           </div>
         </form>
+
+        {/* 방금 생성된 단축링크 — 복사 버튼 */}
+        {created && (
+          <div className="mb-6 flex items-center gap-3 p-4 rounded-lg bg-[#c10002]/10 border border-[#c10002]/40">
+            <a
+              href={created}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 min-w-0 truncate text-sm font-mono text-white hover:underline"
+            >
+              {created}
+            </a>
+            <button
+              onClick={copyCreated}
+              className="shrink-0 rounded-md px-4 py-2 text-xs font-black uppercase tracking-wider text-white transition-transform hover:-translate-y-0.5"
+              style={{backgroundColor: copied ? "#16a34a" : ACCENT}}
+            >
+              {copied ? "복사됨 ✓" : "복사"}
+            </button>
+          </div>
+        )}
 
         {msg && (
           <div className="mb-6 p-3 rounded-lg bg-white/5 border border-white/10 text-sm break-all">
