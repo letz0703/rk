@@ -122,7 +122,9 @@ Key routes:
 
 ## Session Continuity
 
-**IMPORTANT**: At start of new conversation or after `/clear`, **triggered by `higem` command**, read `kiss.md` first to understand current project state, ongoing work handoffs between AI collaborators (제갈공명/다빈치/이순신).
+**IMPORTANT**: At start of new conversation or after `/clear`, **triggered by `higem` command**, read `kiss.md` and the latest `obsidian/03_Projects/kiss[YYYY-MM-DD]-*.md` archive to understand current project state, ongoing work handoffs between AI collaborators (제갈공명=Claude 판단·실행 / 조조=Grok HARD / 2순신=Gemini Gem 리서치).
+
+Session cycle: `higem` (restore) → work → `packgem` (checkpoint) → `byec` (archive + encrypted backup) → `/clear`.
 
 ## AI-to-AI Collaboration Protocol
 

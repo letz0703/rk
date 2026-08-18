@@ -1,35 +1,36 @@
 #!/bin/bash
+# ⛔ 폐기됨 — 2026-08-07
+#
+# 이 스크립트는 obsidian vault를 *평문*으로 Google Drive에 업로드했다.
+# vault에 야한 프롬프트가 다수 있어, 구글 자동 스캔에 걸리면
+# icanmart@gmail.com 계정이 정지될 수 있다 → Drive·Gmail·YouTube 동반 사망.
+#
+# 대체: ~/vault_seal.sh
+#   - AES-256 .7z 로 봉인 (-mhe=on 이라 파일명까지 안 보임)
+#   - 대상: obsidian + .claude/skills(gstack 제외) + .claude/projects, 약 32MB
+#   - 복원: 7zz x rk-vault-<날짜>.7z -o<경로>
 
-VAULT_PATH="/Users/changmankim/projects/rk/obsidian"
-# 구글 드라이브 데스크탑 앱의 로컬 경로 (사용자 환경에 맞춰 자동 탐색)
-GDRIVE_LOCAL_ROOT=$(ls -d $HOME/Library/CloudStorage/GoogleDrive-* 2>/dev/null | head -n 1)
-# 구글 드라이브 내의 메인 통합 Vault 경로
-MAIN_VAULT_PATH="$GDRIVE_LOCAL_ROOT/My Drive/obsidian_vault"
+cat <<'EOF'
+⛔ sync_gdrive.sh 는 폐기됐습니다.
 
-if [ -z "$GDRIVE_LOCAL_ROOT" ]; then
-    echo "❌ 로컬 구글 드라이브 경로를 찾을 수 없습니다. 앱이 실행 중인지 확인하세요."
-    exit 1
-fi
+이 스크립트는 vault를 평문으로 Google Drive에 올립니다.
+야한 프롬프트가 구글 스캔에 노출되어 계정 정지 위험이 있습니다.
 
-echo "🚀 MacBook Air 자료를 메인 Vault(Google Drive)로 전달 중..."
-echo "📤 Local Source: $VAULT_PATH"
-echo "📥 Main Target: $MAIN_VAULT_PATH"
+대신 사용하세요:
 
-mkdir -p "$MAIN_VAULT_PATH"
+    ~/vault_seal.sh
 
-# --delete 옵션을 유지하여 로컬에서 정리된 상태를 메인에 그대로 반영 (통합 전략)
-# Google Drive 스트리밍 지연 대응: 타임아웃 및 재시도 설정
-rsync -avz --delete --timeout=30 --contimeout=10 \
-    --exclude ".obsidian/workspace*" \
-    --exclude ".obsidian/cache*" \
-    --exclude ".DS_Store" \
-    "$VAULT_PATH/" "$MAIN_VAULT_PATH/"
+(암호화 백업 — 내용도 파일명도 구글이 못 봅니다)
+EOF
 
-if [ $? -ne 0 ]; then
-    echo "⚠️  일부 파일 전송 실패 (Google Drive 동기화 지연). 재시도 권장."
-    echo "🔄 수동 재실행: ./sync_gdrive.sh"
-else
-    echo "✅ 완벽 동기화 완료!"
-fi
+exit 1
 
-echo "✅ 메인 Vault로 전달 완료! 구글 드라이브를 통해 통합 저장됩니다."
+# ── 원본 보존 (실행되지 않음) ────────────────────────────────
+# VAULT_PATH="/Users/changmankim/projects/rk/obsidian"
+# GDRIVE_LOCAL_ROOT=$(ls -d $HOME/Library/CloudStorage/GoogleDrive-* 2>/dev/null | head -n 1)
+# MAIN_VAULT_PATH="$GDRIVE_LOCAL_ROOT/My Drive/obsidian_vault"
+# rsync -avz --delete --timeout=30 --contimeout=10 \
+#     --exclude ".obsidian/workspace*" \
+#     --exclude ".obsidian/cache*" \
+#     --exclude ".DS_Store" \
+#     "$VAULT_PATH/" "$MAIN_VAULT_PATH/"
