@@ -2,6 +2,7 @@
 
 import {createContext, useContext, useEffect, useState, ReactNode} from "react"
 import {auth} from "@/api/firebase"
+import {ADMIN_EMAILS} from "@/lib/adminEmails"
 import {
   GoogleAuthProvider,
   signInWithPopup,
@@ -26,11 +27,6 @@ const AuthContext = createContext<AuthContextValue>({
   logout: async () => {}
 })
 
-const ADMIN_EMAILS = [
-  "rainskiss@gmail.com",
-  "icanmart@gmail.com",
-  ...(process.env.NEXT_PUBLIC_ADMIN_EMAIL || "").split(",").map(email => email.trim()).filter(Boolean)
-]
 
 export function AuthContextProvider({children}: {children: ReactNode}) {
   const [user, setUser] = useState<User | null>(null)

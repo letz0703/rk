@@ -1,4 +1,7 @@
 const ALLOWED_DOMAINS = [
+  // /api/shop-upload 가 Firebase Storage 로 올리고 이 도메인의 다운로드 URL 을 돌려준다.
+  // 빠져 있으면 상품 페이지에서 올린 이미지가 저장은 되는데 화면에 안 뜬다.
+  "firebasestorage.googleapis.com",
   "cdn.buymeacoffee.com",
   "res.cloudinary.com",
   "lh3.googleusercontent.com",

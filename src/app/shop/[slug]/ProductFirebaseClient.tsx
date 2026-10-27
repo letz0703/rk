@@ -21,15 +21,19 @@ const CATEGORIES = [
 ]
 
 export default function ProductFirebaseClient({slug}: {slug: string}) {
-  const {isAdmin} = useAuthContext()
+  const {user, isAdmin, login} = useAuthContext()
   const router = useRouter()
 
   // 구독 티어 접목 지점 — 지금은 미구축(false). 결제/구독자 판별 붙이면 여기만 교체.
   const isSubscriber = false
-  // HARD 프롬프트 열람 권한 = 관리자 또는 월구독자
-  const canViewHard = isAdmin || isSubscriber
-
   const [product, setProduct] = useState<FBProduct | null>(null)
+  // 상품별 허용 이메일 — 관리자(rainskiss·icanmart, AuthContext) 외에 이 상품만 더 열어 줄 사람.
+  // 관리자 바의 "허용 이메일"에서 넣는다. 이메일은 Google 로그인이 확인한 값만 쓴다
+  // (localStorage 에 손으로 적은 값은 누구나 위조 가능).
+  const email = user?.email?.toLowerCase() ?? ""
+  const isShopViewer = !!email && (product?.viewers ?? []).includes(email)
+  // HARD 프롬프트 열람 권한 = 관리자 또는 허용 이메일 또는 월구독자
+  const canViewHard = isAdmin || isShopViewer || isSubscriber
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState<FBProduct>(emptyProduct(slug))
@@ -54,8 +58,8 @@ export default function ProductFirebaseClient({slug}: {slug: string}) {
           method: "POST",
           body: formData
         })
-        if (!res.ok) throw new Error("Upload failed")
-        const {url} = await res.json()
+        const {url, error} = await res.json()
+        if (!res.ok) throw new Error(error || "Upload failed")
         setDraft(prev => ({...prev, previewImage: url}))
       } else {
         const uploadedUrls: string[] = []
@@ -162,7 +166,7 @@ export default function ProductFirebaseClient({slug}: {slug: string}) {
   }
 
   // 미전시(off) — 비admin에겐 숨김
-  if (product && product.status === "off" && !isAdmin && !editing) {
+  if (product && product.status === "off" && !isAdmin && !isShopViewer && !editing) {
     return <div className="mx-auto max-w-4xl px-6 py-20 text-white/50">상품을 찾을 수 없습니다.</div>
   }
 
@@ -232,6 +236,14 @@ export default function ProductFirebaseClient({slug}: {slug: string}) {
           <button onClick={toggleStatus} className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-sm rounded">{p.status === "on" ? "전시 OFF" : "전시 ON"}</button>
           <button onClick={startEdit} className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-sm rounded">✏️ 편집</button>
           <button onClick={del} className="px-3 py-1.5 bg-red-700 hover:bg-red-600 text-sm rounded ml-auto">삭제</button>
+          <PurchaseCodeAdmin slug={slug} getToken={() => user?.getIdToken() ?? Promise.resolve(undefined)} />
+          <ViewersEditor
+            viewers={p.viewers ?? []}
+            onChange={async viewers => {
+              await fbUpdateProduct(slug, {viewers})
+              setProduct({...p, viewers})
+            }}
+          />
         </div>
       )}
 
@@ -312,11 +324,25 @@ export default function ProductFirebaseClient({slug}: {slug: string}) {
             <div className="rounded-lg border border-[#c10002]/30 bg-[#c10002]/5 p-6 text-center">
               <div className="mb-1 text-2xl">🔒</div>
               <div className="text-sm text-white/70">
-                HARD 프롬프트는 월구독자에게만 공개됩니다.
+                HARD 프롬프트는 구매자에게만 공개됩니다.
               </div>
               <div className="mt-1 text-xs text-white/40">
-                SOFT는 위에서 바로 사용하세요.
+                DeviantArt 구매 페이지의 구매 코드를 넣으면 이 계정에서 계속 열립니다.
               </div>
+              {user ? (
+                <RedeemCode
+                  slug={slug}
+                  getToken={() => user.getIdToken()}
+                  onUnlocked={viewers => setProduct({...p, viewers})}
+                />
+              ) : (
+                <button
+                  onClick={() => login()}
+                  className="mt-4 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-gray-200"
+                >
+                  Google 로그인 후 구매 코드 입력
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -341,6 +367,157 @@ function PromptBox({label, text}: {label: string; text: string}) {
     <div className="rounded-lg border border-white/10 bg-black/30 p-4">
       <div className="mb-2 text-xs font-semibold text-white/50">{label}</div>
       <pre className="whitespace-pre-wrap break-words font-mono text-sm text-white/90">{text || "—"}</pre>
+    </div>
+  )
+}
+
+// 구매자 — DA 구매 코드 입력 → /api/shop-access 가 확인 후 이 계정 이메일을 허용 목록에 넣는다.
+function RedeemCode({
+  slug,
+  getToken,
+  onUnlocked
+}: {
+  slug: string
+  getToken: () => Promise<string>
+  onUnlocked: (viewers: string[]) => void
+}) {
+  const [code, setCode] = useState("")
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState("")
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault()
+    setBusy(true)
+    setError("")
+    try {
+      const res = await fetch("/api/shop-access", {
+        method: "POST",
+        headers: {"Content-Type": "application/json", Authorization: `Bearer ${await getToken()}`},
+        body: JSON.stringify({slug, code})
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || "확인 실패")
+      onUnlocked(data.viewers)
+    } catch (err: any) {
+      setError(err?.message || String(err))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <form onSubmit={submit} className="mx-auto mt-4 flex max-w-xs flex-col gap-2">
+      <input
+        value={code}
+        onChange={e => setCode(e.target.value)}
+        placeholder="XXXX-XXXX"
+        className="rounded border border-white/20 bg-white/10 px-3 py-2 text-center font-mono tracking-widest text-white focus:outline-none focus:ring-1 focus:ring-[#c10002]"
+      />
+      {error && <p className="text-xs text-red-400">{error}</p>}
+      <button
+        disabled={busy || !code.trim()}
+        className="rounded-lg bg-[#c10002] px-4 py-2 text-sm font-semibold text-white hover:bg-[#a00001] disabled:opacity-50"
+      >
+        {busy ? "확인 중…" : "구매 코드 확인"}
+      </button>
+    </form>
+  )
+}
+
+// 관리자 전용 — 이 상품 구매 코드 보기·새로 만들기(DA 유료 부분에 적을 값).
+function PurchaseCodeAdmin({slug, getToken}: {slug: string; getToken: () => Promise<string | undefined>}) {
+  const [code, setCode] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
+
+  async function call(method: "GET" | "PUT") {
+    setBusy(true)
+    try {
+      const res = await fetch(method === "GET" ? `/api/shop-access?slug=${encodeURIComponent(slug)}` : "/api/shop-access", {
+        method,
+        headers: {"Content-Type": "application/json", Authorization: `Bearer ${await getToken()}`},
+        body: method === "PUT" ? JSON.stringify({slug}) : undefined
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || "실패")
+      setCode(data.code)
+    } catch (e: any) {
+      alert(`구매 코드: ${e?.message || e}`)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="flex w-full items-center gap-2 border-t border-white/10 pt-3 text-xs">
+      <span className="text-white/50">구매 코드(DA 유료 부분용)</span>
+      {code ? (
+        <code className="rounded bg-black/40 px-2 py-1 font-mono tracking-widest text-white">{code}</code>
+      ) : (
+        <button disabled={busy} onClick={() => call("GET")} className="rounded bg-white/10 px-3 py-1 hover:bg-white/20 disabled:opacity-50">
+          보기
+        </button>
+      )}
+      <button
+        disabled={busy}
+        onClick={() => confirm("새 코드를 만들까요? 예전 코드는 더 이상 안 먹힙니다(이미 등록된 이메일은 유지).") && call("PUT")}
+        className="ml-auto rounded bg-white/10 px-3 py-1 hover:bg-white/20 disabled:opacity-50"
+      >
+        코드 새로 만들기
+      </button>
+    </div>
+  )
+}
+
+// 관리자 전용 — 이 상품 HARD 까지 볼 이메일 추가/삭제. 저장 즉시 Firebase 반영.
+function ViewersEditor({viewers, onChange}: {viewers: string[]; onChange: (v: string[]) => Promise<void>}) {
+  const [input, setInput] = useState("")
+  const [busy, setBusy] = useState(false)
+
+  async function apply(next: string[]) {
+    setBusy(true)
+    try {
+      await onChange(next)
+    } catch (e: any) {
+      alert(`허용 이메일 저장 실패: ${e?.message || e}`)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  function add() {
+    const v = input.trim().toLowerCase()
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) return alert("이메일 형식이 아닙니다.")
+    if (viewers.includes(v)) return setInput("")
+    apply([...viewers, v]).then(() => setInput(""))
+  }
+
+  return (
+    <div className="w-full border-t border-white/10 pt-3">
+      <div className="mb-2 text-xs text-white/50">허용 이메일 — 이 상품 HARD 프롬프트까지 보여 줄 Google 계정</div>
+      <div className="flex flex-wrap gap-2">
+        {viewers.map(v => (
+          <span key={v} className="flex items-center gap-1 rounded bg-white/10 px-2 py-1 text-xs">
+            {v}
+            <button
+              disabled={busy}
+              onClick={() => apply(viewers.filter(x => x !== v))}
+              className="text-white/40 hover:text-red-400"
+            >
+              ×
+            </button>
+          </span>
+        ))}
+        <input
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => e.key === "Enter" && add()}
+          placeholder="name@gmail.com"
+          className="min-w-[12rem] flex-1 rounded border border-white/20 bg-white/10 px-2 py-1 text-xs text-white focus:outline-none focus:ring-1 focus:ring-[#c10002]"
+        />
+        <button disabled={busy} onClick={add} className="rounded bg-white/10 px-3 py-1 text-xs hover:bg-white/20 disabled:opacity-50">
+          + 추가
+        </button>
+      </div>
     </div>
   )
 }

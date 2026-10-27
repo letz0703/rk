@@ -20,6 +20,8 @@ export type FBProduct = {
     softModel: string
     hardModel: string
   }
+  codeVersion?: number // 구매 코드 버전(/api/shop-access). 코드 자체는 저장 안 함
+  viewers?: string[] // 이 상품 HARD 까지 볼 수 있는 Google 이메일(관리자 외 추가분)
   createdAt: number
   updatedAt: number
 }
@@ -52,6 +54,7 @@ function normalize(raw: Record<string, unknown> | null | undefined, slug: string
     ...r,
     slug: r.slug || slug,
     gallery: Array.isArray(r.gallery) ? r.gallery : [],
+    viewers: Array.isArray(r.viewers) ? r.viewers : [],
     prompts: {...base.prompts, ...(r.prompts || {})}
   }
 }

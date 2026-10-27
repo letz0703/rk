@@ -19,6 +19,7 @@ export type Model = {
   deviantArtUrl: string
   nsfwUrl?: string
   nsfwPreview?: string
+  themeSong?: { url: string; title: string } // YouTube 링크 — 그녀의 주제가
 }
 
 export const models: Model[] = rawData as Model[]

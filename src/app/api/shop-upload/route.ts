@@ -1,7 +1,8 @@
 import {NextRequest, NextResponse} from "next/server"
-import {storage} from "@/api/firebase"
-import {ref, uploadBytes, getDownloadURL} from "firebase/storage"
+import crypto from "crypto"
 
+// Firebase Storage 버킷이 프로젝트에 없어서(storage/unknown 404) 업로드가 전부 실패했다.
+// 이미 next.config·image.ts 에 허용된 Cloudinary 로 올린다. SDK 없이 서명 REST 업로드.
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData()
@@ -15,17 +16,38 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({error: "images only"}, {status: 400})
     }
 
-    const bytes = await file.arrayBuffer()
-    const buffer = new Uint8Array(bytes)
-    const ext = (file.name.split(".").pop() ?? "jpg").toLowerCase()
-    const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
+    const cloud = process.env.CLOUDINARY_CLOUD_NAME
+    const key = process.env.CLOUDINARY_API_KEY
+    const secret = process.env.CLOUDINARY_API_SECRET
+    if (!cloud || !key || !secret) {
+      return NextResponse.json({error: "cloudinary not configured"}, {status: 500})
+    }
 
-    // Firebase Storage에 업로드
-    const storageRef = ref(storage, `shop/${slug}/${filename}`)
-    const snapshot = await uploadBytes(storageRef, buffer)
-    const downloadURL = await getDownloadURL(snapshot.ref)
+    const folder = `shop/${slug}`
+    const timestamp = Math.floor(Date.now() / 1000).toString()
+    const signature = crypto
+      .createHash("sha1")
+      .update(`folder=${folder}&timestamp=${timestamp}${secret}`)
+      .digest("hex")
 
-    return NextResponse.json({url: downloadURL})
+    const body = new FormData()
+    body.append("file", file)
+    body.append("folder", folder)
+    body.append("timestamp", timestamp)
+    body.append("api_key", key)
+    body.append("signature", signature)
+
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloud}/image/upload`, {
+      method: "POST",
+      body
+    })
+    const data = await res.json()
+    if (!res.ok) {
+      console.error("[shop-upload]", data)
+      return NextResponse.json({error: data?.error?.message ?? "upload failed"}, {status: 500})
+    }
+
+    return NextResponse.json({url: data.secure_url})
   } catch (e) {
     console.error("[shop-upload]", e)
     return NextResponse.json({error: "upload failed"}, {status: 500})

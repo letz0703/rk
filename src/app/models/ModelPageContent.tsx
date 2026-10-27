@@ -5,6 +5,7 @@ import Link from "next/link"
 import { models, type Model, type GalleryItem } from "./data"
 import { database } from "@/api/firebase"
 import { ref, set } from "firebase/database"
+import ThemeSong from "@/components/ThemeSong"
 
 const nationalityMap: Record<string, { flag: string; label: string }> = {
   KR: { flag: "🇰🇷", label: "한국" },
@@ -40,6 +41,7 @@ export default function ModelPageContent({ model, isAdmin }: { model: Model; isA
   const [deviantArtUrl, setDeviantArtUrl] = useState(model.deviantArtUrl)
   const [profileImage, setProfileImage] = useState(model.profileImage)
   const [gallery, setGallery] = useState<GalleryItem[]>(model.gallery)
+  const [themeSong, setThemeSong] = useState(model.themeSong)
 
   useEffect(() => {
     fetch(`/api/model-meta?slug=${slug}`)
@@ -49,6 +51,7 @@ export default function ModelPageContent({ model, isAdmin }: { model: Model; isA
         setBio(data.bio ?? model.bio)
         setDeviantArtUrl(data.deviantArtUrl ?? model.deviantArtUrl)
         setGallery(data.gallery ?? [])
+        setThemeSong(data.themeSong ?? model.themeSong)
       })
     fetch(`/api/model-images?slug=${slug}`)
       .then(r => r.json())
@@ -59,17 +62,21 @@ export default function ModelPageContent({ model, isAdmin }: { model: Model; isA
   const [editingBio, setEditingBio] = useState(false)
   const [bioInput, setBioInput] = useState(bio)
   const [daInput, setDaInput] = useState(deviantArtUrl)
+  const [songUrlInput, setSongUrlInput] = useState(themeSong?.url ?? "")
+  const [songTitleInput, setSongTitleInput] = useState(themeSong?.title ?? "")
   const [bioSaving, setBioSaving] = useState(false)
 
   const handleSaveBio = async () => {
     setBioSaving(true)
+    const song = songUrlInput.trim() ? { url: songUrlInput.trim(), title: songTitleInput.trim() || model.nameKo } : undefined
     await fetch("/api/model-meta", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ slug, action: "update-meta", bio: bioInput, deviantArtUrl: daInput }),
+      body: JSON.stringify({ slug, action: "update-meta", bio: bioInput, deviantArtUrl: daInput, themeSong: song ?? null }),
     })
     setBio(bioInput)
     setDeviantArtUrl(daInput)
+    setThemeSong(song)
     setEditingBio(false)
     setBioSaving(false)
   }
@@ -240,6 +247,18 @@ export default function ModelPageContent({ model, isAdmin }: { model: Model; isA
                   placeholder="DeviantArt URL"
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 focus:outline-none focus:border-[#c10002]/50 transition-colors"
                 />
+                <input
+                  value={songUrlInput}
+                  onChange={e => setSongUrlInput(e.target.value)}
+                  placeholder="주제가 YouTube 링크"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 focus:outline-none focus:border-[#c10002]/50 transition-colors"
+                />
+                <input
+                  value={songTitleInput}
+                  onChange={e => setSongTitleInput(e.target.value)}
+                  placeholder="주제가 제목"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 focus:outline-none focus:border-[#c10002]/50 transition-colors"
+                />
                 <div className="flex gap-2">
                   <button
                     onClick={handleSaveBio}
@@ -249,7 +268,7 @@ export default function ModelPageContent({ model, isAdmin }: { model: Model; isA
                     {bioSaving ? "SAVING..." : "SAVE"}
                   </button>
                   <button
-                    onClick={() => { setEditingBio(false); setBioInput(bio); setDaInput(deviantArtUrl) }}
+                    onClick={() => { setEditingBio(false); setBioInput(bio); setDaInput(deviantArtUrl); setSongUrlInput(themeSong?.url ?? ""); setSongTitleInput(themeSong?.title ?? "") }}
                     className="px-6 py-2 rounded-full border border-slate-200 text-slate-500 text-sm font-bold hover:bg-slate-50 transition"
                   >
                     CANCEL
@@ -272,7 +291,7 @@ export default function ModelPageContent({ model, isAdmin }: { model: Model; isA
                   )}
                   {isAdmin && (
                     <button
-                      onClick={() => { setBioInput(bio); setDaInput(deviantArtUrl); setEditingBio(true) }}
+                      onClick={() => { setBioInput(bio); setDaInput(deviantArtUrl); setSongUrlInput(themeSong?.url ?? ""); setSongTitleInput(themeSong?.title ?? ""); setEditingBio(true) }}
                       className="p-3 rounded-full border border-slate-200 text-slate-400 hover:text-[#c10002] hover:border-[#c10002]/30 transition"
                       title="Edit Bio"
                     >
@@ -491,6 +510,7 @@ export default function ModelPageContent({ model, isAdmin }: { model: Model; isA
           </div>
         </div>
       </div>
+      {themeSong?.url && <ThemeSong url={themeSong.url} title={themeSong.title} />}
     </main>
   )
 }

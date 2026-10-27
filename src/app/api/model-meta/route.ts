@@ -34,8 +34,8 @@ export async function PATCH(req: NextRequest) {
 
   switch (action) {
     case "update-meta": {
-      const { bio, deviantArtUrl } = body as { bio: string; deviantArtUrl: string }
-      data[idx] = { ...model, bio, deviantArtUrl }
+      const { bio, deviantArtUrl, themeSong } = body as { bio: string; deviantArtUrl: string; themeSong?: { url: string; title: string } }
+      data[idx] = { ...model, bio, deviantArtUrl, ...(themeSong !== undefined && { themeSong }) }
       break
     }
 

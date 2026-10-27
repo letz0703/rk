@@ -1,0 +1,89 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "shop-products": {
+      ".read": true,
+      ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com')"
+    },
+    "products":      { ".read": true, ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com')" },
+    "product":       { ".read": true, ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com')" },
+    "products_live": { ".read": true, ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com')" },
+    "prompts":       { ".read": true, ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com')" },
+    "pose":          { ".read": true, ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com')" },
+    "posex_items":   { ".read": true, ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com')" },
+    "models":        { ".read": true, ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com')" },
+    "icArticles":    { ".read": true, ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com')" },
+    "dambeArticles": { ".read": true, ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com')" },
+    "ic-brands":     { ".read": true, ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com')" },
+    "dambe-brands":  { ".read": true, ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com')" },
+    "sunoPlaylist":  { ".read": true, ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com')" },
+    "setContents":   { ".read": true, ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com')" },
+    "fashion-diary": { ".read": true, ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com')" },
+    "shortlinks":    { ".read": true, ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com')" },
+
+    "config": {
+      ".read": "auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com')",
+      ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com')"
+    },
+    "admins": {
+      ".read": "auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com')",
+      ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com')"
+    },
+    "products_pending": {
+      ".read": "auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com')",
+      ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com')"
+    },
+
+    "ic-orders": {
+      ".read": "auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com')",
+      "$id": {
+        ".write": "!data.exists() || (auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com'))"
+      }
+    },
+    "ic-board": {
+      ".read": true,
+      "$id": {
+        ".write": "!data.exists() || (auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com'))"
+      }
+    },
+    "ic-board-private": {
+      ".read": "auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com')",
+      "$id": {
+        ".write": "!data.exists() || (auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com'))"
+      }
+    },
+    "letters": {
+      ".read": "auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com')",
+      "$id": {
+        ".write": "!data.exists() || (auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com'))"
+      }
+    },
+    "inquiries": {
+      ".read": true,
+      "$id": {
+        ".write": "!data.exists() || (auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com'))"
+      }
+    },
+    "lifesongs": {
+      ".read": true,
+      "$id": {
+        ".write": "!data.exists() || (auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com'))"
+      }
+    },
+    "lookbook_requests": {
+      ".read": true,
+      "$model": {
+        "$id": {
+          ".write": "(auth != null && !data.exists()) || (auth != null && auth.token.email_verified == true && (auth.token.email == 'rainskiss@gmail.com' || auth.token.email == 'icanmart@gmail.com'))",
+          "replies": {
+            "$rid": {
+              ".write": "auth != null && !data.exists()"
+            }
+          }
+        }
+      }
+    }
+  }
+}

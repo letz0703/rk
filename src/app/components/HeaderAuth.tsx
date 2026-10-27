@@ -2,15 +2,12 @@
 
 import { useAuthContext } from "@/components/context/AuthContext"
 
-const ADMIN_EMAIL = "rainskiss@gmail.com"
-
 export default function HeaderAuth() {
-  const { user, isLoading, login, logout } = useAuthContext()
+  const { user, isAdmin, isLoading, login, logout } = useAuthContext()
 
   if (isLoading) return null
 
   if (user) {
-    const isAdmin = user.email === ADMIN_EMAIL
     return (
       <div className="flex items-center gap-2">
         {isAdmin && (

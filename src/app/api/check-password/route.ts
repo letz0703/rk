@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-
-const DB_URL = process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL
+import { adminDB } from "@/api/firebaseAdmin"
 
 export async function POST(req: NextRequest) {
   const { password } = await req.json()
@@ -8,13 +7,11 @@ export async function POST(req: NextRequest) {
 
   let correct: string | null = null
 
-  // Firebase에서 읽기 시도
+  // Firebase에서 읽기 시도 — config 는 규칙상 관리자 전용 읽기라 Admin SDK 로 읽는다
+  // (database.rules.json). 예전엔 공개 REST 로 읽어서 비밀번호가 누구에게나 보였다.
   try {
-    const res = await fetch(`${DB_URL}/config/memberPassword.json`)
-    if (res.ok) {
-      const val = await res.json()
-      if (typeof val === "string") correct = val
-    }
+    const val = (await adminDB()?.ref("config/memberPassword").get())?.val()
+    if (typeof val === "string") correct = val
   } catch {
     // Firebase 접근 실패 시 무시하고 env로 폴백
   }

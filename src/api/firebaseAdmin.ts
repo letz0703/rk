@@ -2,6 +2,7 @@
 // 토큰 API/서버 라우트에서 shortlinks 쓰기용. 클라이언트 번들에 절대 포함 금지.
 import {getApps, initializeApp, cert, type App} from "firebase-admin/app"
 import {getDatabase} from "firebase-admin/database"
+import {getAuth} from "firebase-admin/auth"
 import {readFileSync} from "fs"
 import {join} from "path"
 
@@ -64,4 +65,17 @@ function initAdmin(): App | null {
 export function adminDB() {
   const a = initAdmin()
   return a ? getDatabase(a) : null
+}
+
+// Google 로그인 ID 토큰 검증용 (미설정이면 null)
+export function adminAuth() {
+  const a = initAdmin()
+  return a ? getAuth(a) : null
+}
+
+// 서버만 아는 비밀값 — 서비스계정 private_key. 상품 구매 코드를 HMAC 으로 만드는 키.
+// RTDB 는 전체 공개 읽기라 코드 자체를 DB 에 저장할 수 없어서 이렇게 계산한다.
+export function serverSecret(): string | null {
+  const sa = loadServiceAccount()
+  return typeof sa?.private_key === "string" ? sa.private_key : null
 }

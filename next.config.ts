@@ -8,6 +8,9 @@ const nextConfig: NextConfig = {
   eslint: {ignoreDuringBuilds: true},
   images: {
     domains: [
+      // 상품 페이지에서 올린 이미지(/api/shop-upload → Firebase Storage)의 호스트.
+      // src/utils/image.ts 의 ALLOWED_DOMAINS 와 짝이다 — 한쪽만 넣으면 안 뜬다.
+      "firebasestorage.googleapis.com",
       "cdn.buymeacoffee.com",
       "res.cloudinary.com",
       "lh3.googleusercontent.com",
